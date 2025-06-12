@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Chronos Nova
 
-## Getting Started
+Refonte de la plateforme `Chronos` - Annuaire des stages de Télécom Physique Strasbourg.
 
-First, run the development server:
+Ce projet vise à proposer une interface plus intuitive, performante et maintenable pour la consultation et la gestion des stages réalisés par les étudiants.
+
+## 📘 Documentation
+
+- [📄 Cahier des charges](./docs/cahier-des-charges.md)
+- [🚀 Guide de démarrage du stage](./docs/demarrage-stage.md)
+
+## 📦 Installation
+
+Pour installer le projet, vous devez d'abord cloner le dépôt et installer les dépendances :
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone git@github.com:info-telecom-strasbourg/chronos-nova.git
+cd chronos-nova
+pnpm install # ou npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ Développement
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Pour démarrer le serveur de développement, utilisez la commande suivante :
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm dev # ou npm run dev
+```
 
-## Learn More
+Vous pouvez ensuite accéder à l'application à l'adresse `http://localhost:3000` dans votre navigateur.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Mentions légales
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Développé dans le cadre d’un projet pédagogique par Mathias Boldron sous encadrement de Romain Bourdain.
 
-## Deploy on Vercel
+© 2025 - Informatique Télécom Strasbourg
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Ce projet est distribué sous licence MIT. Voir [LICENSE](./LICENSE) pour plus de détails.
