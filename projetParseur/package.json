@@ -11,7 +11,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "exceljs": "^4.4.0"
+    "exceljs": "^4.4.0",
+    "ts-node": "^10.9.2"
   },
   "devDependencies": {
     "@types/node": "^24.0.3",
