@@ -1,13 +1,13 @@
 import { Command } from "commander";
+import fs from "fs";
+import path from "path";
 import { parseExcelInternship2A } from "./parserInternship2A";
 import { parseExcelSubstitutionInternship } from "./parserSubstitutionInternship";
-import path from "path";
-import fs from "fs";
 
 const program = new Command();
 
 program
-  .option("-f, --file <file>", "Excel name")
+  .argument("<file>", "Excel source file")
   .option("-s, --sheet <names...>", "Sheet names", [
     "2A - Récap. stage",
     "Stage substitution",
@@ -17,7 +17,7 @@ program
 const options = program.opts();
 
 async function main() {
-  const fileName = options.file;
+  const fileName = program.args[0];
   const filePath = path.join(process.cwd(), fileName);
   if (!fs.existsSync(filePath)) {
     throw new Error(`File "${fileName}" not found: ${filePath}`);
