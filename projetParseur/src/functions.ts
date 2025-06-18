@@ -13,7 +13,7 @@ export function normalizeField(
 ): string {
   const invalidValues = ["x", "X", "?"];
 
-  const abreviations: Record<string, string> = {
+  const abbreviations: Record<string, string> = {
     fr: "FRANCE",
     en: "ANGLETERRE",
     it: "ITALIE",
@@ -26,7 +26,7 @@ export function normalizeField(
   // Special case for country
   if (options?.isCountry) {
     val = val.toLowerCase();
-    if (abreviations[val]) return abreviations[val].toUpperCase();
+    if (abbreviations[val]) return abbreviations[val].toUpperCase();
     val = val.toUpperCase();
   }
 

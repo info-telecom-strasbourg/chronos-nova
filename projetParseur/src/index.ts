@@ -7,20 +7,24 @@ import fs from "fs";
 const program = new Command();
 
 program
-  .option("-s, --sheet <names...>", "Excel name then sheet names", [])
+  .option("-f, --file <file>", "Excel name")
+  .option("-s, --sheet <names...>", "Sheet names", [
+    "2A - Récap. stage",
+    "Stage substitution",
+  ])
   .parse();
 
 const options = program.opts();
 
 async function main() {
-  const fileName = options.sheet[0];
+  const fileName = options.file;
   const filePath = path.join(process.cwd(), fileName);
   if (!fs.existsSync(filePath)) {
     throw new Error(`File "${fileName}" not found: ${filePath}`);
   }
   console.log(`Parsed data from file: "${fileName}"\n`);
 
-  for (let i = 1; i < options.sheet.length; i++) {
+  for (let i = 0; i < options.sheet.length; i++) {
     const sheetName = options.sheet[i];
     let internships, students, organizations;
     switch (sheetName) {
