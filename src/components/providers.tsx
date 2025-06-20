@@ -1,6 +1,6 @@
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import type { PropsWithChildren } from "react";
-import { ThemeProvider } from "@/features/theme/theme-provider";
+import { ThemeProvider } from "@/components/theme/theme-provider";
 
 export type ProviderProps = PropsWithChildren;
 
