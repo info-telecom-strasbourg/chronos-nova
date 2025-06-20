@@ -22,7 +22,10 @@ export const Footer = () => {
           </span>
           <div>
             <Button variant="ghost" size="icon" asChild>
-              <Link href="https://github.com/info-telecom-strasbourg/chronos-nova">
+              <Link
+                aria-label="GitHub repository"
+                href="https://github.com/info-telecom-strasbourg/chronos-nova"
+              >
                 <FaGithub className="size-5" />
               </Link>
             </Button>
