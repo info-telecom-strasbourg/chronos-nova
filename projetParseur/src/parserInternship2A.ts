@@ -44,12 +44,14 @@ function parseInternships(worksheet: ExcelJS.Worksheet): Internship[] {
 
     const weeksCell = row.getCell(15).text.trim();
     const weeksCount = extractNumberOfWeeks(weeksCell);
+    const year = normalizeField("2A", rowNumber);
 
     internships.push({
       confidential,
       date,
       subject,
       weeksCount,
+      year,
     });
   });
 
@@ -66,13 +68,11 @@ function parseStudents(worksheet: ExcelJS.Worksheet): Student[] {
     const fullNameCell = row.getCell(2).text.trim();
     const { lastName, firstName } = splitLastNameFirstName(normalizeField(fullNameCell, rowNumber));
     const major = normalizeField(row.getCell(3).text, rowNumber);
-    const year = normalizeField("2A", rowNumber);
 
     students.push({
       firstName,
       lastName,
       major,
-      year,
     });
   });
 
