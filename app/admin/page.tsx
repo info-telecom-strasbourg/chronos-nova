@@ -1,5 +1,5 @@
 import type { PageParams } from "@/types/next";
 
 export default async function RoutePage(_: PageParams) {
-  return <div>Hello world</div>;
+  return <div></div>;
 }

@@ -1,8 +1,4 @@
-import {
-  Internship,
-  Student,
-  Organization,
-} from "../../projetParseur/src/typeDefinition";
+import type { Internship, Organization, Student } from "../../projetParseur/src/typeDefinition";
 
 enum InternshipYear {
   FIRST_YEAR = "1A",
