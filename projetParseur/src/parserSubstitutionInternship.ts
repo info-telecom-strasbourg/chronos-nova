@@ -1,10 +1,6 @@
 import ExcelJS from "exceljs";
-import { Internship, Student, Organization } from "./typeDefinition";
-import {
-  normalizeField,
-  splitLastNameFirstName,
-  extractNumberOfWeeks,
-} from "./functions";
+import { extractNumberOfWeeks, normalizeField, splitLastNameFirstName } from "./functions";
+import type { Internship, Organization, Student } from "./typeDefinition";
 
 // ===================================
 // Parsing functions
@@ -13,7 +9,7 @@ const startingRow = 8; // Row to start parsing from
 
 export async function parseExcelSubstitutionInternship(
   filePath: string,
-  sheetName: string
+  sheetName: string,
 ): Promise<{
   internships: Internship[];
   students: Student[];
@@ -32,7 +28,7 @@ export async function parseExcelSubstitutionInternship(
   const students: Student[] = parseStudents(worksheet);
   const organizations: Organization[] = parseOrganizations(worksheet);
 
-  return { internships, students, organizations };
+  return { internships, organizations, students };
 }
 
 function parseInternships(worksheet: ExcelJS.Worksheet): Internship[] {
@@ -50,9 +46,9 @@ function parseInternships(worksheet: ExcelJS.Worksheet): Internship[] {
     const weeksCount = extractNumberOfWeeks(weeksCell);
 
     internships.push({
-      subject,
       confidential,
       date,
+      subject,
       weeksCount,
     });
   });
@@ -68,14 +64,12 @@ function parseStudents(worksheet: ExcelJS.Worksheet): Student[] {
 
     // Extraction and normalization
     const fullNameCell = row.getCell(3).text.trim();
-    const { lastName, firstName } = splitLastNameFirstName(
-      normalizeField(fullNameCell, rowNumber)
-    );
+    const { lastName, firstName } = splitLastNameFirstName(normalizeField(fullNameCell, rowNumber));
     const year = normalizeField("2A", rowNumber);
 
     students.push({
-      lastName,
       firstName,
+      lastName,
       year,
     });
   });
@@ -92,15 +86,16 @@ function parseOrganizations(worksheet: ExcelJS.Worksheet): Organization[] {
     // Extraction and normalization
     const orgName = normalizeField(row.getCell(5).text, rowNumber);
     const tutorFullNameCell = row.getCell(10).text.trim();
-    const { lastName: tutorLastName, firstName: tutorFirstName } =
-      splitLastNameFirstName(normalizeField(tutorFullNameCell, rowNumber));
+    const { lastName: tutorLastName, firstName: tutorFirstName } = splitLastNameFirstName(
+      normalizeField(tutorFullNameCell, rowNumber),
+    );
     const orgType = normalizeField(row.getCell(6).text, rowNumber);
 
     organizations.push({
       orgName,
-      tutorLastName,
-      tutorFirstName,
       orgType,
+      tutorFirstName,
+      tutorLastName,
     });
   });
 

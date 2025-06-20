@@ -1,10 +1,13 @@
 import Image from "next/image";
+import { ThemeToggle } from "@/features/theme/theme-toggle";
+import type { PageParams } from "@/types/next";
 
-export default async function RoutePage() {
+export default async function RoutePage(_: PageParams) {
   return (
     <div className="bg-primary">
       Hello world
-      <Image src="./logo.svg" alt="Chronos Logo" width={100} height={100} />
+      <Image alt="Chronos Logo" height={100} src="./logo.svg" width={100} />
+      <ThemeToggle />
     </div>
   );
 }

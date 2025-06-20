@@ -1,21 +1,17 @@
 import { Providers } from "@/components/providers";
-import { cn } from "@/lib/utils";
+import "@/styles/globals.css";
 import type { Metadata } from "next";
-import "./globals.css";
+import type { LayoutParams } from "@/types/next";
 
 export const metadata: Metadata = {
-  title: "Chronos",
   description: "Télécom Physique Strasbourg's student internship directory",
+  title: "Chronos",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: LayoutParams) {
   return (
-    <html lang="en">
-      <body className={cn("antialiased")}>
+    <html lang="fr" suppressHydrationWarning>
+      <body className="antialiased">
         <Providers>{children}</Providers>
       </body>
     </html>

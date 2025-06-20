@@ -1,17 +1,15 @@
+import fs from "node:fs";
+import path from "node:path";
 import { Command } from "commander";
-import fs from "fs";
-import path from "path";
 import { parseExcelInternship2A } from "./parserInternship2A";
 import { parseExcelSubstitutionInternship } from "./parserSubstitutionInternship";
+import type { Internship, Organization, Student } from "./typeDefinition";
 
 const program = new Command();
 
 program
   .argument("<file>", "Excel source file")
-  .option("-s, --sheet <names...>", "Sheet names", [
-    "2A - Récap. stage",
-    "Stage substitution",
-  ])
+  .option("-s, --sheet <names...>", "Sheet names", ["2A - Récap. stage", "Stage substitution"])
   .parse();
 
 const options = program.opts();
@@ -26,15 +24,19 @@ async function main() {
 
   for (let i = 0; i < options.sheet.length; i++) {
     const sheetName = options.sheet[i];
-    let internships, students, organizations;
+    let internships: Internship[], students: Student[], organizations: Organization[];
     switch (sheetName) {
       case "2A - Récap. stage":
-        ({ internships, students, organizations } =
-          await parseExcelInternship2A(filePath, sheetName));
+        ({ internships, students, organizations } = await parseExcelInternship2A(
+          filePath,
+          sheetName,
+        ));
         break;
       case "Stage substitution":
-        ({ internships, students, organizations } =
-          await parseExcelSubstitutionInternship(filePath, sheetName));
+        ({ internships, students, organizations } = await parseExcelSubstitutionInternship(
+          filePath,
+          sheetName,
+        ));
         break;
       default:
         throw new Error(`Unknown sheet name: "${sheetName}"`);

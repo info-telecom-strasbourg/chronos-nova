@@ -9,16 +9,16 @@
 export function normalizeField(
   value: string,
   rowNumber: number,
-  options?: { isCountry?: boolean }
+  options?: { isCountry?: boolean },
 ): string {
   const invalidValues = ["x", "X", "?"];
 
   const abbreviations: Record<string, string> = {
-    fr: "FRANCE",
-    en: "ANGLETERRE",
-    it: "ITALIE",
     de: "ALLEMAGNE",
+    en: "ANGLETERRE",
     es: "ESPAGNE",
+    fr: "FRANCE",
+    it: "ITALIE",
   };
 
   let val = value.trim();
@@ -53,8 +53,8 @@ export function splitLastNameFirstName(fullName: string): {
   let match = trimmed.match(/^([A-ZÀ-ÖØ-Ý\- ]+)\s+(.+)$/u);
   if (match) {
     return {
-      lastName: match[1].trim(),
       firstName: match[2].trim(),
+      lastName: match[1].trim(),
     };
   }
 
@@ -62,13 +62,13 @@ export function splitLastNameFirstName(fullName: string): {
   match = trimmed.match(/^(.+?)\s+([A-ZÀ-ÖØ-Ý\- ]+)$/u);
   if (match) {
     return {
-      lastName: match[2].trim(),
       firstName: match[1].trim(),
+      lastName: match[2].trim(),
     };
   }
 
   // Fallback: return the whole string as lastName, empty firstName
-  return { lastName: trimmed, firstName: "??" };
+  return { firstName: "??", lastName: trimmed };
 }
 
 /**
