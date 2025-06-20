@@ -1,22 +1,22 @@
 {
+  "name": "excel-parser",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "build": "tsc"
+  },
+  "keywords": [],
   "author": "",
+  "license": "ISC",
+  "description": "",
   "dependencies": {
     "commander": "^14.0.0",
     "exceljs": "^4.4.0",
     "ts-node": "^10.9.2"
   },
-  "description": "",
   "devDependencies": {
     "@types/node": "^24.0.3",
     "typescript": "^5.8.3"
-  },
-  "keywords": [],
-  "license": "ISC",
-  "main": "dist/index.js",
-  "name": "excel-parser",
-  "scripts": {
-    "build": "tsc",
-    "start": "ts-node src/index.ts"
-  },
-  "version": "1.0.0"
+  }
 }
