@@ -2,26 +2,40 @@ import {
   Internship,
   Student,
   Organization,
-} from "../../projetParseur/dist/typeDefinition.ts";
+} from "../../projetParseur/src/typeDefinition";
+
+enum InternshipYear {
+  FIRST_YEAR = "1A",
+  SECOND_YEAR = "2A",
+  THIRD_YEAR = "3A",
+}
+
+enum StudentMajor {
+  G = "Généraliste",
+  IR = "Informatique et Réseaux",
+}
 
 export const fakeInternships: Internship[] = [
   {
     subject: "AI for Healthcare",
-    confidential: "No",
+    confidential: false,
     date: "2025-04-01",
     weeksCount: 12,
+    year: InternshipYear.SECOND_YEAR,
   },
   {
     subject: "Robotics in Industry",
-    confidential: "Yes",
+    confidential: true,
     date: "2025-05-15",
     weeksCount: 10,
+    year: InternshipYear.SECOND_YEAR,
   },
   {
     subject: "Web Development Internship",
-    confidential: "No",
+    confidential: false,
     date: "2025-03-20",
     weeksCount: 8,
+    year: InternshipYear.FIRST_YEAR,
   },
 ];
 
@@ -29,20 +43,17 @@ export const fakeStudents: Student[] = [
   {
     lastName: "DUPONT",
     firstName: "Alice",
-    major: "G",
-    year: "2A",
+    major: StudentMajor.G,
   },
   {
     lastName: "MARTIN",
     firstName: "Bob",
-    major: "IR",
-    year: "2A",
+    major: StudentMajor.IR,
   },
   {
     lastName: "SMITH",
     firstName: "Charlie",
-    major: "IR",
-    year: "2A",
+    major: StudentMajor.IR,
   },
 ];
 
