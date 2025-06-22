@@ -2,30 +2,39 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormError,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
+  FormSubmit,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { type LoginFormData, loginFormSchema } from "./auth.schema";
+import { signInAction } from "./auth.action";
+import { type SignInFormData, signInFormSchema } from "./auth.schema";
 
 export const SignInForm = () => {
-  const form = useForm<LoginFormData>({
-    resolver: zodResolver(loginFormSchema),
+  const form = useForm<SignInFormData>({
+    resolver: zodResolver(signInFormSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  const onSubmit = (data: LoginFormData) => {
-    console.log(data);
+  const onSubmit = async (data: SignInFormData) => {
+    const res = await signInAction(data);
+    if (res.error) {
+      form.setError("root", {
+        type: "manual",
+        message: res.error,
+      });
+    }
   };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -55,9 +64,8 @@ export const SignInForm = () => {
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full">
-          Se connecter
-        </Button>
+        <FormError />
+        <FormSubmit className="w-full">Se connecter</FormSubmit>
       </form>
     </Form>
   );

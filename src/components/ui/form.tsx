@@ -1,5 +1,6 @@
 import type * as LabelPrimitive from "@radix-ui/react-label";
 import { Slot } from "@radix-ui/react-slot";
+import { AlertCircleIcon, Loader2 } from "lucide-react";
 import * as React from "react";
 import {
   Controller,
@@ -12,6 +13,8 @@ import {
 } from "react-hook-form";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { Alert, AlertTitle } from "./alert";
+import { Button } from "./button";
 
 const Form = FormProvider;
 
@@ -147,3 +150,28 @@ export {
   FormMessage,
   FormField,
 };
+
+export function FormError() {
+  const { errors } = useFormState();
+  if (!errors.root) return;
+
+  return (
+    <Alert variant="destructive">
+      <AlertCircleIcon />
+      <AlertTitle>{errors.root.message}</AlertTitle>
+    </Alert>
+  );
+}
+
+export type FormSubmitProps = Omit<React.ComponentProps<typeof Button>, "type">;
+
+export function FormSubmit({ disabled, children, ...props }: FormSubmitProps) {
+  const { isDirty, isSubmitting } = useFormState();
+
+  return (
+    <Button disabled={disabled || !isDirty || isSubmitting} type="submit" {...props}>
+      {isSubmitting && <Loader2 className="size-4 animate-spin" />}
+      {children}
+    </Button>
+  );
+}

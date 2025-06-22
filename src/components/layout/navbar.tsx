@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
+import { AuthButton } from "@/features/auth/auth-button";
 import { Logo } from "./logo";
 
 export const Navbar = () => {
@@ -13,8 +14,9 @@ export const Navbar = () => {
           <Logo />
           <span className="font-semibold text-lg">Chronos</span>
         </Link>
-        <div>
+        <div className="flex items-center gap-2">
           <ThemeToggle />
+          <AuthButton />
         </div>
       </nav>
     </header>

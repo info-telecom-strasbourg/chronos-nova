@@ -2,16 +2,18 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormError,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
+  FormSubmit,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { signUpAction } from "./auth.action";
 import { type SignUpFormData, signUpFormSchema } from "./auth.schema";
 
 export const SignUpForm = () => {
@@ -24,9 +26,16 @@ export const SignUpForm = () => {
     },
   });
 
-  const onSubmit = (data: SignUpFormData) => {
-    console.log(data);
+  const onSubmit = async (data: SignUpFormData) => {
+    const res = await signUpAction(data);
+    if (res.error) {
+      form.setError("root", {
+        type: "manual",
+        message: res.error,
+      });
+    }
   };
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -69,9 +78,8 @@ export const SignUpForm = () => {
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full">
-          S'inscrire
-        </Button>
+        <FormError />
+        <FormSubmit className="w-full">Se connecter</FormSubmit>
       </form>
     </Form>
   );
