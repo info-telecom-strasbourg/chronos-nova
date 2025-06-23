@@ -1,15 +1,25 @@
 import type { Internship, Organization, Student } from "../../projetParseur/src/typeDefinition";
 
-enum InternshipYear {
+export enum InternshipYear {
   FIRST_YEAR = "1A",
   SECOND_YEAR = "2A",
   THIRD_YEAR = "3A",
+  _ = "??"
 }
 
-enum StudentMajor {
+export enum StudentMajor {
   G = "Généraliste",
   IR = "Informatique et Réseaux",
+  TI = "TI Santé",
+  M = "Master",
 }
+
+export enum OrgType {
+  E = "Entreprise",
+  L = "Laboratoire",
+  _ = "Autre"
+}
+
 
 export const fakeInternships: Internship[] = [
   {
@@ -49,7 +59,7 @@ export const fakeStudents: Student[] = [
   {
     lastName: "SMITH",
     firstName: "Charlie",
-    major: StudentMajor.IR,
+    major: StudentMajor.TI,
   },
 ];
 
@@ -58,21 +68,21 @@ export const fakeOrganizations: Organization[] = [
     orgName: "Tech Solutions",
     tutorLastName: "LEGRAND",
     tutorFirstName: "Sophie",
-    orgType: "E",
-    country: "FRANCE",
+    orgType: OrgType.E,
+    country: "AFRIQUE DU SUD",
   },
   {
     orgName: "Google",
     tutorLastName: "DURAND",
     tutorFirstName: "Pierre",
-    orgType: "E",
+    orgType: OrgType.E,
     country: "UNITED STATES",
   },
   {
     orgName: "WebWorks",
     tutorLastName: "GARCIA",
     tutorFirstName: "Maria",
-    orgType: "E",
+    orgType: OrgType.L,
     country: "SPAIN",
   },
 ];
