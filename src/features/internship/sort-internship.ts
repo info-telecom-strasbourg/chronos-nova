@@ -10,8 +10,8 @@ export function getSortedInternships(sort: string, fakeInternships: InternshipFD
       return organizationsSorted
     case "location":
       organizationsSorted.sort((a, b) => {
-        const locA = fakeOrganizations[a.key - 1].country + ", " + fakeOrganizations[a.key - 1].city;
-        const locB = fakeOrganizations[b.key - 1].country + ", " + fakeOrganizations[b.key - 1].city;
+        const locA = `${fakeOrganizations[a.id - 1].country}, ${fakeOrganizations[a.id - 1].city}`;
+        const locB = `${fakeOrganizations[b.id - 1].country}, ${fakeOrganizations[b.id - 1].city}`;
         return locA.localeCompare(locB);
       });
       return organizationsSorted;

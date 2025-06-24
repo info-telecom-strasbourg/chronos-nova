@@ -2,14 +2,10 @@
 import { useQueryState } from 'nuqs'
 import { InternshipHeader } from "@/features/internship/internship-header";
 import { InternshipCard } from "@/features/internship/internship-card";
-import { getSortedInternships } from "@/lib/sort-internship";
+import { getSortedInternships } from "@/features/internship/sort-internship";
 import { fakeInternships, fakeOrganizations, fakeStudents } from "@/data/fake-data";
 
-type InternshipListClientProps = {
-  key: string;
-};
-
-export function InternshipListClient({ key }: InternshipListClientProps) {
+export function InternshipListClient() {
   const [sort, setSort] = useQueryState('sort', { defaultValue: 'most-recent' });
   const sortedData = getSortedInternships(sort, fakeInternships, fakeOrganizations);
 
@@ -21,12 +17,12 @@ export function InternshipListClient({ key }: InternshipListClientProps) {
         setSort={setSort}
       />
       {sortedData.map((elem) => {
-        const internship = fakeInternships[elem.key - 1];
-        const org = fakeOrganizations[elem.key - 1];
-        const student = fakeStudents[elem.key - 1];
+        const internship = fakeInternships[elem.id - 1];
+        const org = fakeOrganizations[elem.id - 1];
+        const student = fakeStudents[elem.id - 1];
         return (
           <InternshipCard
-            key={internship.key}
+            id={internship.id}
             student={student}
             organization={org}
             internship={internship}

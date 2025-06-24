@@ -12,14 +12,14 @@ import { InternshipFD, OrganizationFD, StudentFD } from "@/data/fake-data";
 import { formatDate } from "@/lib/format-date";
 
 type InternshipCardProps = {
-    key: number;
+    id: number;
     internship: InternshipFD;
     organization: OrganizationFD
     student: StudentFD
 };
 
 export function InternshipCard({
-    key,
+    id,
     internship,
     organization,
     student,
