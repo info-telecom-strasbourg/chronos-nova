@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useQueryState } from 'nuqs'
 import { InternshipHeader } from "@/features/internship/internship-header";
 import { InternshipCard } from "@/features/internship/internship-card";
 import { getSortedInternships } from "@/lib/sort-internship";
@@ -10,7 +10,7 @@ type InternshipListClientProps = {
 };
 
 export function InternshipListClient({ key }: InternshipListClientProps) {
-  const [sort, setSort] = useState("most-recent");
+  const [sort, setSort] = useQueryState('sort', { defaultValue: 'most-recent' });
   const sortedData = getSortedInternships(sort, fakeInternships, fakeOrganizations);
 
   return (
