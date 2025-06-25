@@ -1,13 +1,16 @@
-import { InternshipFD, OrganizationFD } from "@/data/fake-data";
+import type { InternshipFD, OrganizationFD } from "@/data/fake-data";
 
-
-export function getSortedInternships(sort: string, fakeInternships: InternshipFD[], fakeOrganizations: OrganizationFD[]) {
-  let internshipsSorted = [...fakeInternships];
-  let organizationsSorted = [...fakeOrganizations];
+export function getSortedInternships(
+  sort: string,
+  fakeInternships: InternshipFD[],
+  fakeOrganizations: OrganizationFD[],
+) {
+  const internshipsSorted = [...fakeInternships];
+  const organizationsSorted = [...fakeOrganizations];
   switch (sort) {
     case "name":
       organizationsSorted.sort((a, b) => a.orgName.localeCompare(b.orgName));
-      return organizationsSorted
+      return organizationsSorted;
     case "location":
       organizationsSorted.sort((a, b) => {
         const locA = `${fakeOrganizations[a.id - 1].country}, ${fakeOrganizations[a.id - 1].city}`;
@@ -20,6 +23,6 @@ export function getSortedInternships(sort: string, fakeInternships: InternshipFD
       return internshipsSorted;
     default:
       internshipsSorted.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-      return internshipsSorted
+      return internshipsSorted;
   }
 }
