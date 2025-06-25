@@ -2,7 +2,7 @@ export enum InternshipYear {
   FIRST_YEAR = "1A",
   SECOND_YEAR = "2A",
   THIRD_YEAR = "3A",
-  _ = "??"
+  _ = "??",
 }
 
 export enum StudentMajor {
@@ -44,7 +44,6 @@ export interface OrganizationFD {
   country: string; // Country of the organization
   city: string; // City of the organization
 }
-
 
 export const fakeInternships: InternshipFD[] = [
   {
@@ -89,7 +88,8 @@ export const fakeInternships: InternshipFD[] = [
   },
   {
     id: 6,
-    subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim. Pellentesque congue. Ut in risus volutpat libero pharetra tempor. Cras vestibulum bibendum augue. Praesent egestas leo in pede. Praesent blandit odio eu enim. Pellentesque sed dui ut augue blandit sodales. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam nibh. Mauris ac mauris sed pede pellentesque fermentum. Maecenas adipiscing ante non diam sodales hendrerit.",
+    subject:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim. Pellentesque congue. Ut in risus volutpat libero pharetra tempor. Cras vestibulum bibendum augue. Praesent egestas leo in pede. Praesent blandit odio eu enim. Pellentesque sed dui ut augue blandit sodales. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam nibh. Mauris ac mauris sed pede pellentesque fermentum. Maecenas adipiscing ante non diam sodales hendrerit.",
     confidential: false,
     date: "2024-03-20",
     weeksCount: 6,
@@ -103,7 +103,6 @@ export const fakeInternships: InternshipFD[] = [
     weeksCount: 8,
     year: InternshipYear.FIRST_YEAR,
   },
-
 ];
 
 export const fakeStudents: StudentFD[] = [
@@ -215,5 +214,4 @@ export const fakeOrganizations: OrganizationFD[] = [
     country: "ALLEMAGNE",
     city: "Berlin",
   },
-
 ];
