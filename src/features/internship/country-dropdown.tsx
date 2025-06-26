@@ -99,8 +99,8 @@ const CountryDropdownComponent = (
         {...props}
       >
         {selectedCountry ? (
-          <div className="flex items-center flex-grow w-0 gap-2 overflow-hidden">
-            <div className="inline-flex items-center justify-center w-5 h-5 shrink-0 overflow-hidden rounded-full">
+          <div className="flex w-0 flex-grow items-center gap-2 overflow-hidden">
+            <div className="inline-flex h-5 w-5 shrink-0 items-center justify-center overflow-hidden rounded-full">
               <CircleFlag countryCode={selectedCountry.alpha2.toLowerCase()} height={20} />
             </div>
             {slim === false && (
@@ -117,7 +117,7 @@ const CountryDropdownComponent = (
         <ChevronDown size={16} />
       </PopoverTrigger>
       <PopoverContent collisionPadding={10} side="bottom" className="w-[180px] p-0">
-        <Command className="w-full max-h-[200px] sm:max-h-[270px]">
+        <Command className="max-h-[200px] w-full sm:max-h-[270px]">
           <CommandList>
             <div className="sticky top-0 z-10 bg-popover">
               <CommandInput placeholder="Search country..." />
@@ -128,12 +128,12 @@ const CountryDropdownComponent = (
                 .filter((x) => x.name)
                 .map((option, key: number) => (
                   <CommandItem
-                    className="flex items-center w-full gap-2"
+                    className="flex w-full items-center gap-2"
                     key={key}
                     onSelect={() => handleSelect(option)}
                   >
-                    <div className="flex flex-grow w-0 space-x-2 overflow-hidden">
-                      <div className="inline-flex items-center justify-center w-5 h-5 shrink-0 overflow-hidden rounded-full">
+                    <div className="flex w-0 flex-grow space-x-2 overflow-hidden">
+                      <div className="inline-flex h-5 w-5 shrink-0 items-center justify-center overflow-hidden rounded-full">
                         <CircleFlag countryCode={option.alpha2.toLowerCase()} height={20} />
                       </div>
                       <span className="overflow-hidden text-ellipsis whitespace-nowrap">
@@ -246,8 +246,8 @@ export function CountryMultiSelectDropdown({
                     onSelect={() => handleSelect(option)}
                     className="flex justify-between"
                   >
-                    <div className="flex items-center flex-1 gap-2 overflow-hidden">
-                      <div className="inline-flex items-center justify-center w-5 h-5 shrink-0 overflow-hidden rounded-full">
+                    <div className="flex flex-1 items-center gap-2 overflow-hidden">
+                      <div className="inline-flex h-5 w-5 shrink-0 items-center justify-center overflow-hidden rounded-full">
                         <CircleFlag countryCode={option.alpha2.toLowerCase()} height={20} />
                       </div>
                       <span className="overflow-hidden text-ellipsis whitespace-nowrap">

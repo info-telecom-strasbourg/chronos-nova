@@ -1,6 +1,6 @@
+import type { Internship, Organization, Student } from "./typeDefinition";
 import ExcelJS from "exceljs";
 import { extractNumberOfWeeks, normalizeField, splitLastNameFirstName } from "./functions";
-import type { Internship, Organization, Student } from "./typeDefinition";
 
 // ===================================
 // Parsing functions

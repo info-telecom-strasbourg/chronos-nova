@@ -1,9 +1,9 @@
+import type { Internship, Organization, Student } from "./typeDefinition";
 import fs from "node:fs";
 import path from "node:path";
 import { Command } from "commander";
 import { parseExcelInternship2A } from "./parserInternship2A";
 import { parseExcelSubstitutionInternship } from "./parserSubstitutionInternship";
-import type { Internship, Organization, Student } from "./typeDefinition";
 
 const program = new Command();
 

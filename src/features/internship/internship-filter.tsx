@@ -1,6 +1,7 @@
 "use client";
+import type { Country } from "@/features/internship/country-dropdown";
 import { countries } from "country-data-list";
-import { Filter, Settings2, SlidersHorizontal, X } from "lucide-react";
+import { Filter, SlidersHorizontal, X } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,14 +11,8 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuGroup,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Select, SelectGroup, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { Country } from "@/features/internship/country-dropdown";
-import { CountryMultiSelectDropdown } from "@/features/internship/country-dropdown";
-import { MultiSelectCombobox } from "@/features/internship/multi-select-combobox";
-import { SelectedDisplay } from "./selected-display";
 
 const organizations = ["Entreprise", "Hors entreprise"];
 
@@ -48,7 +43,7 @@ export function InternshipFilter() {
   }
 
   return (
-    <Card className="max-w-screen-md mx-auto w-full flex justify-center">
+    <Card className="mx-auto flex w-full max-w-screen-md justify-center">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Filter /> Filtres
@@ -107,12 +102,12 @@ export function InternshipFilter() {
         </DropdownMenu>
         <Button
           variant="ghost"
-          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+          className="text-destructive hover:bg-destructive/10 hover:text-destructive"
         >
           <X /> Réinitialiser
         </Button>
       </CardContent>
-      <CardFooter className="flex gap-2 flex-wrap">
+      <CardFooter className="flex flex-wrap gap-2">
         {selectedYears.map((year) => (
           <Badge key={year} variant="outline">
             {year} <X />

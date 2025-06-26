@@ -11,9 +11,9 @@ export function InternshipListClient() {
   const sortedData = getSortedInternships(sort, fakeInternships, fakeOrganizations);
 
   return (
-    <div className="w-full flex flex-col items-center gap-4">
+    <div className="flex w-full flex-col items-center gap-4">
       <InternshipFilter />
-      <div className="w-full max-w-2xl flex flex-col gap-4">
+      <div className="flex w-full max-w-2xl flex-col gap-4">
         <InternshipHeader fakeInternships={fakeInternships} sort={sort} setSort={setSort} />
         {sortedData.map((elem) => {
           const internship = fakeInternships[elem.id - 1];

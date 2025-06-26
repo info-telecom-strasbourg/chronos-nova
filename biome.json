@@ -3,7 +3,12 @@
   "assist": {
     "actions": {
       "source": {
-        "organizeImports": "on"
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "groups": [{ "type": true }]
+          }
+        }
       }
     },
     "enabled": true
@@ -28,9 +33,30 @@
   },
   "linter": {
     "enabled": true,
+    "domains": {
+      "next": "recommended",
+      "react": "recommended"
+    },
     "rules": {
       "recommended": true,
+      "correctness": {
+        "noUnusedImports": {
+          "fix": "safe",
+          "level": "warn"
+        }
+      },
+      "nursery": {
+        "useSortedClasses": {
+          "level": "warn",
+          "fix": "safe",
+          "options": {
+            "attributes": ["className", "class"],
+            "functions": ["cn", "clsx"]
+          }
+        }
+      },
       "suspicious": {
+        "recommended": true,
         "noArrayIndexKey": "off"
       }
     }

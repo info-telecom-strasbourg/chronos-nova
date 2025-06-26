@@ -11,13 +11,13 @@ type InternshipHeaderProps = {
 export function InternshipHeader({ fakeInternships, sort, setSort }: InternshipHeaderProps) {
   return (
     <div>
-      <div className="flex justify-between items-center w-full">
+      <div className="flex w-full items-center justify-between">
         <p className="text-gray-600">
           {fakeInternships.length} stage{fakeInternships.length > 1 ? "s" : ""} trouvé
           {fakeInternships.length > 1 ? "s" : ""}
         </p>
         <div className="flex items-center">
-          <p className="text-gray-600 hidden sm:inline mr-2">Trier par :</p>
+          <p className="mr-2 hidden text-gray-600 sm:inline">Trier par :</p>
           <SortInternshipButton value={sort} onChange={setSort} />
         </div>
       </div>

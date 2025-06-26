@@ -6,8 +6,8 @@ import { Logo } from "./logo";
 
 export const Footer = () => {
   return (
-    <footer className="bg-card border-t w-full">
-      <div className="flex flex-col gap-3 mx-auto px-5 py-7 max-w-screen-xl">
+    <footer className="w-full border-t bg-card">
+      <div className="mx-auto flex max-w-screen-xl flex-col gap-3 px-5 py-7">
         <div className="flex items-center gap-4">
           <Logo className="size-12" />
           <div className="flex flex-col">
