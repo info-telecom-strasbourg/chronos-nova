@@ -2,9 +2,8 @@
 import { Check, ChevronsUpDown } from "lucide-react";
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import { Command, CommandItem, CommandList } from "@/components/ui/command";
+import { Command, CommandItem, CommandList, CommandSeparator } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Separator } from "@/components/ui/separator";
 
 type MultiSelectComboboxProps = {
   options: string[];
@@ -49,9 +48,9 @@ export function MultiSelectCombobox({
                 }}
               >
                 <span style={{ flex: 1 }}>Tout</span>
-                {allSelected && <Check className="h-4 w-4" />}
+                {allSelected && <Check className="size-4" />}
               </CommandItem>
-              <Separator className="bg-gray-300" />
+              <CommandSeparator />
               {options.map((option) => {
                 const selected = value.includes(option);
                 return (
@@ -66,7 +65,7 @@ export function MultiSelectCombobox({
                     }}
                   >
                     <span style={{ flex: 1 }}>{option}</span>
-                    {selected && <Check className="h-4 w-4" />}
+                    {selected && <Check className="size-4" />}
                   </CommandItem>
                 );
               })}
