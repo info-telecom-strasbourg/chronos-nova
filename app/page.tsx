@@ -1,10 +1,10 @@
 import type { PageParams } from "@/types/next";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { InternshipListClient } from "../src/features/internship/internship-list-client";
 
 export default async function RoutePage(_: PageParams) {
-  const supabase = await createSupabaseServerClient();
-
-  const { data: instruments } = await supabase.from("instruments").select("*");
-
-  return <div>{JSON.stringify(instruments, null, 2)}</div>;
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4">
+      <InternshipListClient key="internship-list-client" />
+    </div>
+  );
 }
