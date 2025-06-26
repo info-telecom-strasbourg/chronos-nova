@@ -79,7 +79,7 @@ export const SignUpForm = () => {
           )}
         />
         <FormError />
-        <FormSubmit className="w-full">Se connecter</FormSubmit>
+        <FormSubmit className="w-full">S'inscrire</FormSubmit>
       </form>
     </Form>
   );
