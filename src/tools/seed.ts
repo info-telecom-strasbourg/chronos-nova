@@ -1,13 +1,10 @@
-import { config } from "dotenv";
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { faker } from "@faker-js/faker";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { config } from "dotenv";
 
 config(); // charge .env
 
-const supabase: SupabaseClient = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_KEY!
-);
+const supabase: SupabaseClient = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_KEY!);
 
 // nombre d’éléments à générer
 const N_ORG = 10;
@@ -38,18 +35,11 @@ async function seedStudents(orgIds: number[]) {
   const studs = Array.from({ length: N_STUD }).map(() => ({
     student_lastname: faker.person.lastName(),
     student_firstname: faker.person.firstName(),
-    student_degree: faker.helpers.arrayElement([
-      "Généraliste",
-      "IR",
-      "TI Santé",
-    ]),
+    student_degree: faker.helpers.arrayElement(["Généraliste", "IR", "TI Santé"]),
     student_course: faker.lorem.word(),
     organization_id: faker.helpers.arrayElement(orgIds),
   }));
-  const { data, error } = await supabase
-    .from("Student")
-    .insert(studs)
-    .select("student_id");
+  const { data, error } = await supabase.from("Student").insert(studs).select("student_id");
   if (error) throw error;
   return data!.map((s) => s.student_id);
 }
@@ -62,10 +52,7 @@ async function seedInternships() {
     internship_period: faker.number.int({ min: 4, max: 24 }),
     internship_year: faker.helpers.arrayElement(["1A", "2A", "3A"]),
   }));
-  const { data, error } = await supabase
-    .from("Internship")
-    .insert(interns)
-    .select("internship_id");
+  const { data, error } = await supabase.from("Internship").insert(interns).select("internship_id");
   if (error) throw error;
   return data!.map((i) => i.internship_id);
 }
@@ -93,7 +80,7 @@ async function main() {
   const studIds = await seedStudents(orgIds);
   console.log("→ Création des internships…");
   const internIds = await seedInternships();
-  console.log(" → Création des liaisons Complete…");
+  console.log("→ Création des liaisons Complete…");
   await seedComplete(studIds, internIds);
   console.log("✅ Seeding terminé !");
 }
