@@ -1,0 +1,23 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "seed": "pnpm run build && node dist/src/seed.js",
+    "clean": "pnpm run build && node dist/src/clean.js",
+    "query": "pnpm run build && node dist/src/queries.js",
+    "start": "pnpm run build && node dist/src/index.js"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.30.0",
+    "postgres": "^3.4.0",
+    "@faker-js/faker": "^8.0.0",
+    "dotenv": "^16.0.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0"
+  }
+}
