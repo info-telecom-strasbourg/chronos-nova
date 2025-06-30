@@ -74,13 +74,9 @@ async function seedComplete(studentIds: number[], internshipIds: number[]) {
 }
 
 async function main() {
-  console.log("→ Création des organisations…");
   const orgIds = await seedOrganizations();
-  console.log("→ Création des étudiants…");
   const studIds = await seedStudents(orgIds);
-  console.log("→ Création des internships…");
   const internIds = await seedInternships();
-  console.log("→ Création des liaisons Complete…");
   await seedComplete(studIds, internIds);
   console.log("✅ Seeding terminé !");
 }

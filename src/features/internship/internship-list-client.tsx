@@ -1,30 +1,45 @@
 "use client";
+import { Search } from "lucide-react";
+import { notFound } from "next/navigation";
 import { useQueryState } from "nuqs";
-import { fakeInternships, fakeOrganizations, fakeStudents } from "@/data/fake-data";
+import { Alert, AlertTitle } from "@/components/ui/alert";
 import { InternshipCard } from "@/features/internship/internship-card";
 import { InternshipHeader } from "@/features/internship/internship-header";
-import { getSortedInternships } from "@/features/internship/sort-internship";
+import { InternshipListSkeleton } from "@/features/internship/internship-skeleton";
+import { useInternships } from "@/hooks/use-internships";
 
 export function InternshipListClient() {
   const [sort, setSort] = useQueryState("sort", { defaultValue: "most-recent" });
-  const sortedData = getSortedInternships(sort, fakeInternships, fakeOrganizations);
+  const { internships, loading, error } = useInternships(sort);
+
+  if (loading) {
+    return <InternshipListSkeleton />;
+  }
+
+  if (error) {
+    notFound();
+  }
+
+  if (internships.length === 0) {
+    return (
+      <div className="flex w-full max-w-2xl flex-col gap-4">
+        <InternshipHeader fakeInternships={internships} sort={sort} setSort={setSort} />
+        <div className="flex min-h-[60vh] items-center justify-center">
+          <Alert className="w-full max-w-md">
+            <Search className="h-4 w-4" />
+            <AlertTitle>Aucun stage trouvé</AlertTitle>
+          </Alert>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="w-full max-w-2xl flex flex-col gap-4">
-      <InternshipHeader fakeInternships={fakeInternships} sort={sort} setSort={setSort} />
-      {sortedData.map((elem) => {
-        const internship = fakeInternships[elem.id - 1];
-        const org = fakeOrganizations[elem.id - 1];
-        const student = fakeStudents[elem.id - 1];
-        return (
-          <InternshipCard
-            key={internship.id}
-            student={student}
-            organization={org}
-            internship={internship}
-          />
-        );
-      })}
+    <div className="flex w-full max-w-2xl flex-col gap-4">
+      <InternshipHeader fakeInternships={internships} sort={sort} setSort={setSort} />
+      {internships.map((internship) => (
+        <InternshipCard key={internship.id} internship={internship} />
+      ))}
     </div>
   );
 }

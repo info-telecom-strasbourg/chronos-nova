@@ -25,21 +25,12 @@ const N_STUD = 8;
 const N_COMPLETE = 8;
 
 async function cleanDatabase() {
-  console.log("🧹 Nettoyage de la base de données...");
-
   try {
     // Supprime dans l'ordre inverse des contraintes (relations d'abord)
     await db.delete(completeTable);
-    console.log("   → Table Complete vidée");
-
     await db.delete(internshipsTable);
-    console.log("   → Table Internship vidée");
-
     await db.delete(studentsTable);
-    console.log("   → Table Student vidée");
-
     await db.delete(organizationsTable);
-    console.log("   → Table Organization vidée");
 
     console.log("✅ Base de données nettoyée avec succès !");
   } catch (error) {
@@ -49,8 +40,6 @@ async function cleanDatabase() {
 }
 
 async function seedOrganizations() {
-  console.log("→ Création des organisations...");
-
   const orgs = Array.from({ length: N_ORG }).map(() => ({
     organization_name: faker.company.name(),
     tutor_firstname: faker.person.firstName(),
@@ -70,8 +59,6 @@ async function seedOrganizations() {
 }
 
 async function seedStudents(orgIds: number[]) {
-  console.log("→ Création des étudiants...");
-
   const students = Array.from({ length: N_STUD }).map(() => ({
     student_firstname: faker.person.firstName(),
     student_lastname: faker.person.lastName(),
@@ -99,8 +86,6 @@ async function seedStudents(orgIds: number[]) {
 }
 
 async function seedComplete(studentIds: number[]) {
-  console.log("→ Création des relations étudiant-stage indépendantes...");
-
   const completes = [];
   let lastInternshipId = 0;
 
@@ -141,7 +126,6 @@ async function seedComplete(studentIds: number[]) {
   }
 
   await db.insert(completeTable).values(completes);
-  console.log(`   → ${completes.length} relations étudiant-stage indépendantes créées`);
   return lastInternshipId;
 }
 
