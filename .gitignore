@@ -10,6 +10,11 @@
 !.yarn/releases
 !.yarn/versions
 
+# backend dependencies
+/backend/node_modules
+/backend/dist
+/backend/*.tsbuildinfo
+
 # testing
 /coverage
 
@@ -43,3 +48,23 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Database files
+*.sqlite
+*.db
+
+# Drizzle generated files
+/backend/drizzle/migrations/*
+!/backend/drizzle/migrations/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+
+# Temporary files
+*.tmp
+*.temp

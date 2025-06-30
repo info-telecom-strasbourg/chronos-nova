@@ -24,9 +24,9 @@ export function SortInternshipButton({
         <SelectGroup>
           <SelectLabel>Trier par :</SelectLabel>
           <SelectItem value="most-recent">Date de début</SelectItem>
-          <SelectItem value="name">Nom</SelectItem>
-          <SelectItem value="location">Lieu</SelectItem>
+          <SelectItem value="organization">Nom</SelectItem>
           <SelectItem value="duration">Durée</SelectItem>
+          <SelectItem value="location">Lieu</SelectItem>
         </SelectGroup>
       </SelectContent>
     </Select>
