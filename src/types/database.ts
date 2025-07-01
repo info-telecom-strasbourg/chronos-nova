@@ -49,6 +49,7 @@ export interface InternshipCardData {
     firstName: string;
     lastName: string;
     major?: string;
+    course?: string; // Filière (RIO, SDIA, etc.)
   };
   organization: {
     orgName: string;
@@ -73,6 +74,7 @@ export interface ParsedStudent {
   lastName: string;
   firstName: string;
   major?: string;
+  course?: string;
 }
 
 export interface ParsedOrganization {

@@ -33,6 +33,7 @@ export function convertParsedToCardData(
       firstName: parsed.student.firstName,
       lastName: parsed.student.lastName,
       major: parsed.student.major,
+      course: parsed.student.course,
     },
     organization: {
       orgName: parsed.organization.orgName,

@@ -22,13 +22,15 @@ export function InternshipListClient() {
 
   if (internships.length === 0) {
     return (
-      <div className="flex w-full max-w-2xl flex-col gap-4">
-        <InternshipHeader fakeInternships={internships} sort={sort} setSort={setSort} />
-        <div className="flex min-h-[60vh] items-center justify-center">
-          <Alert className="w-full max-w-md">
-            <Search className="h-4 w-4" />
-            <AlertTitle>Aucun stage trouvé</AlertTitle>
-          </Alert>
+      <div className="flex w-full flex-1 items-center justify-center">
+        <div className="flex w-full max-w-2xl flex-col gap-4">
+          <InternshipHeader fakeInternships={internships} sort={sort} setSort={setSort} />
+          <div className="flex items-center justify-center py-12">
+            <Alert className="w-full max-w-md">
+              <Search className="h-4 w-4" />
+              <AlertTitle>Aucun stage trouvé</AlertTitle>
+            </Alert>
+          </div>
         </div>
       </div>
     );

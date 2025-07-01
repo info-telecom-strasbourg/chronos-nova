@@ -1,7 +1,7 @@
-import { eq, asc, desc, sql } from "drizzle-orm";
+import type { InternshipCardData } from "@/types/database";
+import { asc, desc, eq, sql } from "drizzle-orm";
 import { db } from "./index";
 import { completeTable, internshipsTable, organizationsTable, studentsTable } from "./schema";
-import type { InternshipCardData } from "@/types/database";
 
 /**
  * Fonction de base pour construire la requête avec jointures
@@ -27,32 +27,38 @@ function createBaseInternshipQuery() {
  * Récupère tous les stages avec leurs étudiants et organisations associés
  * @param sort - Type de tri à appliquer ('most-recent', 'name', 'duration', 'location')
  */
-export async function getAllInternshipsData(sort: string = 'most-recent') {
+export async function getAllInternshipsData(sort: string = "most-recent") {
   try {
     const baseQuery = createBaseInternshipQuery();
 
     // Application du tri selon le paramètre
     switch (sort) {
-      case 'most-recent':
-        // Conversion des dates françaises DD/MM/YYYY en format PostgreSQL pour tri
+      case "most-recent":
+        // Gestion des dates invalides : les dates avec "?" ou vides sont mises à la fin
         return await baseQuery.orderBy(
-          desc(sql`TO_DATE(${internshipsTable.internship_dates}, 'DD/MM/YYYY')`)
+          desc(sql`
+            CASE 
+              WHEN ${internshipsTable.internship_dates} ~ '^[0-9]{2}/[0-9]{2}/[0-9]{4}$' 
+              THEN TO_DATE(${internshipsTable.internship_dates}, 'DD/MM/YYYY')
+              ELSE NULL
+            END
+          `),
         );
-      case 'organization':
+      case "organization":
         return await baseQuery.orderBy(asc(organizationsTable.organization_name));
-      case 'duration':
+      case "duration":
         // Tri par durée de stage (période en semaines) - ordre croissant (plus court d'abord)
         return await baseQuery.orderBy(asc(internshipsTable.internship_period));
-      case 'location':
+      case "location":
         // Tri par localisation : pays puis ville (ordre alphabétique)
         return await baseQuery.orderBy(
           asc(organizationsTable.organization_country),
-          asc(organizationsTable.organization_city)
+          asc(organizationsTable.organization_city),
         );
       default:
         // Tri par défaut : plus récent
         return await baseQuery.orderBy(
-          desc(sql`TO_DATE(${internshipsTable.internship_dates}, 'DD/MM/YYYY')`)
+          desc(sql`TO_DATE(${internshipsTable.internship_dates}, 'DD/MM/YYYY')`),
         );
     }
   } catch (error) {
@@ -67,8 +73,9 @@ export async function getAllInternshipsData(sort: string = 'most-recent') {
  */
 export async function getInternshipData(internshipId: number) {
   try {
-    const data = await createBaseInternshipQuery()
-      .where(eq(completeTable.internship_id, internshipId));
+    const data = await createBaseInternshipQuery().where(
+      eq(completeTable.internship_id, internshipId),
+    );
 
     return data;
   } catch (error) {
@@ -80,11 +87,13 @@ export async function getInternshipData(internshipId: number) {
 /**
  * Transforme les données de la base en format compatible avec les composants frontend
  */
-export function transformToCardData(data: Array<{
-  internship: typeof internshipsTable.$inferSelect;
-  student: typeof studentsTable.$inferSelect;
-  organization: typeof organizationsTable.$inferSelect;
-}>): InternshipCardData[] {
+export function transformToCardData(
+  data: Array<{
+    internship: typeof internshipsTable.$inferSelect;
+    student: typeof studentsTable.$inferSelect;
+    organization: typeof organizationsTable.$inferSelect;
+  }>,
+): InternshipCardData[] {
   return data.map((item) => ({
     id: item.internship.internship_id,
     internship: {
@@ -97,13 +106,17 @@ export function transformToCardData(data: Array<{
     student: {
       firstName: item.student.student_firstname,
       lastName: item.student.student_lastname,
-      major: item.student.student_degree || undefined,
+      major: item.student.student_degree || undefined, // Diplôme (G, IR, TIS)
+      course:
+        item.student.student_course && item.student.student_course !== "??"
+          ? item.student.student_course
+          : undefined, // Filière (RIO, SDIA seulement)
     },
     organization: {
       orgName: item.organization.organization_name,
       tutorFirstName: item.organization.tutor_firstname,
       tutorLastName: item.organization.tutor_lastname,
-      orgType: item.organization.organization_type === "E" ? "Entreprise" : "Laboratoire",
+      orgType: item.organization.organization_type, // Déjà "Entreprise" ou "Hors entreprise"
       country: item.organization.organization_country || undefined,
       city: item.organization.organization_city || undefined,
     },

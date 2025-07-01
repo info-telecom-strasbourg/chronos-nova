@@ -1,44 +1,3 @@
-// ========================================
-// Utility functions
-// ========================================
-
-/**
- * Normalizes a text field.
- * - If empty, "x", "X", "?" or invalid => "??"
- */
-export function normalizeField(
-  value: string,
-  rowNumber: number,
-  options?: { isCountry?: boolean },
-): string {
-  const invalidValues = ["x", "X", "?"];
-
-  const abbreviations: Record<string, string> = {
-    de: "ALLEMAGNE",
-    en: "ANGLETERRE",
-    es: "ESPAGNE",
-    fr: "FRANCE",
-    it: "ITALIE",
-  };
-
-  let val = value.trim();
-
-  // Special case for country
-  if (options?.isCountry) {
-    val = val.toLowerCase();
-    if (abbreviations[val]) return abbreviations[val].toUpperCase();
-    val = val.toUpperCase();
-  }
-
-  // If value is empty or incorrect (other cases)
-  if (!val || invalidValues.includes(val)) {
-    console.warn(`Row ${rowNumber}: missing or incorrect data ("${value}").`);
-    return "??";
-  }
-
-  return val;
-}
-
 /**
  * Splits a string in the format "LASTNAME Firstname" or "Firstname LASTNAME"
  * using a regexp: extracts the last name (all caps) and the first name.
@@ -48,34 +7,63 @@ export function splitLastNameFirstName(fullName: string): {
   firstName: string;
 } {
   const trimmed = fullName.trim();
+  if (!trimmed || trimmed === "x" || trimmed === "X" || trimmed === "?" || trimmed === "??") {
+    return { lastName: "??", firstName: "??" };
+  }
 
-  // Try "LASTNAME Firstname"
-  let match = trimmed.match(/^([A-ZÀ-ÖØ-Ý\- ]+)\s+(.+)$/u);
-  if (match) {
+  const words = trimmed.split(/\s+/);
+
+  // Séparer les mots en majuscules (nom de famille) et le reste (prénom)
+  const lastNameWords: string[] = [];
+  const firstNameWords: string[] = [];
+
+  for (const word of words) {
+    // Un mot est considéré comme nom de famille s'il est entièrement en majuscules
+    // et contient au moins 1 caractère alphabétique (pour gérer les noms courts et composés)
+    if (word === word.toUpperCase() && /[A-ZÀ-ÖØ-Ý]/.test(word)) {
+      lastNameWords.push(word);
+    } else {
+      firstNameWords.push(word);
+    }
+  }
+
+  // Si aucun mot en majuscule n'est trouvé, considérer le dernier mot comme nom de famille
+  if (lastNameWords.length === 0 && words.length > 1) {
+    const lastWord = words[words.length - 1];
+    lastNameWords.push(lastWord.toUpperCase());
+    firstNameWords.splice(-1, 1); // Retirer le dernier mot des prénoms
+  }
+
+  // Si un seul mot, le considérer comme nom de famille
+  if (words.length === 1) {
     return {
-      firstName: match[2].trim(),
-      lastName: match[1].trim(),
+      lastName: words[0].toUpperCase(),
+      firstName: "??",
     };
   }
 
-  // Try "Firstname LASTNAME"
-  match = trimmed.match(/^(.+?)\s+([A-ZÀ-ÖØ-Ý\- ]+)$/u);
-  if (match) {
-    return {
-      firstName: match[1].trim(),
-      lastName: match[2].trim(),
-    };
-  }
-
-  // Fallback: return the whole string as lastName, empty firstName
-  return { firstName: "??", lastName: trimmed };
+  return {
+    lastName: lastNameWords.length > 0 ? lastNameWords.join(" ") : "??",
+    firstName: firstNameWords.length > 0 ? firstNameWords.join(" ") : "??",
+  };
 }
 
 /**
- * Extracts the number of weeks from a cell value.
- * If no number is found, returns "??".
+ * Extrait le nombre de semaines depuis une cellule Excel
  */
-export function extractNumberOfWeeks(weeksCell: string): number | string {
-  const weeksMatch = weeksCell.trim().match(/\d+/);
-  return weeksMatch ? Number(weeksMatch[0]) : "??";
+export function extractNumberOfWeeks(weeksCell: string): number {
+  if (!weeksCell || weeksCell.trim() === "") {
+    return 0;
+  }
+
+  const trimmed = weeksCell.trim();
+
+  // Chercher un nombre dans la chaîne
+  const match = trimmed.match(/\d+/);
+  if (match) {
+    const weeks = parseInt(match[0], 10);
+    return weeks > 0 ? weeks : 0;
+  }
+
+  return 0;
 }

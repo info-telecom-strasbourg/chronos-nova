@@ -40,12 +40,16 @@ export function InternshipCard({ internship }: InternshipCardProps) {
             <div className="flex items-center gap-2">
               <GraduationCap className="h-4 w-4" />
               <span>
-                {internship.internship.year} - {internship.student.major}
+                2A - {internship.student.major || "??"}
+                {internship.student.course ? ` - ${internship.student.course}` : ""}
               </span>
             </div>
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4" />
-              <span>{internship.internship.weeksCount} semaines</span>
+              <span>
+                {internship.internship.weeksCount > 0 ? internship.internship.weeksCount : "??"}{" "}
+                semaines
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />

@@ -1,15 +1,15 @@
-import type { Internship, Organization, Student } from "./typeDefinition";
-import fs from "node:fs";
-import path from "node:path";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import { Command } from "commander";
-import { parseExcelInternship2A } from "./parserInternship2A";
-import { parseExcelSubstitutionInternship } from "./parserSubstitutionInternship";
+import { parseAllSheets, parseAllSheetsWithValidation } from "./parser.js";
+import { insertDataToSupabase } from "./inserter-supabase.js";
 
 const program = new Command();
 
 program
   .argument("<file>", "Excel source file")
   .option("-s, --sheet <names...>", "Sheet names", ["2A - Récap. stage", "Stage substitution"])
+  .option("--no-validation", "Disable Zod validation and formatting")
   .parse();
 
 const options = program.opts();
@@ -17,34 +17,34 @@ const options = program.opts();
 async function main() {
   const fileName = program.args[0];
   const filePath = path.join(process.cwd(), fileName);
+
   if (!fs.existsSync(filePath)) {
     throw new Error(`File "${fileName}" not found: ${filePath}`);
   }
-  console.log(`Parsed data from file: "${fileName}"\n`);
 
-  for (let i = 0; i < options.sheet.length; i++) {
-    const sheetName = options.sheet[i];
-    let internships: Internship[], students: Student[], organizations: Organization[];
-    switch (sheetName) {
-      case "2A - Récap. stage":
-        ({ internships, students, organizations } = await parseExcelInternship2A(
-          filePath,
-          sheetName,
-        ));
-        break;
-      case "Stage substitution":
-        ({ internships, students, organizations } = await parseExcelSubstitutionInternship(
-          filePath,
-          sheetName,
-        ));
-        break;
-      default:
-        throw new Error(`Unknown sheet name: "${sheetName}"`);
+  console.log(`📄 Processing file: "${fileName}"\n`);
+
+  // Choisir le parser selon l'option de validation
+  if (options.validation === false) {
+    console.log("🚀 Using legacy parser (no validation)");
+    const { allInternships, allStudents, allOrganizations } = await parseAllSheets(
+      filePath,
+      options.sheet,
+    );
+
+    await insertDataToSupabase(allInternships, allStudents, allOrganizations);
+  } else {
+    console.log("🛡️  Using enhanced parser with Zod validation");
+    const { allInternships, allStudents, allOrganizations, validationSummary } =
+      await parseAllSheetsWithValidation(filePath, options.sheet);
+
+    // Afficher le résumé de validation
+    if (validationSummary.errors > 0) {
+      console.log(`⚠️  ${validationSummary.errors} rows had validation errors and were skipped.`);
     }
-    console.log(`Parsed data from sheet: "${sheetName}"`);
-    console.log("Internships:", internships);
-    console.log("Students:", students);
-    console.log("Organizations:", organizations);
+    console.log(`✅ Successfully processed ${validationSummary.validRows} rows.\n`);
+
+    await insertDataToSupabase(allInternships, allStudents, allOrganizations);
   }
 }
 
