@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 export default function NotFound() {
   return (
-    <div className="flex justify-center bg-gray-50 p-4">
+    <div className="flex justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-red-100">
@@ -17,7 +17,6 @@ export default function NotFound() {
             Connexion à la base de données impossible
           </CardDescription>
         </CardHeader>
-
         <CardContent className="space-y-6">
           <Alert>
             <AlertTriangle className="h-4 w-4" />
@@ -30,7 +29,6 @@ export default function NotFound() {
               </ul>
             </AlertDescription>
           </Alert>
-
           <Button onClick={() => window.location.reload()} className="w-full">
             <RefreshCw className="mr-2 h-4 w-4" />
             Réessayer
