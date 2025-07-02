@@ -1,69 +1,147 @@
 import type { InternshipCardData } from "@/types/database";
-import { asc, desc, eq, sql } from "drizzle-orm";
-import { db } from "./index";
-import { completeTable, internshipsTable, organizationsTable, studentsTable } from "./schema";
+import { createClient } from "@supabase/supabase-js";
 
-/**
- * Fonction de base pour construire la requête avec jointures
- * Évite la duplication de code entre getAllInternshipsData et getInternshipData
- */
-function createBaseInternshipQuery() {
-  return db
-    .select({
-      internship: internshipsTable,
-      student: studentsTable,
-      organization: organizationsTable,
-    })
-    .from(completeTable)
-    .innerJoin(internshipsTable, eq(completeTable.internship_id, internshipsTable.internship_id))
-    .innerJoin(studentsTable, eq(completeTable.student_id, studentsTable.student_id))
-    .innerJoin(
-      organizationsTable,
-      eq(studentsTable.organization_id, organizationsTable.organization_id),
-    );
+// Configuration Supabase pour les requêtes frontend
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error("Les variables d'environnement Supabase sont manquantes");
 }
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 /**
  * Récupère tous les stages avec leurs étudiants et organisations associés
- * @param sort - Type de tri à appliquer ('most-recent', 'name', 'duration', 'location')
+ * @param sort - Type de tri à appliquer ('most-recent', 'organization', 'duration', 'location')
  */
 export async function getAllInternshipsData(sort: string = "most-recent") {
   try {
-    const baseQuery = createBaseInternshipQuery();
+    // Requête avec jointures pour récupérer toutes les données nécessaires
+    let query = supabase.from("Complete").select(`
+        internship_id,
+        student_id,
+        Internship!inner (
+          internship_id,
+          internship_subject,
+          internship_confidential,
+          internship_dates,
+          internship_period,
+          internship_year
+        ),
+        Student!inner (
+          student_id,
+          student_firstname,
+          student_lastname,
+          student_degree,
+          student_course,
+          organization_id,
+          Organization!inner (
+            organization_id,
+            organization_name,
+            organization_type,
+            organization_country,
+            organization_city,
+            tutor_firstname,
+            tutor_lastname
+          )
+        )
+      `);
 
     // Application du tri selon le paramètre
     switch (sort) {
       case "most-recent":
-        // Gestion des dates invalides : les dates avec "?" ou vides sont mises à la fin
-        return await baseQuery.orderBy(
-          desc(sql`
-            CASE 
-              WHEN ${internshipsTable.internship_dates} ~ '^[0-9]{2}/[0-9]{2}/[0-9]{4}$' 
-              THEN TO_DATE(${internshipsTable.internship_dates}, 'DD/MM/YYYY')
-              ELSE NULL
-            END
-          `),
-        );
+        // Tri par date décroissante
+        query = query.order("internship_dates", {
+          foreignTable: "Internship",
+          ascending: false,
+        });
+        break;
       case "organization":
-        return await baseQuery.orderBy(asc(organizationsTable.organization_name));
+        query = query.order("organization_name", {
+          foreignTable: "Student.Organization",
+          ascending: true,
+        });
+        break;
       case "duration":
-        // Tri par durée de stage (période en semaines) - ordre croissant (plus court d'abord)
-        return await baseQuery.orderBy(asc(internshipsTable.internship_period));
+        // Tri par durée de stage (période en semaines) - ordre décroissant
+        query = query.order("internship_period", {
+          foreignTable: "Internship",
+          ascending: false,
+        });
+        break;
       case "location":
-        // Tri par localisation : pays puis ville (ordre alphabétique)
-        return await baseQuery.orderBy(
-          asc(organizationsTable.organization_country),
-          asc(organizationsTable.organization_city),
-        );
+        // Tri par localisation : pays puis ville
+        query = query.order("organization_country", {
+          foreignTable: "Student.Organization",
+          ascending: true,
+        });
+        break;
       default:
         // Tri par défaut : plus récent
-        return await baseQuery.orderBy(
-          desc(sql`TO_DATE(${internshipsTable.internship_dates}, 'DD/MM/YYYY')`),
-        );
+        query = query.order("internship_dates", {
+          foreignTable: "Internship",
+          ascending: false,
+        });
     }
+
+    const { data, error } = await query;
+
+    if (error) {
+      throw new Error(`Failed query: ${error.message}`);
+    }
+
+    if (!data) {
+      return [];
+    }
+
+    // Transformer les données pour correspondre au format attendu
+    return data.map((row: Record<string, unknown>) => ({
+      internship: {
+        internship_id: (row.Internship as Record<string, unknown>)?.internship_id as number,
+        internship_subject: (row.Internship as Record<string, unknown>)
+          ?.internship_subject as string,
+        internship_confidential: (row.Internship as Record<string, unknown>)
+          ?.internship_confidential as boolean,
+        internship_dates: (row.Internship as Record<string, unknown>)?.internship_dates as string,
+        internship_period: (row.Internship as Record<string, unknown>)?.internship_period as number,
+        internship_year: (row.Internship as Record<string, unknown>)?.internship_year as string,
+      },
+      student: {
+        student_id: (row.Student as Record<string, unknown>)?.student_id as number,
+        student_firstname: (row.Student as Record<string, unknown>)?.student_firstname as string,
+        student_lastname: (row.Student as Record<string, unknown>)?.student_lastname as string,
+        student_degree: (row.Student as Record<string, unknown>)?.student_degree as string,
+        student_course: (row.Student as Record<string, unknown>)?.student_course as string,
+        organization_id: (row.Student as Record<string, unknown>)?.organization_id as number,
+      },
+      organization: {
+        organization_id: (
+          (row.Student as Record<string, unknown>)?.Organization as Record<string, unknown>
+        )?.organization_id as number,
+        organization_name: (
+          (row.Student as Record<string, unknown>)?.Organization as Record<string, unknown>
+        )?.organization_name as string,
+        organization_type: (
+          (row.Student as Record<string, unknown>)?.Organization as Record<string, unknown>
+        )?.organization_type as string,
+        organization_country: (
+          (row.Student as Record<string, unknown>)?.Organization as Record<string, unknown>
+        )?.organization_country as string,
+        organization_city: (
+          (row.Student as Record<string, unknown>)?.Organization as Record<string, unknown>
+        )?.organization_city as string,
+        tutor_firstname: (
+          (row.Student as Record<string, unknown>)?.Organization as Record<string, unknown>
+        )?.tutor_firstname as string,
+        tutor_lastname: (
+          (row.Student as Record<string, unknown>)?.Organization as Record<string, unknown>
+        )?.tutor_lastname as string,
+      },
+    }));
   } catch (error) {
     console.error("❌ Erreur lors de la récupération des données de stages:", error);
-    throw error; // Re-throw pour que l'API puisse gérer l'erreur
+    throw error;
   }
 }
 
@@ -73,11 +151,45 @@ export async function getAllInternshipsData(sort: string = "most-recent") {
  */
 export async function getInternshipData(internshipId: number) {
   try {
-    const data = await createBaseInternshipQuery().where(
-      eq(completeTable.internship_id, internshipId),
-    );
+    const { data, error } = await supabase
+      .from("Complete")
+      .select(`
+        internship_id,
+        student_id,
+        Internship!inner (
+          internship_id,
+          internship_subject,
+          internship_confidential,
+          internship_dates,
+          internship_period,
+          internship_year
+        ),
+        Student!inner (
+          student_id,
+          student_firstname,
+          student_lastname,
+          student_degree,
+          student_course,
+          organization_id,
+          Organization!inner (
+            organization_id,
+            organization_name,
+            organization_type,
+            organization_country,
+            organization_city,
+            organization_postal_code,
+            tutor_firstname,
+            tutor_lastname
+          )
+        )
+      `)
+      .eq("internship_id", internshipId);
 
-    return data;
+    if (error) {
+      throw new Error(`Failed to get internship: ${error.message}`);
+    }
+
+    return data || [];
   } catch (error) {
     console.error(`❌ Erreur lors de la récupération du stage ${internshipId}:`, error);
     throw error;
@@ -89,9 +201,31 @@ export async function getInternshipData(internshipId: number) {
  */
 export function transformToCardData(
   data: Array<{
-    internship: typeof internshipsTable.$inferSelect;
-    student: typeof studentsTable.$inferSelect;
-    organization: typeof organizationsTable.$inferSelect;
+    internship: {
+      internship_id: number;
+      internship_subject: string;
+      internship_confidential: boolean;
+      internship_dates: string;
+      internship_period: number;
+      internship_year: string;
+    };
+    student: {
+      student_id: number;
+      student_firstname: string;
+      student_lastname: string;
+      student_degree: string;
+      student_course: string;
+      organization_id: number;
+    };
+    organization: {
+      organization_id: number;
+      organization_name: string;
+      organization_type: string;
+      organization_country: string;
+      organization_city: string;
+      tutor_firstname: string;
+      tutor_lastname: string;
+    };
   }>,
 ): InternshipCardData[] {
   return data.map((item) => ({
@@ -106,17 +240,17 @@ export function transformToCardData(
     student: {
       firstName: item.student.student_firstname,
       lastName: item.student.student_lastname,
-      major: item.student.student_degree || undefined, // Diplôme (G, IR, TIS)
+      major: item.student.student_degree || undefined,
       course:
         item.student.student_course && item.student.student_course !== "??"
           ? item.student.student_course
-          : undefined, // Filière (RIO, SDIA seulement)
+          : undefined,
     },
     organization: {
       orgName: item.organization.organization_name,
       tutorFirstName: item.organization.tutor_firstname,
       tutorLastName: item.organization.tutor_lastname,
-      orgType: item.organization.organization_type, // Déjà "Entreprise" ou "Hors entreprise"
+      orgType: item.organization.organization_type,
       country: item.organization.organization_country || undefined,
       city: item.organization.organization_city || undefined,
     },
