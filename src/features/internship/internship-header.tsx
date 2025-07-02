@@ -1,12 +1,12 @@
 "use client";
-import type { InternshipFD } from "@/data/fake-data";
+import type { InternshipCardData } from "@/types/database";
 import { InternshipFilter } from "@/features/internship/internship-filter";
 import { SortInternshipButton } from "@/features/internship/internship-sort";
 
 type InternshipHeaderProps = {
   sort: string;
   setSort: (v: string) => void;
-  fakeInternships: InternshipFD[];
+  fakeInternships: InternshipCardData[];
 };
 
 export function InternshipHeader({ fakeInternships, sort, setSort }: InternshipHeaderProps) {
@@ -15,13 +15,13 @@ export function InternshipHeader({ fakeInternships, sort, setSort }: InternshipH
       <div>
         <InternshipFilter />
       </div>
-      <div className="flex justify-between items-center w-full">
+      <div className="flex w-full items-center justify-between">
         <p className="text-gray-600">
           {fakeInternships.length} stage{fakeInternships.length > 1 ? "s" : ""} trouvé
           {fakeInternships.length > 1 ? "s" : ""}
         </p>
         <div className="flex items-center gap-2">
-          <p className="text-gray-600 invisible sm:visible">Trier par :</p>
+          <p className="hidden text-gray-600 sm:block">Trier par :</p>
           <SortInternshipButton value={sort} onChange={setSort} />
         </div>
       </div>
