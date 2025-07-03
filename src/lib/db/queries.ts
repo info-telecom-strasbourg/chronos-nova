@@ -52,6 +52,7 @@ export async function getAllInternshipsData(
             organization_type,
             organization_country,
             organization_city,
+            organization_postal_code,
             tutor_firstname,
             tutor_lastname
           )
@@ -142,6 +143,9 @@ export async function getAllInternshipsData(
         organization_city: (
           (row.Student as Record<string, unknown>)?.Organization as Record<string, unknown>
         )?.organization_city as string,
+        organization_postal_code: (
+          (row.Student as Record<string, unknown>)?.Organization as Record<string, unknown>
+        )?.organization_postal_code as number,
         tutor_firstname: (
           (row.Student as Record<string, unknown>)?.Organization as Record<string, unknown>
         )?.tutor_firstname as string,
@@ -234,6 +238,7 @@ export function transformToCardData(
       organization_type: string;
       organization_country: string;
       organization_city: string;
+      organization_postal_code: number;
       tutor_firstname: string;
       tutor_lastname: string;
     };
@@ -264,6 +269,7 @@ export function transformToCardData(
       orgType: item.organization.organization_type,
       country: item.organization.organization_country || undefined,
       city: item.organization.organization_city || undefined,
+      postalCode: item.organization.organization_postal_code || undefined,
     },
   }));
 }

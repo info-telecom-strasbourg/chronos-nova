@@ -1,5 +1,5 @@
 import type { InternshipCardData } from "@/types/database";
-import { Building, Calendar, Clock, GraduationCap, Hash, MapPin } from "lucide-react";
+import { Building, Calendar1, Clock, GraduationCap, Hash, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,7 +9,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { formatDate } from "@/lib/format-date";
+import { InternshipDetailsDialog } from "./internship-details-dialog";
 
 type InternshipCardProps = {
   internship: InternshipCardData;
@@ -58,13 +60,18 @@ export function InternshipCard({ internship }: InternshipCardProps) {
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
+              <Calendar1 className="h-4 w-4" />
               <span>{formatDate(internship.internship.date)}</span>
             </div>
           </div>
         </CardContent>
         <CardFooter className="flex justify-center sm:justify-end">
-          <Button variant="outline">Voir les détails</Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">Voir plus de détails</Button>
+            </DialogTrigger>
+            <InternshipDetailsDialog internship={internship} />
+          </Dialog>
         </CardFooter>
       </Card>
     </div>
