@@ -1,5 +1,5 @@
 import type { InternshipCardData } from "@/types/database";
-import { Building, Calendar, Clock, GraduationCap, MapPin } from "lucide-react";
+import { Building, Calendar, Clock, GraduationCap, Hash, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -20,7 +20,13 @@ export function InternshipCard({ internship }: InternshipCardProps) {
     <div>
       <Card>
         <CardHeader className="border-b-2 pb-4">
-          <CardTitle className="text-2xl">{internship.organization.orgName}</CardTitle>
+          <div className="flex w-full items-start justify-between">
+            <CardTitle className="text-2xl">{internship.organization.orgName}</CardTitle>
+            <span className="flex select-all items-center gap-1 text-muted-foreground text-xs">
+              <Hash className="h-3 w-3" />
+              {internship.id}
+            </span>
+          </div>
           <CardDescription>
             <span className="inline-flex items-center gap-1">
               <Building className="inline h-4 w-4 align-text-bottom" />
@@ -40,7 +46,7 @@ export function InternshipCard({ internship }: InternshipCardProps) {
             <div className="flex items-center gap-2">
               <GraduationCap className="h-4 w-4" />
               <span>
-                2A - {internship.student.major || "??"}
+                {internship.internship.year} - {internship.student.major || "??"}
                 {internship.student.course ? ` - ${internship.student.course}` : ""}
               </span>
             </div>
