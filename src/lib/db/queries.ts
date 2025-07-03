@@ -14,11 +14,21 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 /**
  * Récupère tous les stages avec leurs étudiants et organisations associés
  * @param sort - Type de tri à appliquer ('most-recent', 'organization', 'duration', 'location')
+ * @param page - Numéro de la page (commence à 1)
+ * @param limit - Nombre d'éléments par page
  */
-export async function getAllInternshipsData(sort: string = "most-recent") {
+export async function getAllInternshipsData(
+  sort: string = "most-recent",
+  page: number = 1,
+  limit: number = 10,
+) {
   try {
+    const offset = (page - 1) * limit;
+
     // Requête avec jointures pour récupérer toutes les données nécessaires
-    let query = supabase.from("Complete").select(`
+    let query = supabase
+      .from("Complete")
+      .select(`
         internship_id,
         student_id,
         Internship!inner (
@@ -46,7 +56,8 @@ export async function getAllInternshipsData(sort: string = "most-recent") {
             tutor_lastname
           )
         )
-      `);
+      `)
+      .range(offset, offset + limit - 1);
 
     // Application du tri selon le paramètre
     switch (sort) {
@@ -255,4 +266,24 @@ export function transformToCardData(
       city: item.organization.organization_city || undefined,
     },
   }));
+}
+
+/**
+ * Récupère le nombre total de stages
+ */
+export async function getTotalInternshipsCount(): Promise<number> {
+  try {
+    const { count, error } = await supabase
+      .from("Complete")
+      .select("*", { count: "exact", head: true });
+
+    if (error) {
+      throw new Error(`Failed to get total count: ${error.message}`);
+    }
+
+    return count || 0;
+  } catch (error) {
+    console.error("❌ Erreur lors du comptage des stages:", error);
+    throw error;
+  }
 }
