@@ -40,10 +40,12 @@
     "rules": {
       "recommended": true,
       "correctness": {
+        "noEmptyPattern": "warn",
         "noUnusedImports": {
           "fix": "safe",
           "level": "warn"
-        }
+        },
+        "useExhaustiveDependencies": "off"
       },
       "nursery": {
         "useSortedClasses": {
@@ -58,6 +60,10 @@
       "suspicious": {
         "recommended": true,
         "noArrayIndexKey": "off"
+      },
+      "a11y": {
+        "noAriaHiddenOnFocusable": "off",
+        "noAutofocus": "off"
       }
     }
   },
