@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { reset, seed } from "drizzle-seed";
-import { major2str, option2str } from "@/const/major-correspondance";
+import { major2str, option2str } from "@/lib/const/major-correspondance";
 import { serverEnv } from "@/lib/env/server";
 import * as schema from "./schema";
 
