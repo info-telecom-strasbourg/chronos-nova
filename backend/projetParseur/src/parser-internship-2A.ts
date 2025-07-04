@@ -1,6 +1,7 @@
-import type { Internship, Organization, Student } from "./typeDefinition";
-import ExcelJS from "exceljs";
-import { extractNumberOfWeeks, normalizeField, splitLastNameFirstName } from "./functions";
+import type { Worksheet } from "exceljs";
+import type { Internship, Organization, Student } from "./type-definition";
+import { normalizeOrganizationType } from "./data-normalizer.js";
+import { extractNumberOfWeeks, splitLastNameFirstName } from "./functions.js";
 
 // ===================================
 // Parsing functions
@@ -15,7 +16,8 @@ export async function parseExcelInternship2A(
   students: Student[];
   organizations: Organization[];
 }> {
-  const workbook = new ExcelJS.Workbook();
+  const ExcelJS = await import("exceljs");
+  const workbook = new ExcelJS.default.Workbook();
   await workbook.xlsx.readFile(filePath);
 
   const worksheet = workbook.getWorksheet(sheetName);
@@ -31,20 +33,20 @@ export async function parseExcelInternship2A(
   return { internships, organizations, students };
 }
 
-function parseInternships(worksheet: ExcelJS.Worksheet): Internship[] {
+function parseInternships(worksheet: Worksheet): Internship[] {
   const internships: Internship[] = [];
 
   worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
     if (rowNumber < startingRow) return; // skip header rows
 
-    // Extraction and normalization
-    const subject = normalizeField(row.getCell(11).text, rowNumber);
-    const confidential = normalizeField(row.getCell(12).text, rowNumber);
-    const date = normalizeField(row.getCell(14).text, rowNumber);
+    // Extraction directe des données
+    const subject = row.getCell(11).text.trim() || "??";
+    const confidential = row.getCell(12).text.trim() || "??";
+    const date = row.getCell(14).text.trim() || "??";
 
     const weeksCell = row.getCell(15).text.trim();
     const weeksCount = extractNumberOfWeeks(weeksCell);
-    const year = normalizeField("2A", rowNumber);
+    const year = "2A";
 
     internships.push({
       confidential,
@@ -58,16 +60,16 @@ function parseInternships(worksheet: ExcelJS.Worksheet): Internship[] {
   return internships;
 }
 
-function parseStudents(worksheet: ExcelJS.Worksheet): Student[] {
+function parseStudents(worksheet: Worksheet): Student[] {
   const students: Student[] = [];
 
   worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
     if (rowNumber < startingRow) return; // skip header rows
 
-    // Extraction and normalization
+    // Extraction directe des données
     const fullNameCell = row.getCell(2).text.trim();
-    const { lastName, firstName } = splitLastNameFirstName(normalizeField(fullNameCell, rowNumber));
-    const major = normalizeField(row.getCell(3).text, rowNumber);
+    const { lastName, firstName } = splitLastNameFirstName(fullNameCell);
+    const major = row.getCell(3).text.trim() || "??";
 
     students.push({
       firstName,
@@ -79,22 +81,23 @@ function parseStudents(worksheet: ExcelJS.Worksheet): Student[] {
   return students;
 }
 
-function parseOrganizations(worksheet: ExcelJS.Worksheet): Organization[] {
+function parseOrganizations(worksheet: Worksheet): Organization[] {
   const organizations: Organization[] = [];
 
   worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
     if (rowNumber < startingRow) return; // skip header rows
 
-    // Extraction and normalization
-    const orgName = normalizeField(row.getCell(4).text, rowNumber);
+    // Extraction directe des données
+    const orgName = row.getCell(4).text.trim() || "??";
     const tutorFullNameCell = row.getCell(13).text.trim();
-    const { lastName: tutorLastName, firstName: tutorFirstName } = splitLastNameFirstName(
-      normalizeField(tutorFullNameCell, rowNumber),
-    );
-    const orgType = normalizeField(row.getCell(5).text, rowNumber);
-    const country = normalizeField(row.getCell(6).text, rowNumber, {
-      isCountry: true,
-    });
+    const { lastName: tutorLastName, firstName: tutorFirstName } =
+      splitLastNameFirstName(tutorFullNameCell);
+
+    // Utiliser normalizeOrganizationType pour convertir "E" en "Entreprise"
+    const orgTypeRaw = row.getCell(5).text.trim();
+    const orgType = normalizeOrganizationType(orgTypeRaw);
+
+    const country = row.getCell(6).text.trim() || "??";
 
     organizations.push({
       country,

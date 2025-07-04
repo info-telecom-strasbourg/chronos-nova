@@ -1,4 +1,5 @@
-import { Building, Calendar, Clock, GraduationCap, MapPin } from "lucide-react";
+import type { InternshipCardData } from "@/types/database";
+import { Building, Calendar1, Clock, GraduationCap, Hash, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -8,55 +9,69 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { InternshipFD, OrganizationFD, StudentFD } from "@/data/fake-data";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { formatDate } from "@/lib/format-date";
+import { InternshipDetailsDialog } from "./internship-details-dialog";
 
 type InternshipCardProps = {
-  internship: InternshipFD;
-  organization: OrganizationFD;
-  student: StudentFD;
+  internship: InternshipCardData;
 };
 
-export function InternshipCard({ internship, organization, student }: InternshipCardProps) {
+export function InternshipCard({ internship }: InternshipCardProps) {
   return (
     <div>
       <Card>
         <CardHeader className="border-b-2 pb-4">
-          <CardTitle className="text-2xl">{organization.orgName}</CardTitle>
+          <div className="flex w-full items-start justify-between">
+            <CardTitle className="text-2xl">{internship.organization.orgName}</CardTitle>
+            <span className="flex select-all items-center gap-1 text-muted-foreground text-xs">
+              <Hash className="h-3 w-3" />
+              {internship.id}
+            </span>
+          </div>
           <CardDescription>
             <span className="inline-flex items-center gap-1">
-              <Building className="w-4 h-4 inline align-text-bottom" />
-              {organization.orgType}
+              <Building className="inline h-4 w-4 align-text-bottom" />
+              {internship.organization.orgType}
             </span>
           </CardDescription>
         </CardHeader>
-        <CardContent className="font-thin mb-4 px-6 text-justify">
-          <p className="mb-7">{internship.subject}</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 mt-4 text-sm">
+        <CardContent className="mb-4 px-6 text-justify font-thin">
+          <p className="mb-7">{internship.internship.subject}</p>
+          <div className="mt-4 grid grid-cols-1 gap-x-4 gap-y-2 text-sm sm:grid-cols-2">
             <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4" />
+              <MapPin className="h-4 w-4" />
               <span>
-                {organization.country}, {organization.city}
+                {internship.organization.country}, {internship.organization.city}
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <GraduationCap className="w-4 h-4" />
+              <GraduationCap className="h-4 w-4" />
               <span>
-                {internship.year} - {student.major}
+                {internship.internship.year} - {internship.student.major || "??"}
+                {internship.student.course ? ` - ${internship.student.course}` : ""}
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4" />
-              <span>{internship.weeksCount} semaines</span>
+              <Clock className="h-4 w-4" />
+              <span>
+                {internship.internship.weeksCount > 0 ? internship.internship.weeksCount : "??"}{" "}
+                semaines
+              </span>
             </div>
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              <span>{formatDate(internship.date)}</span>
+              <Calendar1 className="h-4 w-4" />
+              <span>{formatDate(internship.internship.date)}</span>
             </div>
           </div>
         </CardContent>
         <CardFooter className="flex justify-center sm:justify-end">
-          <Button variant="outline">Voir les détails</Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">Voir plus de détails</Button>
+            </DialogTrigger>
+            <InternshipDetailsDialog internship={internship} />
+          </Dialog>
         </CardFooter>
       </Card>
     </div>

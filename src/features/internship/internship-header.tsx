@@ -1,27 +1,43 @@
 "use client";
-import type { InternshipFD } from "@/data/fake-data";
+import { Skeleton } from "@/components/ui/skeleton";
 import { InternshipFilter } from "@/features/internship/internship-filter";
+import { InternshipSearch } from "@/features/internship/internship-search";
 import { SortInternshipButton } from "@/features/internship/internship-sort";
 
 type InternshipHeaderProps = {
   sort: string;
   setSort: (v: string) => void;
-  fakeInternships: InternshipFD[];
+  totalCount: number;
+  loading?: boolean;
+  search: string;
+  setSearch: (v: string) => void;
 };
 
-export function InternshipHeader({ fakeInternships, sort, setSort }: InternshipHeaderProps) {
+export function InternshipHeader({
+  totalCount,
+  sort,
+  setSort,
+  loading,
+  search,
+  setSearch,
+}: InternshipHeaderProps) {
+  const isLoading = loading && totalCount === 0;
   return (
-    <div>
-      <div>
-        <InternshipFilter />
-      </div>
+    <div className="space-y-4">
+      <InternshipSearch value={search} onChange={setSearch} />
+
+      <InternshipFilter />
+
       <div className="flex justify-between items-center w-full">
-        <p className="text-gray-600">
-          {fakeInternships.length} stage{fakeInternships.length > 1 ? "s" : ""} trouvé
-          {fakeInternships.length > 1 ? "s" : ""}
-        </p>
+        {isLoading ? (
+          <Skeleton className="w-40 h-5" />
+        ) : (
+          <p className="text-muted-foreground">
+            {totalCount} stage{totalCount > 1 ? "s" : ""} trouvé{totalCount > 1 ? "s" : ""}
+          </p>
+        )}
         <div className="flex items-center gap-2">
-          <p className="text-gray-600 invisible sm:visible">Trier par :</p>
+          <p className="hidden sm:block text-muted-foreground">Trier par :</p>
           <SortInternshipButton value={sort} onChange={setSort} />
         </div>
       </div>
