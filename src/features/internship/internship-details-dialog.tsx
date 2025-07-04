@@ -16,7 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { formatDate } from "@/lib/format-date";
+import { formatDate } from "@/lib/scripts/date";
 import { getFullCourseName, getFullMajorName } from "@/types/correspondance";
 
 type InternshipDetailsDialogProps = {

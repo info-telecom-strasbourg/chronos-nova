@@ -4,10 +4,10 @@ import { notFound } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { InternshipCard } from "@/features/internship/internship-card";
-import { InternshipHeader } from "@/features/internship/internship-header";
 import { InternshipCardSkeleton } from "@/features/internship/internship-skeleton";
+import { useInternships } from "@/features/internship/use-internships";
+import { InternshipHeader } from "@/features/search/internship-header";
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
-import { useInternships } from "@/hooks/use-internships";
 
 export function InternshipListClient() {
   const [sort, setSort] = useQueryState("sort", { defaultValue: "most-recent" });
@@ -29,17 +29,17 @@ export function InternshipListClient() {
 
   if (showNoResults) {
     return (
-      <div className="flex flex-1 justify-center items-center w-full">
-        <div className="flex flex-col gap-4 mx-auto w-full max-w-2xl">
+      <div className="flex w-full flex-1 items-center justify-center">
+        <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
           <InternshipHeader
             totalCount={totalCount}
             sort={sort}
             setSort={setSort}
             loading={loading}
           />
-          <div className="flex justify-center items-center py-12">
+          <div className="flex items-center justify-center py-12">
             <Alert className="w-full max-w-md">
-              <Search className="w-4 h-4" />
+              <Search className="h-4 w-4" />
               <AlertTitle>Aucun stage trouvé</AlertTitle>
             </Alert>
           </div>
@@ -49,7 +49,7 @@ export function InternshipListClient() {
   }
 
   return (
-    <div className="flex flex-col gap-4 mx-auto w-full max-w-2xl">
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
       <InternshipHeader totalCount={totalCount} sort={sort} setSort={setSort} loading={loading} />
 
       {loading ? (
@@ -67,7 +67,7 @@ export function InternshipListClient() {
       {hasMore ? (
         <div
           ref={loadingRef}
-          className="flex justify-center items-center gap-2 py-8"
+          className="flex items-center justify-center gap-2 py-8"
           style={{ minHeight: 60 }}
         >
           {loadingMore && (
@@ -81,7 +81,7 @@ export function InternshipListClient() {
         </div>
       ) : (
         !loading && (
-          <div className="flex justify-center items-center py-8">
+          <div className="flex items-center justify-center py-8">
             <p className="text-muted-foreground text-sm">Tous les stages ont été chargés !</p>
           </div>
         )

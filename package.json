@@ -25,6 +25,7 @@
     "clsx": "^2.1.1",
     "dotenv": "^16.5.0",
     "drizzle-orm": "^0.44.2",
+    "drizzle-seed": "^0.3.1",
     "lucide-react": "^0.514.0",
     "next": "15.3.3",
     "next-safe-action": "^8.0.3",

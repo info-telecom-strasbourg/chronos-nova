@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { formatDate } from "@/lib/format-date";
+import { formatDate } from "@/lib/scripts/date";
 import { InternshipDetailsDialog } from "./internship-details-dialog";
 
 type InternshipCardProps = {

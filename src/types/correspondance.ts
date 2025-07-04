@@ -1,6 +1,8 @@
 export const COURSE_MAPPING: Record<string, string> = {
   SDIA: "Science des données et intelligence artificielle",
   RIO: "Réseaux et internet des objets",
+  titi: "",
+  dtmi: "",
 };
 
 export const MAJOR_MAPPING: Record<string, string> = {

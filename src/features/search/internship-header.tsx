@@ -1,7 +1,7 @@
 "use client";
 import { Skeleton } from "@/components/ui/skeleton";
-import { InternshipFilter } from "@/features/internship/internship-filter";
-import { SortInternshipButton } from "@/features/internship/internship-sort";
+import { InternshipFilter } from "@/features/search/internship-filter";
+import { SortInternshipButton } from "@/features/search/internship-sort";
 
 type InternshipHeaderProps = {
   sort: string;
