@@ -13,7 +13,7 @@ async function main() {
     internships: {
       count: 100,
       columns: {
-        weeks_duration: f.valuesFromArray({ values: ["4", "6", "8", "12"] }),
+        weeksDuration: f.valuesFromArray({ values: ["4", "6", "8", "12"] }),
       },
     },
     students: {

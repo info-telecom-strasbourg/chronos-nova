@@ -1,13 +1,16 @@
-import { boolean, date, integer, pgTable, text, uuid } from "drizzle-orm/pg-core";
+import { boolean, date, integer, pgEnum, pgTable, text, uuid } from "drizzle-orm/pg-core";
 import { organizations } from "./organization";
 import { students } from "./student";
+
+export const academicYear = pgEnum("academic_year", ["1A", "2A", "3A"]);
 
 export const internships = pgTable("internship", {
   id: uuid("id").defaultRandom().primaryKey(),
   subject: text("subject"),
   confidential: boolean("confidential"),
   beginDate: date("begin_date"),
-  weeks_duration: integer("weeks_duration"),
+  weeksDuration: integer("weeks_duration"),
+  academicYear: academicYear("academic_year"),
   studentId: uuid("student_id")
     .notNull()
     .references(() => students.id, {
