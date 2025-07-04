@@ -2,7 +2,7 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
 // Configuration de la base de données pour Next.js
-const connectionString = process.env.DATABASE_URL || "postgresql://postgres:password@localhost:5432/chronos_nova";
+const connectionString = process.env.DATABASE_URL;
 
 // Création du client postgres
 const client = postgres(connectionString, {

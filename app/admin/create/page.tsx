@@ -1,6 +1,6 @@
 import type { PageParams } from "@/types/next";
 
-// liste de stages avec référence et bouton edit / delete + un bouton en haut ajouter un stage
+// formulaire pour créer un stage + formulaire import excel
 export default async function RoutePage(_: PageParams) {
   return <div></div>;
 }

@@ -1,0 +1,1 @@
+// informations actuelles du stage
