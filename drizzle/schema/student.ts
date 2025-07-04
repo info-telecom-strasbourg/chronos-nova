@@ -3,7 +3,7 @@ import { majors, options } from "./major";
 
 export const degree = pgEnum("degree", ["gene", "ir", "ti"]);
 
-export const students = pgTable("Student", {
+export const students = pgTable("student", {
   id: uuid("id").defaultRandom().primaryKey(),
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),

@@ -4,11 +4,10 @@ import { students } from "./student";
 
 export const internships = pgTable("internship", {
   id: uuid("id").defaultRandom().primaryKey(),
-  subject: text("subject").notNull(),
-  confidential: boolean("confidential").notNull(),
-  beginDate: date("begin_date").notNull(),
-  period: integer("period").notNull(),
-  year: text("year").notNull(),
+  subject: text("subject"),
+  confidential: boolean("confidential"),
+  beginDate: date("begin_date"),
+  weeks_duration: integer("weeks_duration"),
   studentId: uuid("student_id")
     .notNull()
     .references(() => students.id, {
