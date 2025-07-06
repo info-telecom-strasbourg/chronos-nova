@@ -2,6 +2,8 @@
 import { Loader2Icon, Search } from "lucide-react";
 import { notFound } from "next/navigation";
 import { useQueryState } from "nuqs";
+import { useEffect, useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { InternshipCard } from "@/features/internship/internship-card";
 import { InternshipCardSkeleton } from "@/features/internship/internship-skeleton";
@@ -11,6 +13,13 @@ import { useInfiniteScroll } from "@/hooks/use-infinite-scroll";
 
 export function InternshipListClient() {
   const [sort, setSort] = useQueryState("sort", { defaultValue: "most-recent" });
+  const [search, setSearch] = useQueryState("search", { defaultValue: "" });
+  const [searchInput, setSearchInput] = useState(search);
+
+  useEffect(() => {
+    setSearchInput(search);
+  }, [search]);
+
   const { internships, loading, loadingMore, error, hasMore, totalCount, loadMore } =
     useInternships(sort);
 
@@ -21,38 +30,36 @@ export function InternshipListClient() {
     threshold: 300,
   });
 
+  const debouncedSetSearch = useDebouncedCallback((val) => setSearch(val), 500);
+
   if (error) {
     notFound();
   }
 
   const showNoResults = !loading && totalCount === 0;
 
-  if (showNoResults) {
-    return (
-      <div className="flex w-full flex-1 items-center justify-center">
-        <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
-          <InternshipHeader
-            totalCount={totalCount}
-            sort={sort}
-            setSort={setSort}
-            loading={loading}
-          />
-          <div className="flex items-center justify-center py-12">
-            <Alert className="w-full max-w-md">
-              <Search className="h-4 w-4" />
-              <AlertTitle>Aucun stage trouvé</AlertTitle>
-            </Alert>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-4">
-      <InternshipHeader totalCount={totalCount} sort={sort} setSort={setSort} loading={loading} />
+      <InternshipHeader
+        totalCount={totalCount}
+        sort={sort}
+        setSort={setSort}
+        loading={loading}
+        search={searchInput}
+        setSearch={(val) => {
+          setSearchInput(val);
+          debouncedSetSearch(val);
+        }}
+      />
 
-      {loading ? (
+      {showNoResults ? (
+        <div className="flex items-center justify-center py-12">
+          <Alert className="w-full max-w-md">
+            <Search className="size-4" />
+            <AlertTitle>Aucun stage trouvé</AlertTitle>
+          </Alert>
+        </div>
+      ) : loading ? (
         <div className="flex flex-col gap-4">
           {[...Array(10)].map((_, i) => (
             <InternshipCardSkeleton key={`skeleton-${i + 1}`} />
@@ -80,7 +87,8 @@ export function InternshipListClient() {
           )}
         </div>
       ) : (
-        !loading && (
+        !loading &&
+        !showNoResults && (
           <div className="flex items-center justify-center py-8">
             <p className="text-muted-foreground text-sm">Tous les stages ont été chargés !</p>
           </div>
