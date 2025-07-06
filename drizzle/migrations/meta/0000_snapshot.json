@@ -1,5 +1,5 @@
 {
-  "id": "45eebcc6-04b8-43a7-bb62-7f0c9e804199",
+  "id": "5fc96e2b-7815-40c4-82d8-29313b3e70ee",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -25,34 +25,36 @@
           "name": "confidential",
           "type": "boolean",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": false
         },
-        "begin_date": {
-          "name": "begin_date",
+        "beginDate": {
+          "name": "beginDate",
           "type": "date",
           "primaryKey": false,
           "notNull": true
         },
-        "period": {
-          "name": "period",
+        "weeksCount": {
+          "name": "weeksCount",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "year": {
-          "name": "year",
-          "type": "text",
+        "academicYear": {
+          "name": "academicYear",
+          "type": "academic_year",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
         },
-        "student_id": {
-          "name": "student_id",
+        "studentId": {
+          "name": "studentId",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
-        "organization_id": {
-          "name": "organization_id",
+        "organizationId": {
+          "name": "organizationId",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
@@ -60,12 +62,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "internship_student_id_Student_id_fk": {
-          "name": "internship_student_id_Student_id_fk",
+        "internship_studentId_student_id_fk": {
+          "name": "internship_studentId_student_id_fk",
           "tableFrom": "internship",
-          "tableTo": "Student",
+          "tableTo": "student",
           "columnsFrom": [
-            "student_id"
+            "studentId"
           ],
           "columnsTo": [
             "id"
@@ -73,12 +75,12 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "internship_organization_id_organization_id_fk": {
-          "name": "internship_organization_id_organization_id_fk",
+        "internship_organizationId_organization_id_fk": {
+          "name": "internship_organizationId_organization_id_fk",
           "tableFrom": "internship",
           "tableTo": "organization",
           "columnsFrom": [
-            "organization_id"
+            "organizationId"
           ],
           "columnsTo": [
             "id"
@@ -188,8 +190,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.Student": {
-      "name": "Student",
+    "public.student": {
+      "name": "student",
       "schema": "",
       "columns": {
         "id": {
@@ -199,26 +201,26 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "first_name": {
-          "name": "first_name",
+        "firstName": {
+          "name": "firstName",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "last_name": {
-          "name": "last_name",
+        "lastName": {
+          "name": "lastName",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "major_alias": {
-          "name": "major_alias",
+        "majorAlias": {
+          "name": "majorAlias",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "option_alias": {
-          "name": "option_alias",
+        "optionAlias": {
+          "name": "optionAlias",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -226,12 +228,12 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "Student_major_alias_major_alias_fk": {
-          "name": "Student_major_alias_major_alias_fk",
-          "tableFrom": "Student",
+        "student_majorAlias_major_alias_fk": {
+          "name": "student_majorAlias_major_alias_fk",
+          "tableFrom": "student",
           "tableTo": "major",
           "columnsFrom": [
-            "major_alias"
+            "majorAlias"
           ],
           "columnsTo": [
             "alias"
@@ -239,12 +241,12 @@
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
-        "Student_option_alias_option_alias_fk": {
-          "name": "Student_option_alias_option_alias_fk",
-          "tableFrom": "Student",
+        "student_optionAlias_option_alias_fk": {
+          "name": "student_optionAlias_option_alias_fk",
+          "tableFrom": "student",
           "tableTo": "option",
           "columnsFrom": [
-            "option_alias"
+            "optionAlias"
           ],
           "columnsTo": [
             "alias"
@@ -261,6 +263,15 @@
     }
   },
   "enums": {
+    "public.academic_year": {
+      "name": "academic_year",
+      "schema": "public",
+      "values": [
+        "1A",
+        "2A",
+        "3A"
+      ]
+    },
     "public.organization_type": {
       "name": "organization_type",
       "schema": "public",

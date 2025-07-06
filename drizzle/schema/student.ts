@@ -5,14 +5,14 @@ export const degree = pgEnum("degree", ["gene", "ir", "ti"]);
 
 export const students = pgTable("student", {
   id: uuid("id").defaultRandom().primaryKey(),
-  firstName: text("first_name").notNull(),
-  lastName: text("last_name").notNull(),
-  majorAlias: text("major_alias")
+  firstName: text("firstName").notNull(),
+  lastName: text("lastName").notNull(),
+  majorAlias: text("majorAlias")
     .notNull()
     .references(() => majors.alias, {
       onDelete: "cascade",
     }),
-  optionAlias: text("option_alias")
+  optionAlias: text("optionAlias")
     .notNull()
     .references(() => options.alias, {
       onDelete: "cascade",

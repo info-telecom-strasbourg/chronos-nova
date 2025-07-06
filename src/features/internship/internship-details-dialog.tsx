@@ -1,6 +1,5 @@
-import type { InternshipCardData } from "@/types/database";
+import type { InternshipData } from "@/types/database";
 import {
-  BadgeInfo,
   Calendar,
   Calendar1,
   Clock,
@@ -20,7 +19,7 @@ import { formatDate } from "@/lib/scripts/date";
 import { getFullCourseName, getFullMajorName } from "@/types/correspondance";
 
 type InternshipDetailsDialogProps = {
-  internship: InternshipCardData;
+  internship: InternshipData;
 };
 
 export function InternshipDetailsDialog({ internship }: InternshipDetailsDialogProps) {
@@ -60,22 +59,12 @@ export function InternshipDetailsDialog({ internship }: InternshipDetailsDialogP
               <b>Ville :</b> {internship.organization.city}
             </span>
           </span>
-          {internship.organization.postalCode && (
-            <span className="flex items-start gap-2">
-              <span>
-                <BadgeInfo className="h-4 w-4 text-muted-foreground" />
-              </span>
-              <span>
-                <b>Code postal :</b> {internship.organization.postalCode}
-              </span>
-            </span>
-          )}
           <span className="flex items-start gap-2">
             <span>
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </span>
             <span>
-              <b>Année :</b> {internship.internship.year}
+              <b>Année :</b> {internship.academicYear}
             </span>
           </span>
           <span className="flex items-start gap-2">
@@ -83,25 +72,25 @@ export function InternshipDetailsDialog({ internship }: InternshipDetailsDialogP
               <GraduationCap className="h-4 w-4 text-muted-foreground" />
             </span>
             <span>
-              <b>Diplôme :</b> {internship.student.major}
-              {internship.student.major && getFullMajorName(internship.student.major) && (
+              <b>Diplôme :</b> {internship.student.major.name}
+              {internship.student.major && getFullMajorName(internship.student.major.name) && (
                 <span className="text-muted-foreground">
                   {" ("}
-                  {getFullMajorName(internship.student.major)}
+                  {getFullMajorName(internship.student.major.name)}
                   {")"}
                 </span>
               )}
             </span>
           </span>
-          {internship.student.course && (
+          {internship.student.option && (
             <span className="flex items-start gap-2">
               <span>
                 <School className="h-4 w-4 text-muted-foreground" />
               </span>
               <span>
-                <b>Filière :</b> {internship.student.course}
+                <b>Filière :</b> {internship.student.option.name}
                 {" ("}
-                {getFullCourseName(internship.student.course)}
+                {getFullCourseName(internship.student.option.name)}
                 {")"}
               </span>
             </span>
@@ -111,7 +100,7 @@ export function InternshipDetailsDialog({ internship }: InternshipDetailsDialogP
               <Clock className="h-4 w-4 text-muted-foreground" />
             </span>
             <span>
-              <b>Durée :</b> {internship.internship.weeksCount} semaines
+              <b>Durée :</b> {internship.weeksCount} semaines
             </span>
           </span>
           <span className="flex items-start gap-2">
@@ -119,7 +108,7 @@ export function InternshipDetailsDialog({ internship }: InternshipDetailsDialogP
               <Calendar1 className="h-4 w-4 text-muted-foreground" />
             </span>
             <span>
-              <b>Date de début :</b> {formatDate(internship.internship.date)}
+              <b>Date de début :</b> {formatDate(internship.beginDate || "")}
             </span>
           </span>
         </div>

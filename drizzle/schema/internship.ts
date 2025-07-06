@@ -6,17 +6,17 @@ export const academicYear = pgEnum("academic_year", ["1A", "2A", "3A"]);
 
 export const internships = pgTable("internship", {
   id: uuid("id").defaultRandom().primaryKey(),
-  subject: text("subject"),
-  confidential: boolean("confidential"),
-  beginDate: date("begin_date"),
-  weeksDuration: integer("weeks_duration"),
-  academicYear: academicYear("academic_year"),
-  studentId: uuid("student_id")
+  subject: text("subject").notNull(),
+  confidential: boolean("confidential").notNull().default(false),
+  beginDate: date("beginDate").notNull(),
+  weeksCount: integer("weeksCount").notNull(),
+  academicYear: academicYear("academicYear").notNull(),
+  studentId: uuid("studentId")
     .notNull()
     .references(() => students.id, {
       onDelete: "cascade",
     }),
-  organizationId: uuid("organization_id")
+  organizationId: uuid("organizationId")
     .notNull()
     .references(() => organizations.id, {
       onDelete: "cascade",

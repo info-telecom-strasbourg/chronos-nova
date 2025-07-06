@@ -6,14 +6,14 @@ import { serverEnv } from "@/lib/env/server";
 import * as schema from "./schema";
 
 async function main() {
-  const db = drizzle(serverEnv.SUPABASE_DB_URL);
+  const db = drizzle(serverEnv.SUPABASE_DB_URL, { logger: true });
 
   await reset(db, schema);
   await seed(db, schema).refine((f) => ({
     internships: {
       count: 100,
       columns: {
-        weeksDuration: f.valuesFromArray({ values: ["4", "6", "8", "12"] }),
+        weeksCount: f.valuesFromArray({ values: ["4", "6", "8", "12"] }),
       },
     },
     students: {

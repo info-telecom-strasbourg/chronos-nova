@@ -4,8 +4,8 @@ export const organizationType = pgEnum("organization_type", ["company", "not_com
 
 export const organizations = pgTable("organization", {
   id: uuid("id").defaultRandom().primaryKey(),
-  name: text("name"),
-  type: organizationType("type"),
-  country: text("country"),
-  city: text("city"),
+  name: text("name").notNull(),
+  type: organizationType("type").notNull(),
+  country: text("country").notNull(),
+  city: text("city").notNull(),
 });
