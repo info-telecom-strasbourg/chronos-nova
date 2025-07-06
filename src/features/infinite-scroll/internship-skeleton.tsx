@@ -1,5 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 
+// TODO: Reimplement this component in loading state
 export function InternshipCardSkeleton() {
   return (
     <div className="space-y-4 rounded-lg border p-6">

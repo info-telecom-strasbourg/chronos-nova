@@ -1,42 +1,47 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
+import { useInView } from "react-intersection-observer";
 
-interface UseInfiniteScrollProps {
-  hasNextPage: boolean;
-  isLoading: boolean;
-  loadMore: () => void;
-  threshold?: number;
-}
+export type UseInfiniteScrollOptions<T> = {
+  initialData: T[];
+  loadMore: (page: number) => Promise<T[] | null>;
+  initialPage?: number;
+};
 
-export function useInfiniteScroll({
-  hasNextPage,
-  isLoading,
+export const useInfiniteScroll = <T>({
+  initialData,
   loadMore,
-  threshold = 300,
-}: UseInfiniteScrollProps) {
-  const observerRef = useRef<IntersectionObserver | null>(null);
-  const loadingRef = useRef<HTMLDivElement | null>(null);
+  initialPage = 1,
+}: UseInfiniteScrollOptions<T>) => {
+  const [data, setData] = useState(initialData);
+  const [page, setPage] = useState(initialPage);
+  const [hasMore, setHasMore] = useState(true);
+  const [isPending, startTransition] = useTransition();
+
+  const [ref, inView] = useInView({
+    threshold: 0,
+    rootMargin: "500px",
+  });
+
+  const loadNextPage = useCallback(() => {
+    if (!hasMore || isPending) return;
+
+    startTransition(async () => {
+      const nextPage = page + 1;
+      const newData = await loadMore(nextPage);
+      if (newData && newData.length > 0) {
+        setPage(nextPage);
+        setData((prev) => [...prev, ...newData]);
+      } else {
+        setHasMore(false);
+      }
+    });
+  }, [hasMore, loadMore, isPending, page]);
 
   useEffect(() => {
-    const el = loadingRef.current;
-    if (!el || !hasNextPage || isLoading) return;
+    if (inView && hasMore && !isPending) {
+      loadNextPage();
+    }
+  }, [inView, hasMore, loadNextPage, isPending]);
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && hasNextPage && !isLoading) {
-          loadMore();
-        }
-      },
-      {
-        threshold: 0,
-        rootMargin: `0px 0px ${threshold}px 0px`,
-      },
-    );
-
-    observer.observe(el);
-    observerRef.current = observer;
-
-    return () => observer.disconnect();
-  }, [hasNextPage, isLoading, loadMore, threshold]);
-
-  return loadingRef;
-}
+  return { data, hasMore, ref, isPending };
+};

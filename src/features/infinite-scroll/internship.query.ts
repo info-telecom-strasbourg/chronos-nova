@@ -1,3 +1,7 @@
+"use server";
+
+import type { PostgrestSingleResponse } from "@supabase/supabase-js";
+import type { InternshipData } from "@/types/drizzle";
 import { z } from "zod";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -9,6 +13,9 @@ const getInternshipsQuerySchema = z.object({
   page: z.coerce.number().optional(),
 });
 
+const internshipPerPage = 10;
+
+// TODO: Implement search params handling in loadInternships function
 export const getInternshipsQuery = async ({
   q,
   filter,
@@ -20,8 +27,8 @@ export const getInternshipsQuery = async ({
   const data = await supabase
     .from("internship")
     .select("*, organization(*), student(*, major(*), option(*))")
-    .limit(10)
-    .range(page * 10, (page + 1) * 10);
+    .limit(internshipPerPage)
+    .range(page * internshipPerPage, (page + 1) * internshipPerPage - 1);
 
-  return data;
+  return data as PostgrestSingleResponse<InternshipData[]>;
 };

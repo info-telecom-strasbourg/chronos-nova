@@ -1,4 +1,4 @@
-import type { InternshipCardData } from "@/types/database";
+import type { InternshipCardData } from "@/types/drizzle";
 import { createClient } from "@supabase/supabase-js";
 
 // Configuration Supabase pour les requêtes frontend

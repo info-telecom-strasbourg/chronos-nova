@@ -1,34 +1,34 @@
 "use client";
 
 import { Search, X } from "lucide-react";
+import { useQueryState } from "nuqs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-type InternshipSearchProps = {
-  value: string;
-  onChange: (value: string) => void;
-};
+export function InternshipSearch() {
+  const [value, setValue] = useQueryState("q", {
+    defaultValue: "",
+  });
 
-export function InternshipSearch({ value, onChange }: InternshipSearchProps) {
   const handleClear = () => {
-    onChange("");
+    setValue("");
   };
 
   return (
-    <div className="space-y-2 w-full">
+    <div className="w-full space-y-2">
       <div className="relative">
-        <Search className="top-1/2 left-3 absolute size-4 text-muted-foreground -translate-y-1/2 pointer-events-none" />
+        <Search className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 size-4 text-muted-foreground" />
         <Input
           type="text"
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => setValue(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.currentTarget.blur();
             }
           }}
           placeholder={"Rechercher..."}
-          className="pr-10 pl-10 w-full h-11"
+          className="h-11 w-full pr-10 pl-10"
         />
         {value && (
           <Button
@@ -36,7 +36,7 @@ export function InternshipSearch({ value, onChange }: InternshipSearchProps) {
             variant="ghost"
             size="icon"
             onClick={handleClear}
-            className="top-1/2 right-2 absolute p-0 rounded-md size-7 -translate-y-1/2"
+            className="-translate-y-1/2 absolute top-1/2 right-2 size-7 rounded-md p-0"
           >
             <X className="size-4" />
           </Button>

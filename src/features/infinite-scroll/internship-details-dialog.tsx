@@ -1,4 +1,4 @@
-import type { InternshipData } from "@/types/database";
+import type { InternshipData } from "@/types/drizzle";
 import {
   Calendar,
   Calendar1,

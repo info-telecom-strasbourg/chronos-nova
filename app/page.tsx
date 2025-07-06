@@ -1,14 +1,20 @@
 import type { PageParams } from "@/types/next";
-import { getInternshipsQuery } from "@/features/internship/internship.query";
-import { InternshipCard } from "@/features/internship/internship-card";
+import { Suspense } from "react";
+import { getInternshipsQuery } from "@/features/infinite-scroll/internship.query";
+import { InternshipInfiniteScroll } from "@/features/infinite-scroll/internship-infinite-scroll";
+import { InternshipHeader } from "@/features/search/internship-header";
 
 export default async function RoutePage({ searchParams }: PageParams) {
   const { data: internships } = await getInternshipsQuery(await searchParams);
+
+  if (!internships) throw new Error("Implement error handling");
   return (
-    <div className="flex h-full flex-col items-center justify-start gap-4 pt-8">
-      {internships?.map((internship) => (
-        <InternshipCard internship={internship} key={internship.id} />
-      ))}
+    <div className="space-y-8 pt-8">
+      <InternshipHeader />
+      {/* TODO: Implement Skeleton */}
+      <Suspense fallback={<div>TODO: Implement Skeleton</div>}>
+        <InternshipInfiniteScroll initialInternships={internships} />
+      </Suspense>
     </div>
   );
 }
