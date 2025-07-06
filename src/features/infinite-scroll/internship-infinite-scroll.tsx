@@ -30,7 +30,7 @@ export const InternshipInfiniteScroll = ({ initialInternships }: InternshipInfin
   });
 
   return (
-    <ul className="w-full space-y-4">
+    <ul className="mx-auto w-full max-w-screen-md space-y-4 px-4 py-6">
       {internships.map((internship) => (
         <InternshipCard key={internship.id} internship={internship} />
       ))}

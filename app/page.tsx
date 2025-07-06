@@ -9,7 +9,7 @@ export default async function RoutePage({ searchParams }: PageParams) {
 
   if (!internships) throw new Error("Implement error handling");
   return (
-    <div className="space-y-8 pt-8">
+    <div className="space-y-8">
       <InternshipHeader />
       {/* TODO: Implement Skeleton */}
       <Suspense fallback={<div>TODO: Implement Skeleton</div>}>
