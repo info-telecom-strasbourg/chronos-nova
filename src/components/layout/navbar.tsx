@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { RouteToggle } from "@/components/route-toggle";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { AuthButton } from "@/features/auth/auth-button";
 import { Logo } from "./logo";
@@ -15,6 +16,7 @@ export const Navbar = () => {
           <span className="font-semibold text-lg">Chronos</span>
         </Link>
         <div className="flex items-center gap-2">
+          <RouteToggle />
           <ThemeToggle />
           <AuthButton />
         </div>

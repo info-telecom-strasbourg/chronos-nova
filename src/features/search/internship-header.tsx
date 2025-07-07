@@ -1,13 +1,17 @@
 "use client";
+import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { InternshipFilter } from "@/features/search/internship-filter";
 import { InternshipSearch } from "@/features/search/internship-search";
 import { SortInternshipButton } from "@/features/search/internship-sort";
+import { useAdminMode } from "@/hooks/use-admin-mode";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export function InternshipHeader() {
   const [totalCount, setTotalCount] = useState<number | null>(null);
+  const { isAdmin } = useAdminMode();
 
   useEffect(() => {
     const fetchTotalCount = async () => {
@@ -33,6 +37,14 @@ export function InternshipHeader() {
 
   return (
     <div className="w-full space-y-4">
+      {isAdmin && (
+        <div className="flex justify-end">
+          <Button className="flex items-center gap-2 bg-primary shadow-md transition-shadow hover:shadow-lg">
+            <Plus className="size-4" />
+            Ajouter un stage
+          </Button>
+        </div>
+      )}
       <InternshipSearch />
       <InternshipFilter />
       <div className="flex w-full items-center justify-between">

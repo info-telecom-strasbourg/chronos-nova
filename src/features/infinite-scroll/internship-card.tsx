@@ -1,5 +1,14 @@
 import type { InternshipData } from "@/types/drizzle";
-import { Building, Calendar1, Clock, GraduationCap, Hash, MapPin } from "lucide-react";
+import {
+  Building,
+  Calendar1,
+  Clock,
+  Edit,
+  GraduationCap,
+  Hash,
+  MapPin,
+  Trash2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,6 +19,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { useAdminMode } from "@/hooks/use-admin-mode";
 import { InternshipDetailsDialog } from "./internship-details-dialog";
 
 type InternshipCardProps = {
@@ -17,6 +27,7 @@ type InternshipCardProps = {
 };
 
 export function InternshipCard({ internship }: InternshipCardProps) {
+  const { isAdmin } = useAdminMode();
   return (
     <Card className="w-full">
       <CardHeader className="border-b-2 pb-4">
@@ -63,13 +74,27 @@ export function InternshipCard({ internship }: InternshipCardProps) {
           </div>
         </div>
       </CardContent>
-      <CardFooter className="flex justify-center sm:justify-end">
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="outline">Voir plus de détails</Button>
-          </DialogTrigger>
-          <InternshipDetailsDialog internship={internship} />
-        </Dialog>
+      <CardFooter className="flex justify-center gap-2 sm:justify-between">
+        {isAdmin && (
+          <div className="flex gap-2">
+            <Button variant="outline">
+              <Edit className="size-4" />
+              Modifier
+            </Button>
+            <Button variant="destructive">
+              <Trash2 className="size-4" />
+              Supprimer
+            </Button>
+          </div>
+        )}
+        <div className="sm:ml-auto">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">Voir plus</Button>
+            </DialogTrigger>
+            <InternshipDetailsDialog internship={internship} />
+          </Dialog>
+        </div>
       </CardFooter>
     </Card>
   );
