@@ -33,7 +33,7 @@ export function InternshipDetailsDialog({ internship }: InternshipDetailsDialogP
         </DialogTitle>
       </DialogHeader>
 
-      <DialogDescription>
+      <DialogDescription asChild>
         <div className="flex flex-col gap-3">
           <span className="flex items-start gap-2">
             <span>
