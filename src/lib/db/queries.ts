@@ -280,7 +280,7 @@ export function transformToCardData(
 export async function getTotalInternshipsCount(): Promise<number> {
   try {
     const { count, error } = await supabase
-      .from("Complete")
+      .from("internship")
       .select("*", { count: "exact", head: true });
 
     if (error) {

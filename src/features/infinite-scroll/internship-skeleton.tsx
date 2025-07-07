@@ -1,11 +1,13 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAdminMode } from "@/hooks/use-admin-mode";
 
 // TODO: Reimplement this component in loading state
 export function InternshipCardSkeleton() {
+  const { isAdmin } = useAdminMode();
   return (
-    <div className="space-y-4 rounded-lg border p-6">
+    <div className="flex w-full flex-col gap-6 rounded-xl border bg-card py-6 text-card-foreground shadow-sm">
       {/* Header */}
-      <div className="space-y-2 border-b pb-4">
+      <div className="grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 border-b px-6 pb-6">
         <Skeleton className="h-8 w-3/4" />
         <div className="flex items-center gap-2">
           <Skeleton className="h-4 w-4" />
@@ -14,15 +16,15 @@ export function InternshipCardSkeleton() {
       </div>
 
       {/* Content */}
-      <div className="space-y-4">
-        <div className="space-y-2">
+      <div className="px-6">
+        <div className="mb-7 space-y-2">
           <Skeleton className="h-4 w-full" />
           <Skeleton className="h-4 w-full" />
           <Skeleton className="h-4 w-2/3" />
         </div>
 
         {/* Grid info */}
-        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="mt-4 grid grid-cols-1 gap-x-4 gap-y-2 text-sm sm:grid-cols-2">
           <div className="flex items-center gap-2">
             <Skeleton className="h-4 w-4" />
             <Skeleton className="h-4 w-32" />
@@ -43,8 +45,16 @@ export function InternshipCardSkeleton() {
       </div>
 
       {/* Footer */}
-      <div className="flex justify-center pt-4 sm:justify-end">
-        <Skeleton className="h-10 w-32" />
+      <div className="flex items-center justify-center gap-2 px-6 sm:justify-between">
+        {isAdmin && (
+          <div className="flex gap-2">
+            <Skeleton className="h-10 w-26" />
+            <Skeleton className="h-10 w-30" />
+          </div>
+        )}
+        <div className="sm:ml-auto">
+          <Skeleton className="h-10 w-20" />
+        </div>
       </div>
     </div>
   );
@@ -52,21 +62,11 @@ export function InternshipCardSkeleton() {
 
 export function InternshipListSkeleton() {
   return (
-    <div className="flex w-full max-w-2xl flex-col gap-4" style={{ zIndex: 1 }}>
-      {/* Count and sort skeleton */}
-      <div className="flex w-full items-center justify-between">
-        <Skeleton className="h-5 w-32" />
-        <div className="flex items-center gap-2">
-          <Skeleton className="hidden h-5 w-20 sm:block" />
-          <Skeleton className="h-10 w-32" />
-        </div>
-      </div>
-
+    <div className="flex w-full flex-col gap-4" style={{ zIndex: 1 }}>
       {/* Cards skeleton */}
-
-      <InternshipCardSkeleton key="skeleton-1" />
-      <InternshipCardSkeleton key="skeleton-2" />
-      <InternshipCardSkeleton key="skeleton-3" />
+      {[1, 2, 3].map((i) => (
+        <InternshipCardSkeleton key={`skeleton-${i}`} />
+      ))}
     </div>
   );
 }

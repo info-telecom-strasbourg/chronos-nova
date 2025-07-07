@@ -13,8 +13,8 @@ export interface Internship {
 export interface Student {
   lastName?: string; // Last name of the student
   firstName?: string; // First name of the student
-  major?: string; // Major field of study (diplôme : IR, GM, GE, etc.)
-  course?: string; // Course specialization (filière : RIO, GEII, TC, etc.)
+  major?: string; // Major field of study
+  course?: string; // Course specialization 
 }
 
 export interface Organization {
@@ -22,6 +22,6 @@ export interface Organization {
   // Tutor's information
   tutorLastName?: string;
   tutorFirstName?: string;
-  orgType?: string; // Type of organization (E = company, L = laboratory)
+  orgType?: string; // Type of organization
   country?: string; // Country of the organization
 }

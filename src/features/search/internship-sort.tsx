@@ -35,24 +35,44 @@ export function SortInternshipButton() {
     }
   }
 
+  const selectedOption = options.find((opt) => opt.value === sort);
+
   return (
     <Select value={sort} onValueChange={handleValueChange} allowReselect={true}>
       <SelectTrigger className="w-[180px]">
-        <SelectValue />
+        <SelectValue>
+          <span className="flex items-center gap-2">
+            {order === "desc" ? (
+              <ArrowUpNarrowWide className="size-4" />
+            ) : (
+              <ArrowDownNarrowWide className="size-4" />
+            )}
+            {selectedOption?.label || "Date de début"}
+          </span>
+        </SelectValue>
       </SelectTrigger>
       <SelectContent>
-        {options.map((opt) => (
-          <SelectItem key={opt.value} value={opt.value}>
-            <span className="flex items-center gap-2">
-              {order === "desc" && opt.value === sort ? (
-                <ArrowDownNarrowWide className="size-4" />
-              ) : (
-                <ArrowUpNarrowWide className="size-4" />
-              )}
-              {opt.label}
-            </span>
-          </SelectItem>
-        ))}
+        {options.map((opt) => {
+          const isSelected = sort === opt.value;
+          const icon = isSelected ? (
+            order === "desc" ? (
+              <ArrowUpNarrowWide className="size-4" />
+            ) : (
+              <ArrowDownNarrowWide className="size-4" />
+            )
+          ) : (
+            <ArrowDownNarrowWide className="opacity-30 size-4" />
+          );
+
+          return (
+            <SelectItem key={opt.value} value={opt.value}>
+              <span className="flex items-center gap-2">
+                {icon}
+                {opt.label}
+              </span>
+            </SelectItem>
+          );
+        })}
       </SelectContent>
     </Select>
   );
