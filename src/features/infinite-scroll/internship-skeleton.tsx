@@ -1,9 +1,11 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAdminMode } from "@/hooks/use-admin-mode";
 
 // TODO: Reimplement this component in loading state
-export function InternshipCardSkeleton() {
-  const { isAdmin } = useAdminMode();
+export type InternshipCardSkeletonProps = {
+  admin?: boolean;
+};
+
+export function InternshipCardSkeleton({ admin = false }: InternshipCardSkeletonProps) {
   return (
     <div className="flex w-full flex-col gap-6 rounded-xl border bg-card py-6 text-card-foreground shadow-sm">
       {/* Header */}
@@ -46,7 +48,7 @@ export function InternshipCardSkeleton() {
 
       {/* Footer */}
       <div className="flex items-center justify-center gap-2 px-6 sm:justify-between">
-        {isAdmin && (
+        {admin && (
           <div className="flex gap-2">
             <Skeleton className="h-10 w-26" />
             <Skeleton className="h-10 w-30" />

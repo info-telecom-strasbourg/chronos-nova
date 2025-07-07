@@ -19,15 +19,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { useAdminMode } from "@/hooks/use-admin-mode";
 import { InternshipDetailsDialog } from "./internship-details-dialog";
 
 type InternshipCardProps = {
   internship: InternshipData;
+  admin?: boolean;
 };
 
-export function InternshipCard({ internship }: InternshipCardProps) {
-  const { isAdmin } = useAdminMode();
+export function InternshipCard({ internship, admin }: InternshipCardProps) {
   return (
     <Card className="w-full">
       <CardHeader className="border-b-2 pb-4">
@@ -75,7 +74,7 @@ export function InternshipCard({ internship }: InternshipCardProps) {
         </div>
       </CardContent>
       <CardFooter className="flex justify-center gap-2 sm:justify-between">
-        {isAdmin && (
+        {admin && (
           <div className="flex gap-2">
             <Button variant="outline">
               <Edit className="size-4" />

@@ -1,7 +1,17 @@
-import type { PageParams } from "@/types/next";
-import { InternshipList } from "@/features/internship/internship-list";
+import { Suspense } from "react";
+import { getInternshipsCount } from "@/features/infinite-scroll/internship.query";
+import { InternshipInfiniteScroll } from "@/features/infinite-scroll/internship-infinite-scroll";
+import { InternshipListSkeleton } from "@/features/infinite-scroll/internship-skeleton";
+import { InternshipHeader } from "@/features/search/internship-header";
 
-// liste de stages avec référence et bouton edit / delete + un bouton en haut ajouter un stage
-export default async function RoutePage(_: PageParams) {
-  return <InternshipList />;
+export default async function RoutePage() {
+  const totalInternships = await getInternshipsCount();
+  return (
+    <div className="space-y-8">
+      <InternshipHeader admin />
+      <Suspense fallback={<InternshipListSkeleton />}>
+        <InternshipInfiniteScroll totalItems={totalInternships} admin />
+      </Suspense>
+    </div>
+  );
 }

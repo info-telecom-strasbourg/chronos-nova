@@ -1,3 +1,5 @@
+"use client";
+
 import { ArrowDownNarrowWide, ArrowUpNarrowWide } from "lucide-react";
 import { useQueryState } from "nuqs";
 import {
@@ -61,7 +63,7 @@ export function SortInternshipButton() {
               <ArrowDownNarrowWide className="size-4" />
             )
           ) : (
-            <ArrowDownNarrowWide className="opacity-30 size-4" />
+            <ArrowDownNarrowWide className="size-4 opacity-30" />
           );
 
           return (

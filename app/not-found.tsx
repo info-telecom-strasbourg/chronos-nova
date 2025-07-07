@@ -1,24 +1,22 @@
-"use client";
-
 import { AlertTriangle, Home } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-export default function NotFound() {
+export default async function NotFound() {
   return (
-    <div className="flex flex-col justify-center items-center gap-6 p-4 min-h-[60vh]">
+    <div className="flex flex-1 flex-col items-center justify-center gap-4 px-2">
       <AlertTriangle className="size-12 text-destructive" />
-      <h1 className="font-bold text-2xl">Page non trouvée</h1>
-      <p className="text-muted-foreground text-center">
-        La page que vous cherchez n’existe pas ou a été déplacée.
-      </p>
-      <Button
-        onClick={() => {
-          window.location.href = "/";
-        }}
-        className="w-full max-w-xs"
-      >
-        <Home className="mr-2 size-4" />
-        Retourner à l’accueil
+      <div className="text-center">
+        <h1 className="font-bold text-2xl">Page non trouvée</h1>
+        <p className="text-center text-muted-foreground">
+          La page que vous cherchez n’existe pas ou a été déplacée.
+        </p>
+      </div>
+      <Button asChild>
+        <Link href="/">
+          <Home className="size-4" />
+          Retourner à l’accueil
+        </Link>
       </Button>
     </div>
   );

@@ -1,18 +1,19 @@
 "use client";
 import { AlertTriangle, RefreshCw } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 export default function Error500() {
+  const router = useRouter();
   return (
-    <div className="flex flex-col justify-center items-center gap-6 p-4 min-h-[60vh]">
+    <div className="flex flex-1 flex-col items-center justify-center gap-4 px-2">
       <AlertTriangle className="size-12 text-destructive" />
-      <h1 className="font-bold text-2xl">Erreur serveur</h1>
-      <p className="text-muted-foreground text-center">
-        Connexion à la base de données impossible.
-        <br />
-        Veuillez réessayer plus tard.
-      </p>
-      <Button onClick={() => window.location.reload()} className="w-full max-w-xs">
+      <div className="text-center">
+        <h1 className="font-bold text-2xl">Erreur serveur</h1>
+        <p className="text-muted-foreground">Connexion au serveur impossible.</p>
+        <p className="text-muted-foreground">Veuillez réessayer plus tard.</p>
+      </div>
+      <Button onClick={() => router.refresh()}>
         <RefreshCw className="mr-2 size-4" />
         Réessayer
       </Button>
