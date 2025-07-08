@@ -1,4 +1,5 @@
 import { Plus } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { InternshipFilter } from "@/features/search/internship-filter";
 import { InternshipSearch } from "@/features/search/internship-search";
@@ -13,10 +14,12 @@ export function InternshipHeader({ admin = false }: InternshipHeaderProps) {
     <div className="w-full space-y-4">
       {admin && (
         <div className="flex justify-end">
-          <Button className="flex items-center gap-2 bg-primary shadow-md transition-shadow hover:shadow-lg">
-            <Plus className="size-4" />
-            Ajouter un stage
-          </Button>
+          <Link href="/admin/create">
+            <Button className="flex items-center gap-2 bg-primary shadow-md transition-shadow hover:shadow-lg">
+              <Plus className="size-4" />
+              Ajouter un stage
+            </Button>
+          </Link>
         </div>
       )}
       <InternshipSearch />
