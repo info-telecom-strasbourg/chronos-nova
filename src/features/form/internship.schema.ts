@@ -30,7 +30,9 @@ export const createInternshipSchema = z.object({
     invalid_type_error: "Année académique invalide",
   }),
   beginDate: z.string().min(1, { message: "La date de début est requise" }),
-  weeksCount: z.number().min(1, { message: "La durée doit être d'au moins 1 semaine" }),
+  weeksCount: z
+    .number({ invalid_type_error: "La durée est requise" })
+    .min(1, { message: "La durée doit être d'au moins 1 semaine" }),
   studentFirstName: z.string().min(1, { message: "Le prénom de l'étudiant est requis" }),
   studentLastName: z.string().min(1, { message: "Le nom de l'étudiant est requis" }),
   studentMajor: z.enum(studentMajorValues, {

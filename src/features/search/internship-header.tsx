@@ -14,12 +14,12 @@ export function InternshipHeader({ admin = false }: InternshipHeaderProps) {
     <div className="w-full space-y-4">
       {admin && (
         <div className="flex justify-end">
-          <Link href="/admin/create">
-            <Button className="flex items-center gap-2 bg-primary shadow-md transition-shadow hover:shadow-lg">
+          <Button asChild>
+            <Link href="/admin/create">
               <Plus className="size-4" />
               Ajouter un stage
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       )}
       <InternshipSearch />

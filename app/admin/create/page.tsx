@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, Upload, X } from "lucide-react";
+import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -78,9 +79,12 @@ export default function CreateInternshipPage() {
                 <Eye className="size-4" />
                 Prévisualiser
               </Button>
-              <Button type="button" variant="destructive" className="flex items-center gap-2">
-                <X className="size-4" />
-                Annuler
+
+              <Button asChild variant="destructive">
+                <Link href="/admin">
+                  <X className="size-4" />
+                  Annuler
+                </Link>
               </Button>
             </div>
           </form>
