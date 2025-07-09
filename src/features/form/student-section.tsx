@@ -1,6 +1,7 @@
 import type { Control, FieldErrors, UseFormRegister } from "react-hook-form";
 import type { CreateInternshipFormData } from "@/features/form/internship.schema";
 import { Controller, useWatch } from "react-hook-form";
+import { toast } from "sonner";
 import { AutoComplete } from "@/components/ui/autocomplete";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -69,12 +70,19 @@ export function StudentSection({ register, errors, control }: StudentSectionProp
                   options={availableMajors}
                   value={availableMajors.find((major) => major.value === field.value) || undefined}
                   onValueChange={(option) => field.onChange(option?.value || "")}
-                  placeholder={
-                    academicYear ? "Sélectionnez une filière" : "Sélectionnez d'abord une année"
-                  }
+                  placeholder={(() => {
+                    if (!academicYear) {
+                      return "Sélectionnez une année";
+                    } else {
+                      return "Sélectionnez une filière";
+                    }
+                  })()}
                   emptyMessage="Aucun résultat"
                   error={!!errors.studentMajor}
                   disabled={!academicYear}
+                  onDisabledClick={() => {
+                    toast.error("Veuillez d’abord sélectionner une année académique");
+                  }}
                 />
               );
             }}
@@ -106,18 +114,29 @@ export function StudentSection({ register, errors, control }: StudentSectionProp
                     availableOptions.find((option) => option.value === field.value) || undefined
                   }
                   onValueChange={(option) => field.onChange(option?.value || "")}
-                  placeholder={
-                    !academicYear
-                      ? "Sélectionnez une année"
-                      : !studentMajor
-                        ? "Sélectionnez une filière"
-                        : !hasOptions
-                          ? "Aucune option"
-                          : "Sélectionnez une option"
-                  }
+                  placeholder={(() => {
+                    if (!academicYear) {
+                      return "Sélectionnez une année";
+                    } else if (!studentMajor) {
+                      return "Sélectionnez une filière";
+                    } else if (!hasOptions) {
+                      return "Aucune option";
+                    } else {
+                      return "Sélectionnez une option";
+                    }
+                  })()}
                   emptyMessage="Aucun résultat"
                   error={!!errors.studentOption}
                   disabled={!academicYear || !studentMajor || !hasOptions}
+                  onDisabledClick={() => {
+                    if (!academicYear) {
+                      toast.error("Veuillez d’abord sélectionner une année académique");
+                    } else if (!studentMajor) {
+                      toast.error("Veuillez d’abord sélectionner une filière");
+                    } else if (!hasOptions) {
+                      toast.error("Cette filière n’a pas d’option disponible");
+                    }
+                  }}
                 />
               );
             }}
