@@ -72,3 +72,19 @@ export function InternshipListSkeleton({ admin = false }: { admin?: boolean } = 
     </div>
   );
 }
+
+export function InternshipPaginationSkeleton({
+  count,
+  admin = false,
+}: {
+  count: number;
+  admin?: boolean;
+}) {
+  return (
+    <div className="flex w-full flex-col gap-4">
+      {Array.from({ length: count }, (_, i) => (
+        <InternshipCardSkeleton key={`pagination-skeleton-${Date.now()}-${i}`} admin={admin} />
+      ))}
+    </div>
+  );
+}

@@ -3,11 +3,10 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
-import { Spinner } from "@/components/ui/spinner";
 import { pluralize } from "@/lib/scripts/string";
 import { getInternshipsQuery } from "./internship.query";
 import { InternshipCard } from "./internship-card";
-import { InternshipListSkeleton } from "./internship-skeleton";
+import { InternshipListSkeleton, InternshipPaginationSkeleton } from "./internship-skeleton";
 
 export type InternshipInfiniteScrollProps = {
   initialPage?: number;
@@ -37,6 +36,10 @@ export const InternshipInfiniteScroll = ({
 
   const allInternships = data?.pages?.flatMap((page) => page.data) || [];
 
+  const loadedInternshipsCount = allInternships.length;
+  const remainingInternships = totalItems - loadedInternshipsCount;
+  const skeletonsToShow = Math.min(limit, remainingInternships);
+
   if (isPending) {
     return <InternshipListSkeleton admin={admin} />;
   }
@@ -58,14 +61,13 @@ export const InternshipInfiniteScroll = ({
             />
           )),
         )}
-        {hasNextPage && !isFetchingNextPage && (
-          <div ref={ref} className="mx-auto flex w-fit items-center gap-2">
-            <Spinner />
-            <span className="text-muted-foreground text-sm">
-              Chargement de plus de stages en cours…
-            </span>
-          </div>
+        {hasNextPage && isFetchingNextPage && skeletonsToShow > 0 && (
+          <>
+            <InternshipPaginationSkeleton count={skeletonsToShow} admin={admin} />
+            <div ref={ref} />
+          </>
         )}
+        {hasNextPage && !isFetchingNextPage && <div ref={ref} />}
         {!hasNextPage && allInternships.length > 0 && (
           <div className="mx-auto w-fit pt-2 text-muted-foreground text-sm">
             Tous les stages ont été chargés !
