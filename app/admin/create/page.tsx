@@ -19,6 +19,7 @@ export default function CreateInternshipPage() {
   const {
     register,
     setValue,
+    watch,
     formState: { errors },
     trigger,
   } = useForm<CreateInternshipFormData>({
@@ -66,7 +67,7 @@ export default function CreateInternshipPage() {
 
             <Separator />
 
-            <StudentSection register={register} errors={errors} setValue={setValue} />
+            <StudentSection register={register} errors={errors} setValue={setValue} watch={watch} />
 
             <div className="flex items-center justify-center gap-5 pt-6">
               <Button

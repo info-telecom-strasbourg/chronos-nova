@@ -17,6 +17,7 @@ type AutoCompleteProps = {
   disabled?: boolean;
   placeholder?: string;
   error?: boolean;
+  onDisabledClick?: () => void;
 };
 
 export const AutoComplete = ({
@@ -28,6 +29,7 @@ export const AutoComplete = ({
   disabled,
   isLoading = false,
   error = false,
+  onDisabledClick,
 }: AutoCompleteProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setOpen] = useState(false);
@@ -99,7 +101,7 @@ export const AutoComplete = ({
 
   return (
     <CommandPrimitive filter={() => 1} value={inputValue} shouldFilter={false}>
-      <div>
+      <div className="relative">
         <CommandPrimitive.Input
           ref={inputRef}
           value={inputValue ?? ""}
@@ -108,7 +110,8 @@ export const AutoComplete = ({
             setOpen(true);
           }}
           onBlur={handleBlur}
-          onFocus={() => setOpen(true)}
+          onFocus={disabled ? onDisabledClick : () => setOpen(true)}
+          onClick={disabled ? onDisabledClick : undefined}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={disabled}
@@ -120,6 +123,14 @@ export const AutoComplete = ({
             error ? "border-destructive hover:border-destructive" : "",
           )}
         />
+        {disabled && onDisabledClick && (
+          <button
+            type="button"
+            onClick={onDisabledClick}
+            className="absolute inset-0 cursor-pointer"
+            aria-label="Cliquez pour plus d'informations"
+          />
+        )}
       </div>
       <div className="relative mt-1">
         <div
