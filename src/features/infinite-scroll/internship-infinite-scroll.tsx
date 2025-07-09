@@ -7,6 +7,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { pluralize } from "@/lib/scripts/string";
 import { getInternshipsQuery } from "./internship.query";
 import { InternshipCard } from "./internship-card";
+import { InternshipListSkeleton } from "./internship-skeleton";
 
 export type InternshipInfiniteScrollProps = {
   initialPage?: number;
@@ -21,7 +22,7 @@ export const InternshipInfiniteScroll = ({
   totalItems,
   admin = false,
 }: InternshipInfiniteScrollProps) => {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery({
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteQuery({
     queryKey: ["internships"],
     queryFn: ({ pageParam }) => getInternshipsQuery({ page: pageParam, limit }),
     initialPageParam: initialPage,
@@ -35,6 +36,10 @@ export const InternshipInfiniteScroll = ({
   }, [inView, fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   const allInternships = data?.pages?.flatMap((page) => page.data) || [];
+
+  if (isPending) {
+    return <InternshipListSkeleton admin={admin} />;
+  }
 
   return (
     <>

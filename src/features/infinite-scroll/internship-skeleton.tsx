@@ -62,12 +62,12 @@ export function InternshipCardSkeleton({ admin = false }: InternshipCardSkeleton
   );
 }
 
-export function InternshipListSkeleton() {
+export function InternshipListSkeleton({ admin = false }: { admin?: boolean } = {}) {
   return (
     <div className="flex w-full flex-col gap-4" style={{ zIndex: 1 }}>
       {/* Cards skeleton */}
       {[1, 2, 3].map((i) => (
-        <InternshipCardSkeleton key={`skeleton-${i}`} />
+        <InternshipCardSkeleton key={`skeleton-${i}`} admin={admin} />
       ))}
     </div>
   );

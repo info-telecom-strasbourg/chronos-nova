@@ -9,7 +9,7 @@ export default async function RoutePage() {
   return (
     <div className="space-y-8">
       <InternshipHeader admin />
-      <Suspense fallback={<InternshipListSkeleton />}>
+      <Suspense fallback={<InternshipListSkeleton admin />}>
         <InternshipInfiniteScroll totalItems={totalInternships} admin />
       </Suspense>
     </div>
