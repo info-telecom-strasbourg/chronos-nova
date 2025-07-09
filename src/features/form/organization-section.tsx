@@ -1,7 +1,7 @@
-import type { FieldErrors, UseFormRegister, UseFormSetValue } from "react-hook-form";
+import type { Control, FieldErrors, UseFormRegister } from "react-hook-form";
 import type { CreateInternshipFormData } from "@/features/form/internship.schema";
-import { useState } from "react";
-import { AutoComplete, type Option } from "@/components/ui/autocomplete";
+import { Controller } from "react-hook-form";
+import { AutoComplete } from "@/components/ui/autocomplete";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { countries, organizationTypes } from "@/features/form/options";
@@ -9,23 +9,10 @@ import { countries, organizationTypes } from "@/features/form/options";
 interface OrganizationSectionProps {
   register: UseFormRegister<CreateInternshipFormData>;
   errors: FieldErrors<CreateInternshipFormData>;
-  setValue: UseFormSetValue<CreateInternshipFormData>;
+  control: Control<CreateInternshipFormData>;
 }
 
-export function OrganizationSection({ register, errors, setValue }: OrganizationSectionProps) {
-  const [orgType, setOrgType] = useState<Option>();
-  const [country, setCountry] = useState<Option>();
-
-  const handleOrgTypeChange = (option: Option | undefined) => {
-    setOrgType(option);
-    setValue("organizationType", option?.value ?? "");
-  };
-
-  const handleCountryChange = (option: Option | undefined) => {
-    setCountry(option);
-    setValue("organizationCountry", option?.value ?? "");
-  };
-
+export function OrganizationSection({ register, errors, control }: OrganizationSectionProps) {
   return (
     <div className="space-y-4">
       <h3 className="font-semibold text-lg">Organisation</h3>
@@ -51,13 +38,19 @@ export function OrganizationSection({ register, errors, setValue }: Organization
           <Label htmlFor="organizationType">
             Type d'organisation <span className="text-destructive">*</span>
           </Label>
-          <AutoComplete
-            options={organizationTypes}
-            value={orgType}
-            onValueChange={handleOrgTypeChange}
-            placeholder="Sélectionnez un type"
-            emptyMessage="Aucun résultat"
-            error={!!errors.organizationType}
+          <Controller
+            control={control}
+            name="organizationType"
+            render={({ field }) => (
+              <AutoComplete
+                options={organizationTypes}
+                value={organizationTypes.find((type) => type.value === field.value) || undefined}
+                onValueChange={(option) => field.onChange(option?.value || "")}
+                placeholder="Sélectionnez un type"
+                emptyMessage="Aucun résultat"
+                error={!!errors.organizationType}
+              />
+            )}
           />
           {errors.organizationType && (
             <p className="text-destructive text-sm">{errors.organizationType.message}</p>
@@ -68,13 +61,19 @@ export function OrganizationSection({ register, errors, setValue }: Organization
           <Label htmlFor="organizationCountry">
             Pays <span className="text-destructive">*</span>
           </Label>
-          <AutoComplete
-            options={countries}
-            value={country}
-            onValueChange={handleCountryChange}
-            placeholder="Sélectionnez un pays"
-            emptyMessage="Aucun résultat"
-            error={!!errors.organizationCountry}
+          <Controller
+            control={control}
+            name="organizationCountry"
+            render={({ field }) => (
+              <AutoComplete
+                options={countries}
+                value={countries.find((country) => country.value === field.value) || undefined}
+                onValueChange={(option) => field.onChange(option?.value || "")}
+                placeholder="Sélectionnez un pays"
+                emptyMessage="Aucun résultat"
+                error={!!errors.organizationCountry}
+              />
+            )}
           />
           {errors.organizationCountry && (
             <p className="text-destructive text-sm">{errors.organizationCountry.message}</p>

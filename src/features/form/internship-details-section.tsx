@@ -1,7 +1,7 @@
-import type { FieldErrors, UseFormRegister, UseFormSetValue } from "react-hook-form";
+import type { Control, FieldErrors, UseFormRegister } from "react-hook-form";
 import type { CreateInternshipFormData } from "@/features/form/internship.schema";
-import { useState } from "react";
-import { AutoComplete, type Option } from "@/components/ui/autocomplete";
+import { Controller } from "react-hook-form";
+import { AutoComplete } from "@/components/ui/autocomplete";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,20 +10,14 @@ import { academicYears } from "@/features/form/options";
 interface InternshipDetailsSectionProps {
   register: UseFormRegister<CreateInternshipFormData>;
   errors: FieldErrors<CreateInternshipFormData>;
-  setValue: UseFormSetValue<CreateInternshipFormData>;
+  control: Control<CreateInternshipFormData>;
 }
 
 export function InternshipDetailsSection({
   register,
   errors,
-  setValue,
+  control,
 }: InternshipDetailsSectionProps) {
-  const [academicYear, setAcademicYear] = useState<Option>();
-
-  const handleAcademicYearChange = (option: Option | undefined) => {
-    setAcademicYear(option);
-    setValue("academicYear", option?.value ?? "");
-  };
   return (
     <div className="space-y-4">
       <h3 className="font-semibold text-lg">Détails du stage</h3>
@@ -46,13 +40,19 @@ export function InternshipDetailsSection({
             <Label htmlFor="academicYear">
               Année académique <span className="text-destructive">*</span>
             </Label>
-            <AutoComplete
-              options={academicYears}
-              value={academicYear}
-              onValueChange={handleAcademicYearChange}
-              placeholder="Sélectionnez une année"
-              emptyMessage="Aucun résultat"
-              error={!!errors.academicYear}
+            <Controller
+              control={control}
+              name="academicYear"
+              render={({ field }) => (
+                <AutoComplete
+                  options={academicYears}
+                  value={academicYears.find((year) => year.value === field.value) || undefined}
+                  onValueChange={(option) => field.onChange(option?.value || "")}
+                  placeholder="Sélectionnez une année"
+                  emptyMessage="Aucun résultat"
+                  error={!!errors.academicYear}
+                />
+              )}
             />
             {errors.academicYear && (
               <p className="text-destructive text-sm">{errors.academicYear.message}</p>

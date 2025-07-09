@@ -1,6 +1,6 @@
 export const organizationTypes = [
-  { value: "entreprise", label: "Entreprise" },
-  { value: "hors-entreprise", label: "Hors Entreprise" },
+  { value: "company", label: "Entreprise" },
+  { value: "not_company", label: "Hors Entreprise" },
 ];
 
 export const countries = [

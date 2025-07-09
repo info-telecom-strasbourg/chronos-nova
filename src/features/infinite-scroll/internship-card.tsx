@@ -9,6 +9,7 @@ import {
   MapPin,
   Trash2,
 } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -76,9 +77,11 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
       <CardFooter className="flex justify-center gap-2 sm:justify-between">
         {admin && (
           <div className="flex gap-2">
-            <Button variant="outline">
-              <Edit className="size-4" />
-              Modifier
+            <Button variant="outline" asChild>
+              <Link href={`/admin/${internship.id}/edit`}>
+                <Edit className="size-4" />
+                Modifier
+              </Link>
             </Button>
             <Button variant="destructive">
               <Trash2 className="size-4" />

@@ -1,8 +1,16 @@
-// formulaire de création de stage pré-rempli avec les infos actuelles du stage
-// le bouton submit ne crée pas de stage mais modifie
+import type { PageParams } from "@/types/next";
+import { notFound } from "next/navigation";
+import { EditInternshipForm } from "@/features/form/edit-form-client";
+import { getInternshipById } from "@/lib/actions/internship";
 
-export default function EditInternshipPage() {
-  return (
-    <div></div>
-  );
+export default async function EditInternshipPage({ params }: PageParams<{ id: string }>) {
+  const { id } = await params;
+
+  const internship = await getInternshipById(id);
+
+  if (!internship) {
+    notFound();
+  }
+
+  return <EditInternshipForm internship={internship} />;
 }

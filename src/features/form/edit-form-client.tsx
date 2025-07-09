@@ -1,7 +1,8 @@
 "use client";
 
+import type { InternshipData } from "@/types/drizzle";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, Upload, X } from "lucide-react";
+import { Save, X } from "lucide-react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,11 @@ import { InternshipDetailsSection } from "@/features/form/internship-details-sec
 import { OrganizationSection } from "@/features/form/organization-section";
 import { StudentSection } from "@/features/form/student-section";
 
-export default function CreateInternshipPage() {
+interface EditInternshipFormProps {
+  internship: InternshipData;
+}
+
+export function EditInternshipForm({ internship }: EditInternshipFormProps) {
   const {
     register,
     control,
@@ -24,33 +29,26 @@ export default function CreateInternshipPage() {
   } = useForm<CreateInternshipFormData>({
     resolver: zodResolver(createInternshipSchema),
     defaultValues: {
-      organizationName: "",
-      organizationType: undefined,
-      organizationCountry: undefined,
-      organizationCity: "",
-      subject: "",
-      academicYear: undefined,
-      beginDate: "",
-      weeksCount: undefined,
-      studentFirstName: "",
-      studentLastName: "",
-      studentMajor: undefined,
-      studentOption: undefined,
+      organizationName: internship.organization.name ?? "",
+      organizationType: internship.organization.type ?? undefined,
+      organizationCountry: internship.organization.country ?? undefined,
+      organizationCity: internship.organization.city ?? "",
+      subject: internship.subject ?? "",
+      academicYear: internship.academicYear ?? undefined,
+      beginDate: internship.beginDate ?? "",
+      weeksCount: internship.weeksCount ?? undefined,
+      studentFirstName: internship.student.firstName ?? "",
+      studentLastName: internship.student.lastName ?? "",
+      studentMajor: internship.student.major.alias ?? undefined,
+      studentOption: internship.student.option.alias ?? undefined,
     },
   });
 
   return (
     <div className="container mx-auto max-w-4xl space-y-6 p-6">
-      <div className="flex justify-end">
-        <Button variant="outline" className="flex items-center gap-2" type="button">
-          <Upload className="size-4" />
-          Importer depuis Excel
-        </Button>
-      </div>
-
       <Card>
         <CardHeader>
-          <CardTitle className="text-xl">Ajouter un nouveau stage</CardTitle>
+          <CardTitle className="text-xl">Modifier le stage</CardTitle>
           <p className="mt-1 pl-0.5 text-muted-foreground text-xs">
             <span className="text-destructive">*</span> Champs requis
           </p>
@@ -74,10 +72,11 @@ export default function CreateInternshipPage() {
                 className="flex items-center"
                 onClick={async () => {
                   await trigger();
+                  // TODO: Implement save functionality
                 }}
               >
-                <Eye className="size-4" />
-                Prévisualiser
+                <Save className="size-4" />
+                Sauvegarder
               </Button>
 
               <Button asChild variant="destructive">
