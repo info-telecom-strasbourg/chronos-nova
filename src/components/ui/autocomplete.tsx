@@ -1,7 +1,7 @@
 // import * as React from "react";
 import { Command as CommandPrimitive } from "cmdk";
 import { Check } from "lucide-react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { CommandGroup, CommandItem, CommandList } from "./command";
 import { Skeleton } from "./skeleton";
@@ -35,6 +35,11 @@ export const AutoComplete = ({
   const [isOpen, setOpen] = useState(false);
   const [selected, setSelected] = useState<Option | undefined>(value);
   const [inputValue, setInputValue] = useState<string>(value?.label ?? "");
+
+  useEffect(() => {
+    setSelected(value);
+    setInputValue(value?.label ?? "");
+  }, [value]);
 
   const filteredOptions = inputValue
     ? options.filter((option) => option.label.toLowerCase().includes(inputValue.toLowerCase()))

@@ -1,0 +1,142 @@
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Plus, Save, Upload, X } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useRef } from "react";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form } from "@/components/ui/form";
+import { Separator } from "@/components/ui/separator";
+import {
+  type CreateInternshipFormData,
+  createInternshipSchema,
+} from "@/features/form/internship.schema";
+import { InternshipDetailsSection } from "@/features/form/internship-details-section";
+import { OrganizationSection } from "@/features/form/organization-section";
+import { StudentSection } from "@/features/form/student-section";
+
+interface InternshipFormProps {
+  mode: "create" | "edit";
+  defaultValues?: Partial<CreateInternshipFormData>;
+  internshipId?: string;
+}
+
+export function InternshipForm({ mode, defaultValues, internshipId }: InternshipFormProps) {
+  const form = useForm<CreateInternshipFormData>({
+    resolver: zodResolver(createInternshipSchema),
+    defaultValues: {
+      organizationName: "",
+      organizationType: undefined,
+      organizationCountry: undefined,
+      organizationCity: "",
+      subject: "",
+      academicYear: undefined,
+      beginDate: "",
+      weeksCount: undefined,
+      studentFirstName: "",
+      studentLastName: "",
+      studentMajor: undefined,
+      studentOption: undefined,
+      ...defaultValues,
+    },
+  });
+
+  const { control, setValue, watch } = form;
+
+  const academicYear = watch("academicYear");
+  const studentMajor = watch("studentMajor");
+
+  const prevAcademicYear = useRef(academicYear);
+  const prevStudentMajor = useRef(studentMajor);
+
+  useEffect(() => {
+    if (prevAcademicYear.current !== academicYear && prevAcademicYear.current !== undefined) {
+      setValue("studentMajor", "");
+      setValue("studentOption", undefined);
+    }
+    prevAcademicYear.current = academicYear;
+  }, [academicYear, setValue]);
+
+  useEffect(() => {
+    if (prevStudentMajor.current !== studentMajor && prevStudentMajor.current !== undefined) {
+      setValue("studentOption", undefined);
+    }
+    prevStudentMajor.current = studentMajor;
+  }, [studentMajor, setValue]);
+
+  const onSubmit = async (data: CreateInternshipFormData) => {
+    console.log("Form data:", data);
+    // Logique de soumission selon le mode
+    if (mode === "create") {
+      // Logique de création
+      console.log("Creating internship:", data);
+    } else {
+      // Logique d'édition
+      console.log("Updating internship:", internshipId, data);
+    }
+  };
+
+  const pageTitle = mode === "create" ? "Ajouter un nouveau stage" : "Modifier le stage";
+  const submitButtonText = mode === "create" ? "Ajouter" : "Sauvegarder";
+
+  return (
+    <div className="container mx-auto max-w-4xl space-y-6 p-6">
+      <div className="flex justify-end">
+        <Button variant="outline" className="flex items-center gap-2" type="button">
+          <Upload className="size-4" />
+          Importer depuis Excel
+        </Button>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xl">{pageTitle}</CardTitle>
+          <p className="mt-1 pl-0.5 text-muted-foreground text-xs">
+            <span className="text-destructive">*</span> Champs requis
+          </p>
+        </CardHeader>
+        <Separator />
+        <CardContent>
+          <Form {...form}>
+            <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+              <OrganizationSection control={control} />
+
+              <Separator />
+
+              <InternshipDetailsSection control={control} />
+
+              <Separator />
+
+              <StudentSection control={control} />
+
+              <div className="flex items-center justify-center gap-5 pt-6">
+                <Button type="submit" variant="default" className="flex items-center gap-2">
+                  {mode === "create" ? (
+                    <>
+                      <Plus className="size-4" />
+                      {submitButtonText}
+                    </>
+                  ) : (
+                    <>
+                      <Save className="size-4" />
+                      {submitButtonText}
+                    </>
+                  )}
+                </Button>
+
+                <Button asChild variant="destructive">
+                  <Link href="/admin" className="flex items-center gap-2">
+                    <X className="size-4" />
+                    Annuler
+                  </Link>
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

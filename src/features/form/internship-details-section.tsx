@@ -1,101 +1,103 @@
-import type { Control, FieldErrors, UseFormRegister } from "react-hook-form";
+import type { Control } from "react-hook-form";
 import type { CreateInternshipFormData } from "@/features/form/internship.schema";
-import { Controller } from "react-hook-form";
 import { AutoComplete } from "@/components/ui/autocomplete";
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { academicYears } from "@/features/form/options";
 
 interface InternshipDetailsSectionProps {
-  register: UseFormRegister<CreateInternshipFormData>;
-  errors: FieldErrors<CreateInternshipFormData>;
   control: Control<CreateInternshipFormData>;
 }
 
-export function InternshipDetailsSection({
-  register,
-  errors,
-  control,
-}: InternshipDetailsSectionProps) {
+export function InternshipDetailsSection({ control }: InternshipDetailsSectionProps) {
   return (
     <div className="space-y-4">
       <h3 className="font-semibold text-lg">Détails du stage</h3>
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="subject">
-            Sujet du stage <span className="text-destructive">*</span>
-          </Label>
-          <Textarea
-            id="subject"
-            {...register("subject")}
-            className={errors.subject ? "border-destructive focus-visible:ring-destructive" : ""}
-            placeholder="Description détaillée du sujet de stage"
-          />
-          {errors.subject && <p className="text-destructive text-sm">{errors.subject.message}</p>}
-        </div>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <FormField
+          control={control}
+          name="subject"
+          render={({ field }) => (
+            <FormItem className="md:col-span-2">
+              <FormLabel>
+                Sujet du stage <span className="text-destructive">*</span>
+              </FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Décrivez le sujet du stage"
+                  className="min-h-20"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <div className="space-y-2">
-            <Label htmlFor="academicYear">
-              Année académique <span className="text-destructive">*</span>
-            </Label>
-            <Controller
-              control={control}
-              name="academicYear"
-              render={({ field }) => (
+        <FormField
+          control={control}
+          name="academicYear"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Année académique <span className="text-destructive">*</span>
+              </FormLabel>
+              <FormControl>
                 <AutoComplete
                   options={academicYears}
                   value={academicYears.find((year) => year.value === field.value) || undefined}
                   onValueChange={(option) => field.onChange(option?.value || "")}
                   placeholder="Sélectionnez une année"
                   emptyMessage="Aucun résultat"
-                  error={!!errors.academicYear}
                 />
-              )}
-            />
-            {errors.academicYear && (
-              <p className="text-destructive text-sm">{errors.academicYear.message}</p>
-            )}
-          </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-          <div className="space-y-2">
-            <Label htmlFor="beginDate">
-              Date de début <span className="text-destructive">*</span>
-            </Label>
-            <Input
-              id="beginDate"
-              type="date"
-              {...register("beginDate")}
-              className={
-                errors.beginDate ? "border-destructive focus-visible:ring-destructive" : ""
-              }
-            />
-            {errors.beginDate && (
-              <p className="text-destructive text-sm">{errors.beginDate.message}</p>
-            )}
-          </div>
+        <FormField
+          control={control}
+          name="beginDate"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Date de début <span className="text-destructive">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input type="date" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-          <div className="space-y-2">
-            <Label htmlFor="weeksCount">
-              Durée (semaines) <span className="text-destructive">*</span>
-            </Label>
-            <Input
-              id="weeksCount"
-              type="number"
-              min="1"
-              max="100"
-              {...register("weeksCount", { valueAsNumber: true })}
-              className={
-                errors.weeksCount ? "border-destructive focus-visible:ring-destructive" : ""
-              }
-              placeholder="12"
-            />
-            {errors.weeksCount && (
-              <p className="text-destructive text-sm">{errors.weeksCount.message}</p>
-            )}
-          </div>
-        </div>
+        <FormField
+          control={control}
+          name="weeksCount"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                Nombre de semaines <span className="text-destructive">*</span>
+              </FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  min="1"
+                  max="52"
+                  placeholder="8"
+                  {...field}
+                  value={field.value || ""}
+                  onChange={(e) =>
+                    field.onChange(e.target.value ? Number(e.target.value) : undefined)
+                  }
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
     </div>
   );
