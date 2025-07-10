@@ -2,7 +2,6 @@ import { Providers } from "@/components/providers";
 import "@/styles/globals.css";
 import type { Metadata } from "next";
 import type { LayoutParams } from "@/types/next";
-import { Toaster } from "sonner";
 import { Footer } from "@/components/layout/footer";
 import { Navbar } from "@/components/layout/navbar";
 
@@ -20,7 +19,6 @@ export default function RootLayout({ children }: LayoutParams) {
           <main className="mx-auto flex w-full max-w-screen-md flex-1 flex-col px-5 py-3">
             {children}
           </main>
-          <Toaster position="top-center" theme="system" />
           <Footer />
         </Providers>
       </body>

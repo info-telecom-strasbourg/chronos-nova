@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "./ui/button";
 
-export const RouteToggle = () => {
+export const AdminToggle = () => {
   const pathname = usePathname();
   const isAdmin = pathname.startsWith("/admin");
 
