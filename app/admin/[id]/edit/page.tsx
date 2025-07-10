@@ -1,7 +1,7 @@
 import type { PageParams } from "@/types/next";
 import { notFound } from "next/navigation";
 import { InternshipForm } from "@/features/form/internship-form";
-import { getInternshipById } from "@/lib/actions/internship";
+import { getInternshipById } from "@/features/internship/internship.action";
 
 export default async function EditInternshipPage({ params }: PageParams<{ id: string }>) {
   const { id } = await params;
