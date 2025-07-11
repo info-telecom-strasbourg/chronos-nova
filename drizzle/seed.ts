@@ -14,6 +14,7 @@ async function main() {
       count: 100,
       columns: {
         weeksCount: f.valuesFromArray({ values: ["4", "6", "8", "12"] }),
+        state: f.default({ defaultValue: "visible" }),
       },
     },
     students: {
