@@ -10,9 +10,8 @@ export default async function AdminDeletedPage() {
   const pendingCount = await getInternshipsCount("draft");
 
   return (
-    <div className="container mx-auto py-8">
+    <div className="container mx-auto space-y-8 py-8">
       <AdminTabs pendingCount={pendingCount} />
-
       <div className="space-y-8">
         <InternshipHeader />
         <Suspense fallback={<InternshipListSkeleton admin />}>
