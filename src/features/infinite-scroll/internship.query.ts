@@ -11,6 +11,7 @@ const getInternshipsQuerySchema = z.object({
   order: z.enum(["asc", "desc"]).optional(),
   page: z.coerce.number().optional(),
   limit: z.number().optional().default(10),
+  state: z.enum(["visible", "draft", "deleted"]).optional(),
 });
 
 export type GetInternshipsResponse = {
@@ -27,14 +28,23 @@ export const getInternshipsQuery = async ({
   order,
   page = 0,
   limit,
+  state,
 }: z.infer<typeof getInternshipsQuerySchema>): Promise<GetInternshipsResponse> => {
   const supabase = await createSupabaseServerClient();
   const from = page * limit;
   const to = from + limit - 1;
-  const { data, error } = await supabase
+
+  let query = supabase
     .from("internship")
     .select("*, organization(*), student(*, major(*), option(*))")
     .range(from, to);
+
+  // Filter by state if provided
+  if (state) {
+    query = query.eq("state", state);
+  }
+
+  const { data, error } = await query;
 
   if (error) throw error;
 
@@ -45,11 +55,18 @@ export const getInternshipsQuery = async ({
   };
 };
 
-export const getInternshipsCount = async (): Promise<number> => {
+export const getInternshipsCount = async (
+  state?: "visible" | "draft" | "deleted",
+): Promise<number> => {
   const supabase = await createSupabaseServerClient();
-  const { count, error } = await supabase
-    .from("internship")
-    .select("*", { count: "exact", head: true });
+
+  let query = supabase.from("internship").select("*", { count: "exact", head: true });
+
+  if (state) {
+    query = query.eq("state", state);
+  }
+
+  const { count, error } = await query;
 
   if (error) throw error;
 

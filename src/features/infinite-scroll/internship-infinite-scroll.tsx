@@ -13,6 +13,7 @@ export type InternshipInfiniteScrollProps = {
   limit?: number;
   totalItems: number;
   admin?: boolean;
+  state?: "visible" | "draft" | "deleted";
 };
 
 export const InternshipInfiniteScroll = ({
@@ -20,10 +21,11 @@ export const InternshipInfiniteScroll = ({
   limit = 10,
   totalItems,
   admin = false,
+  state,
 }: InternshipInfiniteScrollProps) => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteQuery({
-    queryKey: ["internships"],
-    queryFn: ({ pageParam }) => getInternshipsQuery({ page: pageParam, limit }),
+    queryKey: ["internships", { state }],
+    queryFn: ({ pageParam }) => getInternshipsQuery({ page: pageParam, limit, state }),
     initialPageParam: initialPage,
     getNextPageParam: (lastPage) => lastPage.nextPage,
   });

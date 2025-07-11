@@ -5,18 +5,18 @@ import { InternshipInfiniteScroll } from "@/features/infinite-scroll/internship-
 import { InternshipListSkeleton } from "@/features/infinite-scroll/internship-skeleton";
 import { InternshipHeader } from "@/features/search/internship-header";
 
-export default async function AdminPage() {
-  const totalInternships = await getInternshipsCount("visible");
+export default async function AdminDeletedPage() {
+  const totalInternships = await getInternshipsCount("deleted");
   const pendingCount = await getInternshipsCount("draft");
 
   return (
-    <div className="container mx-auto space-y-8 py-8">
+    <div className="container mx-auto py-8">
       <AdminTabs pendingCount={pendingCount} />
 
       <div className="space-y-8">
         <InternshipHeader />
         <Suspense fallback={<InternshipListSkeleton admin />}>
-          <InternshipInfiniteScroll totalItems={totalInternships} admin state="visible" />
+          <InternshipInfiniteScroll totalItems={totalInternships} admin state="deleted" />
         </Suspense>
       </div>
     </div>

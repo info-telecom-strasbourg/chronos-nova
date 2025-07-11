@@ -1,14 +1,5 @@
 import type { InternshipData } from "@/types/drizzle";
-import {
-  Calendar,
-  Calendar1,
-  Clock,
-  GraduationCap,
-  Hash,
-  Landmark,
-  MapPin,
-  School,
-} from "lucide-react";
+import { Calendar, Calendar1, Clock, GraduationCap, Landmark, MapPin, School } from "lucide-react";
 import {
   DialogContent,
   DialogDescription,
@@ -35,14 +26,6 @@ export function InternshipDetailsDialog({ internship }: InternshipDetailsDialogP
 
       <DialogDescription asChild>
         <div className="flex flex-col gap-3">
-          <span className="flex items-start gap-2">
-            <span>
-              <Hash className="h-4 w-4 text-muted-foreground" />
-            </span>
-            <span>
-              <b>Référence :</b> {internship.id}
-            </span>
-          </span>
           <span className="flex items-start gap-2">
             <span>
               <Landmark className="h-4 w-4 text-muted-foreground" />

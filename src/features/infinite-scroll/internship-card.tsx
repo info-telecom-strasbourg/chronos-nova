@@ -2,14 +2,17 @@ import type { InternshipData } from "@/types/drizzle";
 import {
   Building,
   Calendar1,
+  Check,
   Clock,
   Edit,
+  Eye,
   GraduationCap,
-  Hash,
   MapPin,
+  RotateCcw,
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -28,15 +31,97 @@ type InternshipCardProps = {
 };
 
 export function InternshipCard({ internship, admin }: InternshipCardProps) {
+  const getStateBadge = () => {
+    const stateLabels = {
+      visible: { label: "Actif", variant: "default" as "default" },
+      draft: { label: "En attente", variant: "outline" as "outline" },
+      deleted: { label: "Supprimé", variant: "destructive" as "destructive" },
+    };
+
+    const stateInfo = stateLabels[internship.state as keyof typeof stateLabels];
+    return stateInfo ? <Badge variant={stateInfo.variant}>{stateInfo.label}</Badge> : null;
+  };
+
+  const getActionButtons = () => {
+    if (!admin) return null;
+
+    const baseButtons = (
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button variant="outline" size="sm">
+            <Eye className="size-4" />
+            Voir plus
+          </Button>
+        </DialogTrigger>
+        <InternshipDetailsDialog internship={internship} />
+      </Dialog>
+    );
+
+    switch (internship.state) {
+      case "visible":
+        return (
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" asChild>
+              <Link href={`/admin/${internship.id}/edit`}>
+                <Edit className="size-4" />
+                Modifier
+              </Link>
+            </Button>
+            <Button variant="destructive" size="sm">
+              <Trash2 className="size-4" />
+              Supprimer
+            </Button>
+            {baseButtons}
+          </div>
+        );
+
+      case "draft":
+        return (
+          <div className="flex gap-2">
+            <Button variant="default" size="sm">
+              <Check className="size-4" />
+              Valider
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <Link href={`/admin/${internship.id}/edit`}>
+                <Edit className="size-4" />
+                Modifier
+              </Link>
+            </Button>
+            <Button variant="destructive" size="sm">
+              <Trash2 className="size-4" />
+              Supprimer
+            </Button>
+            {baseButtons}
+          </div>
+        );
+
+      case "deleted":
+        return (
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm">
+              <RotateCcw className="size-4" />
+              Restaurer
+            </Button>
+            <Button variant="destructive" size="sm">
+              <Trash2 className="size-4" />
+              Supprimer
+            </Button>
+            {baseButtons}
+          </div>
+        );
+
+      default:
+        return baseButtons;
+    }
+  };
+
   return (
     <Card className="w-full">
       <CardHeader className="border-b-2 pb-4">
         <div className="flex w-full items-start justify-between">
           <CardTitle className="text-2xl">{internship.organization.name}</CardTitle>
-          <span className="flex select-all items-center gap-1 text-muted-foreground text-xs">
-            <Hash className="h-3 w-3" />
-            {internship.id}
-          </span>
+          {admin && getStateBadge()}
         </div>
         <CardDescription>
           <span className="inline-flex items-center gap-1">
@@ -75,28 +160,16 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
         </div>
       </CardContent>
       <CardFooter className="flex justify-center gap-2 sm:justify-between">
-        {admin && (
-          <div className="flex gap-2">
-            <Button variant="outline" asChild>
-              <Link href={`/admin/${internship.id}/edit`}>
-                <Edit className="size-4" />
-                Modifier
-              </Link>
-            </Button>
-            <Button variant="destructive">
-              <Trash2 className="size-4" />
-              Supprimer
-            </Button>
-          </div>
-        )}
-        <div className="sm:ml-auto">
+        {admin ? (
+          getActionButtons()
+        ) : (
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="outline">Voir plus</Button>
             </DialogTrigger>
             <InternshipDetailsDialog internship={internship} />
           </Dialog>
-        </div>
+        )}
       </CardFooter>
     </Card>
   );

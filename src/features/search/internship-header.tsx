@@ -1,6 +1,3 @@
-import { Plus } from "lucide-react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { InternshipFilter } from "@/features/search/internship-filter";
 import { InternshipSearch } from "@/features/search/internship-search";
 import { SortInternshipButton } from "@/features/search/internship-sort";
@@ -9,19 +6,9 @@ export type InternshipHeaderProps = {
   admin?: boolean;
 };
 
-export function InternshipHeader({ admin = false }: InternshipHeaderProps) {
+export function InternshipHeader() {
   return (
     <div className="w-full space-y-4">
-      {admin && (
-        <div className="flex justify-end">
-          <Button asChild>
-            <Link href="/admin/create">
-              <Plus className="size-4" />
-              Ajouter un stage
-            </Link>
-          </Button>
-        </div>
-      )}
       <InternshipSearch />
       <InternshipFilter />
       <div className="flex w-full items-center justify-between">
