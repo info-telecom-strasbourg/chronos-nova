@@ -3,8 +3,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Save, Upload, X } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useTransition } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
@@ -16,6 +18,7 @@ import {
 import { InternshipDetailsSection } from "@/features/form/internship-details-section";
 import { OrganizationSection } from "@/features/form/organization-section";
 import { StudentSection } from "@/features/form/student-section";
+import { createInternship, updateInternship } from "@/features/infinite-scroll/internship.query";
 
 interface InternshipFormProps {
   mode: "create" | "edit";
@@ -24,6 +27,9 @@ interface InternshipFormProps {
 }
 
 export function InternshipForm({ mode, defaultValues, internshipId }: InternshipFormProps) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
   const form = useForm<CreateInternshipFormData>({
     resolver: zodResolver(createInternshipSchema),
     defaultValues: {
@@ -67,15 +73,26 @@ export function InternshipForm({ mode, defaultValues, internshipId }: Internship
   }, [studentMajor, setValue]);
 
   const onSubmit = async (data: CreateInternshipFormData) => {
-    console.log("Form data:", data);
-    // Logique de soumission selon le mode
-    if (mode === "create") {
-      // Logique de création
-      console.log("Creating internship:", data);
-    } else {
-      // Logique d'édition
-      console.log("Updating internship:", internshipId, data);
-    }
+    startTransition(async () => {
+      try {
+        if (mode === "create") {
+          await createInternship(data);
+          toast.success("Stage créé avec succès");
+          router.push("/admin");
+        } else {
+          if (!internshipId) {
+            toast.error("ID du stage manquant");
+            return;
+          }
+          await updateInternship(internshipId, data);
+          toast.success("Stage modifié avec succès");
+          router.push("/admin");
+        }
+      } catch (error) {
+        toast.error("Une erreur s'est produite");
+        console.error(error);
+      }
+    });
   };
 
   const pageTitle = mode === "create" ? "Ajouter un nouveau stage" : "Modifier le stage";
@@ -112,7 +129,12 @@ export function InternshipForm({ mode, defaultValues, internshipId }: Internship
               <StudentSection control={control} />
 
               <div className="flex items-center justify-center gap-5 pt-6">
-                <Button type="submit" variant="default" className="flex items-center gap-2">
+                <Button
+                  type="submit"
+                  variant="default"
+                  className="flex items-center gap-2"
+                  disabled={isPending}
+                >
                   {mode === "create" ? (
                     <>
                       <Plus className="size-4" />

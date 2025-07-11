@@ -23,6 +23,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { InternshipActions } from "@/features/admin/internship-actions";
 import { InternshipDetailsDialog } from "./internship-details-dialog";
 
 type InternshipCardProps = {
@@ -31,6 +32,10 @@ type InternshipCardProps = {
 };
 
 export function InternshipCard({ internship, admin }: InternshipCardProps) {
+  const actions = InternshipActions({
+    internshipId: internship.id,
+  });
+
   const getStateBadge = () => {
     const stateLabels = {
       visible: { label: "Actif", variant: "default" as "default" },
@@ -68,7 +73,12 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
                 Modifier
               </Link>
             </Button>
-            <Button variant="destructive" size="sm">
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={actions.handleSoftDelete}
+              disabled={actions.isPending}
+            >
               <Trash2 className="size-4" />
               Supprimer
             </Button>
@@ -78,7 +88,12 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
       case "draft":
         mainActions = (
           <>
-            <Button variant="default" size="sm">
+            <Button
+              variant="default"
+              size="sm"
+              onClick={actions.handleApprove}
+              disabled={actions.isPending}
+            >
               <Check className="size-4" />
               Valider
             </Button>
@@ -88,7 +103,12 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
                 Modifier
               </Link>
             </Button>
-            <Button variant="destructive" size="sm">
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={actions.handleSoftDelete}
+              disabled={actions.isPending}
+            >
               <Trash2 className="size-4" />
               Supprimer
             </Button>
@@ -98,7 +118,12 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
       case "deleted":
         mainActions = (
           <>
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={actions.handleRestore}
+              disabled={actions.isPending}
+            >
               <RotateCcw className="size-4" />
               Restaurer
             </Button>
@@ -125,6 +150,7 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
 
   return (
     <Card className="w-full">
+      {admin && actions.deleteDialog}
       <CardHeader className="border-b-2 pb-4">
         <div className="flex w-full items-start justify-between">
           <CardTitle className="text-2xl">{internship.organization.name}</CardTitle>
