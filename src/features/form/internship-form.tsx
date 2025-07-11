@@ -1,16 +1,18 @@
 "use client";
 
+import type { SheetConfig } from "@/types/excel-import";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Save, Upload, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
+import { ExcelImportDialog } from "@/features/excel-import/excel-import-dialog";
 import {
   type CreateInternshipFormData,
   createInternshipSchema,
@@ -29,6 +31,7 @@ interface InternshipFormProps {
 export function InternshipForm({ mode, defaultValues, internshipId }: InternshipFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const [isExcelDialogOpen, setIsExcelDialogOpen] = useState(false);
 
   const form = useForm<CreateInternshipFormData>({
     resolver: zodResolver(createInternshipSchema),
@@ -72,6 +75,10 @@ export function InternshipForm({ mode, defaultValues, internshipId }: Internship
     prevStudentMajor.current = studentMajor;
   }, [studentMajor, setValue]);
 
+  const handleExcelImport = (file: File, sheetsConfig: SheetConfig[]) => {
+    // TODO: Implémenter la logique d'import et de relier le parsing des données Excel
+  };
+
   const onSubmit = async (data: CreateInternshipFormData) => {
     startTransition(async () => {
       try {
@@ -100,12 +107,19 @@ export function InternshipForm({ mode, defaultValues, internshipId }: Internship
 
   return (
     <div className="container mx-auto max-w-4xl space-y-6 p-6">
-      <div className="flex justify-end">
-        <Button variant="outline" className="flex items-center gap-2" type="button">
-          <Upload className="size-4" />
-          Importer depuis Excel
-        </Button>
-      </div>
+      {mode === "create" && (
+        <div className="flex justify-end">
+          <Button
+            variant="outline"
+            className="flex items-center gap-2"
+            type="button"
+            onClick={() => setIsExcelDialogOpen(true)}
+          >
+            <Upload className="size-4" />
+            Importer depuis Excel
+          </Button>
+        </div>
+      )}
 
       <Card>
         <CardHeader>
@@ -159,6 +173,14 @@ export function InternshipForm({ mode, defaultValues, internshipId }: Internship
           </Form>
         </CardContent>
       </Card>
+
+      {mode === "create" && (
+        <ExcelImportDialog
+          open={isExcelDialogOpen}
+          onOpenChange={setIsExcelDialogOpen}
+          onImport={handleExcelImport}
+        />
+      )}
     </div>
   );
 }
