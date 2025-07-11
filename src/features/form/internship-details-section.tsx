@@ -38,7 +38,7 @@ export function InternshipDetailsSection({ control }: InternshipDetailsSectionPr
         <FormField
           control={control}
           name="academicYear"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
               <FormLabel>
                 Année académique <span className="text-destructive">*</span>
@@ -50,6 +50,7 @@ export function InternshipDetailsSection({ control }: InternshipDetailsSectionPr
                   onValueChange={(option) => field.onChange(option?.value || "")}
                   placeholder="Sélectionnez une année"
                   emptyMessage="Aucun résultat"
+                  error={fieldState.invalid}
                 />
               </FormControl>
               <FormMessage />

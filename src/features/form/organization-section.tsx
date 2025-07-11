@@ -33,7 +33,7 @@ export function OrganizationSection({ control }: OrganizationSectionProps) {
         <FormField
           control={control}
           name="organizationType"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
               <FormLabel>
                 Type d'organisme <span className="text-destructive">*</span>
@@ -45,6 +45,7 @@ export function OrganizationSection({ control }: OrganizationSectionProps) {
                   onValueChange={(option) => field.onChange(option?.value || "")}
                   placeholder="Sélectionnez un type"
                   emptyMessage="Aucun résultat"
+                  error={fieldState.invalid}
                 />
               </FormControl>
               <FormMessage />
@@ -55,7 +56,7 @@ export function OrganizationSection({ control }: OrganizationSectionProps) {
         <FormField
           control={control}
           name="organizationCountry"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
               <FormLabel>
                 Pays <span className="text-destructive">*</span>
@@ -67,6 +68,7 @@ export function OrganizationSection({ control }: OrganizationSectionProps) {
                   onValueChange={(option) => field.onChange(option?.value || "")}
                   placeholder="Sélectionnez un pays"
                   emptyMessage="Aucun résultat"
+                  error={fieldState.invalid}
                 />
               </FormControl>
               <FormMessage />

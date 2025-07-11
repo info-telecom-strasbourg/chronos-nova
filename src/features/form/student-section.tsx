@@ -54,7 +54,7 @@ export function StudentSection({ control }: StudentSectionProps) {
         <FormField
           control={control}
           name="studentMajor"
-          render={({ field }) => {
+          render={({ field, fieldState }) => {
             const availableMajors = academicYear ? getMajorsForYear(academicYear) : [];
 
             return (
@@ -79,6 +79,7 @@ export function StudentSection({ control }: StudentSectionProps) {
                     onDisabledClick={() => {
                       toast.error("Veuillez d'abord sélectionner une année académique");
                     }}
+                    error={fieldState.invalid}
                   />
                 </FormControl>
                 <FormMessage />
@@ -90,7 +91,7 @@ export function StudentSection({ control }: StudentSectionProps) {
         <FormField
           control={control}
           name="studentOption"
-          render={({ field }) => {
+          render={({ field, fieldState }) => {
             const availableOptions =
               academicYear && studentMajor ? getOptionsForMajor(academicYear, studentMajor) : [];
             const hasOptions =
@@ -132,6 +133,7 @@ export function StudentSection({ control }: StudentSectionProps) {
                         toast.error("Cette filière n'a pas d'options disponibles");
                       }
                     }}
+                    error={fieldState.invalid}
                   />
                 </FormControl>
                 <FormMessage />
