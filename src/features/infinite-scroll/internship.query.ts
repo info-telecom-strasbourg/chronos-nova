@@ -81,6 +81,10 @@ export const softDeleteInternship = async (id: string): Promise<void> => {
   const { error } = await supabase.from("internship").update({ state: "deleted" }).eq("id", id);
 
   if (error) throw error;
+
+  // Revalidate admin pages
+  const { revalidateAdmin } = await import("@/lib/revalidation");
+  await revalidateAdmin();
 };
 
 // Action: Approve a draft internship by setting state to 'visible'
@@ -90,6 +94,10 @@ export const approveInternship = async (id: string): Promise<void> => {
   const { error } = await supabase.from("internship").update({ state: "visible" }).eq("id", id);
 
   if (error) throw error;
+
+  // Revalidate admin pages
+  const { revalidateAdmin } = await import("@/lib/revalidation");
+  await revalidateAdmin();
 };
 
 // Action: Restore a deleted internship by setting state to 'visible'
@@ -99,6 +107,23 @@ export const restoreInternship = async (id: string): Promise<void> => {
   const { error } = await supabase.from("internship").update({ state: "visible" }).eq("id", id);
 
   if (error) throw error;
+
+  // Revalidate admin pages
+  const { revalidateAdmin } = await import("@/lib/revalidation");
+  await revalidateAdmin();
+};
+
+// Action: Permanently delete an internship from the database
+export const hardDeleteInternship = async (id: string): Promise<void> => {
+  const supabase = await createSupabaseServerClient();
+
+  const { error } = await supabase.from("internship").delete().eq("id", id);
+
+  if (error) throw error;
+
+  // Revalidate admin pages
+  const { revalidateAdmin } = await import("@/lib/revalidation");
+  await revalidateAdmin();
 };
 
 // Action: Create a new internship
@@ -175,6 +200,10 @@ export const createInternship = async (data: CreateInternshipFormData): Promise<
     .single();
 
   if (internshipError) throw internshipError;
+
+  // Revalidate admin pages after creating new internship
+  const { revalidateAdmin } = await import("@/lib/revalidation");
+  await revalidateAdmin();
 
   return { id: internshipData.id };
 };
@@ -253,4 +282,8 @@ export const updateInternship = async (
     .eq("id", id);
 
   if (internshipError) throw internshipError;
+
+  // Revalidate admin pages after update
+  const { revalidateAdmin } = await import("@/lib/revalidation");
+  await revalidateAdmin();
 };

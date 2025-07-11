@@ -114,10 +114,13 @@ export const studentMajors = Array.from(
   ),
 ).map((str) => JSON.parse(str));
 
-export const studentOptions = Array.from(
-  new Set(
-    Object.values(academicStructure)
-      .flatMap((yearData) => Object.values(yearData).flatMap((major) => major.options || []))
-      .map((option) => JSON.stringify(option)),
-  ),
-).map((str) => JSON.parse(str));
+export const studentOptions = [
+  { value: "aucune", label: "Aucune" },
+  ...Array.from(
+    new Set(
+      Object.values(academicStructure)
+        .flatMap((yearData) => Object.values(yearData).flatMap((major) => major.options || []))
+        .map((option) => JSON.stringify(option)),
+    ),
+  ).map((str) => JSON.parse(str)),
+];

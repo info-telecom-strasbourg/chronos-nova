@@ -1,5 +1,7 @@
 import type { InternshipData } from "@/types/drizzle";
+import { useQueryClient } from "@tanstack/react-query";
 import {
+  AlertTriangle,
   Building,
   Calendar1,
   Check,
@@ -8,10 +10,13 @@ import {
   Eye,
   GraduationCap,
   MapPin,
-  RotateCcw,
+  RefreshCw,
   Trash2,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useTransition } from "react";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,8 +27,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { InternshipActions } from "@/features/admin/internship-actions";
+import {
+  approveInternship,
+  hardDeleteInternship,
+  restoreInternship,
+  softDeleteInternship,
+} from "@/features/infinite-scroll/internship.query";
 import { InternshipDetailsDialog } from "./internship-details-dialog";
 
 type InternshipCardProps = {
@@ -32,9 +43,42 @@ type InternshipCardProps = {
 };
 
 export function InternshipCard({ internship, admin }: InternshipCardProps) {
-  const actions = InternshipActions({
-    internshipId: internship.id,
-  });
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const [isPending, startTransition] = useTransition();
+
+  const handleAction = async (action: () => Promise<void>, successMessage: string) => {
+    startTransition(async () => {
+      try {
+        await action();
+
+        await queryClient.invalidateQueries({ queryKey: ["internships"] });
+
+        router.refresh();
+
+        toast.success(successMessage);
+      } catch (error) {
+        toast.error("Une erreur s'est produite");
+        console.error(error);
+      }
+    });
+  };
+
+  const handleSoftDelete = () => {
+    handleAction(() => softDeleteInternship(internship.id), "Stage supprimé avec succès");
+  };
+
+  const handleHardDelete = () => {
+    handleAction(() => hardDeleteInternship(internship.id), "Stage supprimé définitivement");
+  };
+
+  const handleApprove = () => {
+    handleAction(() => approveInternship(internship.id), "Stage approuvé avec succès");
+  };
+
+  const handleRestore = () => {
+    handleAction(() => restoreInternship(internship.id), "Stage restauré avec succès");
+  };
 
   const getStateBadge = () => {
     const stateLabels = {
@@ -50,107 +94,101 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
   const getActionButtons = () => {
     if (!admin) return null;
 
-    const baseButtons = (
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="outline" size="sm">
-            <Eye className="size-4" />
-            Voir plus
-          </Button>
-        </DialogTrigger>
-        <InternshipDetailsDialog internship={internship} />
-      </Dialog>
-    );
-
-    let mainActions: React.ReactNode = null;
-    switch (internship.state) {
-      case "visible":
-        mainActions = (
-          <>
-            <Button variant="outline" size="sm" asChild>
-              <Link href={`/admin/${internship.id}/edit`}>
-                <Edit className="size-4" />
-                Modifier
-              </Link>
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={actions.handleSoftDelete}
-              disabled={actions.isPending}
-            >
-              <Trash2 className="size-4" />
-              Supprimer
-            </Button>
-          </>
-        );
-        break;
-      case "draft":
-        mainActions = (
-          <>
-            <Button
-              variant="default"
-              size="sm"
-              onClick={actions.handleApprove}
-              disabled={actions.isPending}
-            >
-              <Check className="size-4" />
-              Valider
-            </Button>
-            <Button variant="outline" size="sm" asChild>
-              <Link href={`/admin/${internship.id}/edit`}>
-                <Edit className="size-4" />
-                Modifier
-              </Link>
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={actions.handleSoftDelete}
-              disabled={actions.isPending}
-            >
-              <Trash2 className="size-4" />
-              Supprimer
-            </Button>
-          </>
-        );
-        break;
-      case "deleted":
-        mainActions = (
-          <>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={actions.handleRestore}
-              disabled={actions.isPending}
-            >
-              <RotateCcw className="size-4" />
-              Restaurer
-            </Button>
-            <Button variant="destructive" size="sm">
-              <Trash2 className="size-4" />
-              Supprimer
-            </Button>
-          </>
-        );
-        break;
-      default:
-        mainActions = null;
-    }
-
     return (
       <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
         <div className="flex w-full justify-center gap-2 sm:w-auto sm:justify-start">
-          {mainActions}
+          {internship.state === "draft" && (
+            <>
+              <Button variant="default" size="sm" onClick={handleApprove} disabled={isPending}>
+                <Check className="mr-1 h-4 w-4" />
+                Approuver
+              </Button>
+              <Button variant="outline" size="sm" asChild>
+                <Link href={`/admin/${internship.id}/edit`}>
+                  <Edit className="mr-1 h-4 w-4" />
+                  Modifier
+                </Link>
+              </Button>
+              <ConfirmDialog
+                title="Supprimer le stage"
+                description="Êtes-vous sûr de vouloir supprimer ce stage ? Il sera déplacé vers la section supprimés."
+                confirmText="Supprimer"
+                variant="destructive"
+                onConfirm={handleSoftDelete}
+                disabled={isPending}
+              >
+                <Button variant="destructive" size="sm" disabled={isPending}>
+                  <Trash2 className="mr-1 h-4 w-4" />
+                  Supprimer
+                </Button>
+              </ConfirmDialog>
+            </>
+          )}
+
+          {internship.state === "visible" && (
+            <>
+              <Button variant="outline" size="sm" asChild>
+                <Link href={`/admin/${internship.id}/edit`}>
+                  <Edit className="mr-1 h-4 w-4" />
+                  Modifier
+                </Link>
+              </Button>
+              <ConfirmDialog
+                title="Supprimer le stage"
+                description="Êtes-vous sûr de vouloir supprimer ce stage ? Il sera déplacé vers la section supprimés."
+                confirmText="Supprimer"
+                variant="destructive"
+                onConfirm={handleSoftDelete}
+                disabled={isPending}
+              >
+                <Button variant="destructive" size="sm" disabled={isPending}>
+                  <Trash2 className="mr-1 h-4 w-4" />
+                  Supprimer
+                </Button>
+              </ConfirmDialog>
+            </>
+          )}
+
+          {internship.state === "deleted" && (
+            <>
+              <Button variant="default" size="sm" onClick={handleRestore} disabled={isPending}>
+                <RefreshCw className="mr-1 h-4 w-4" />
+                Restaurer
+              </Button>
+              <ConfirmDialog
+                title="Suppression définitive"
+                description="ATTENTION : Cette action est irréversible ! Le stage sera définitivement supprimé de la base de données et ne pourra pas être récupéré."
+                confirmText="Supprimer définitivement"
+                variant="destructive"
+                onConfirm={handleHardDelete}
+                disabled={isPending}
+              >
+                <Button variant="destructive" size="sm" disabled={isPending}>
+                  <AlertTriangle className="mr-1 h-4 w-4" />
+                  Supprimer définitivement
+                </Button>
+              </ConfirmDialog>
+            </>
+          )}
         </div>
-        <div className="flex w-full justify-center sm:w-auto sm:justify-end">{baseButtons}</div>
+
+        <div className="flex w-full justify-center sm:w-auto sm:justify-end">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Eye className="mr-1 h-4 w-4" />
+                Voir plus
+              </Button>
+            </DialogTrigger>
+            <InternshipDetailsDialog internship={internship} />
+          </Dialog>
+        </div>
       </div>
     );
   };
 
   return (
     <Card className="w-full">
-      {admin && actions.deleteDialog}
       <CardHeader className="border-b-2 pb-4">
         <div className="flex w-full items-start justify-between">
           <CardTitle className="text-2xl">{internship.organization.name}</CardTitle>
@@ -196,12 +234,17 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
         {admin ? (
           getActionButtons()
         ) : (
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline">Voir plus</Button>
-            </DialogTrigger>
-            <InternshipDetailsDialog internship={internship} />
-          </Dialog>
+          <div className="flex w-full justify-center sm:justify-end">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Eye className="mr-1 h-4 w-4" />
+                  Voir plus
+                </Button>
+              </DialogTrigger>
+              <InternshipDetailsDialog internship={internship} />
+            </Dialog>
+          </div>
         )}
       </CardFooter>
     </Card>
