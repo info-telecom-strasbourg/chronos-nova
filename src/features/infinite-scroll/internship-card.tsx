@@ -57,10 +57,11 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
       </Dialog>
     );
 
+    let mainActions: React.ReactNode = null;
     switch (internship.state) {
       case "visible":
-        return (
-          <div className="flex gap-2">
+        mainActions = (
+          <>
             <Button variant="outline" size="sm" asChild>
               <Link href={`/admin/${internship.id}/edit`}>
                 <Edit className="size-4" />
@@ -71,13 +72,12 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
               <Trash2 className="size-4" />
               Supprimer
             </Button>
-            {baseButtons}
-          </div>
+          </>
         );
-
+        break;
       case "draft":
-        return (
-          <div className="flex gap-2">
+        mainActions = (
+          <>
             <Button variant="default" size="sm">
               <Check className="size-4" />
               Valider
@@ -92,13 +92,12 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
               <Trash2 className="size-4" />
               Supprimer
             </Button>
-            {baseButtons}
-          </div>
+          </>
         );
-
+        break;
       case "deleted":
-        return (
-          <div className="flex gap-2">
+        mainActions = (
+          <>
             <Button variant="outline" size="sm">
               <RotateCcw className="size-4" />
               Restaurer
@@ -107,13 +106,21 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
               <Trash2 className="size-4" />
               Supprimer
             </Button>
-            {baseButtons}
-          </div>
+          </>
         );
-
+        break;
       default:
-        return baseButtons;
+        mainActions = null;
     }
+
+    return (
+      <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+        <div className="flex w-full justify-center gap-2 sm:w-auto sm:justify-start">
+          {mainActions}
+        </div>
+        <div className="flex w-full justify-center sm:w-auto sm:justify-end">{baseButtons}</div>
+      </div>
+    );
   };
 
   return (
