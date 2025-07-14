@@ -14,11 +14,12 @@ export interface Student {
   lastName?: string; // Last name of the student
   firstName?: string; // First name of the student
   major?: string; // Major field of study
-  course?: string; // Course specialization 
+  option?: string; // Course specialization 
 }
 
 export interface Organization {
   orgName?: string; // Name of the organization
+  city?: string; // City where the organization is located
   // Tutor's information
   tutorLastName?: string;
   tutorFirstName?: string;

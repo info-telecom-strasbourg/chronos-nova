@@ -75,8 +75,23 @@ export function InternshipForm({ mode, defaultValues, internshipId }: Internship
     prevStudentMajor.current = studentMajor;
   }, [studentMajor, setValue]);
 
-  const handleExcelImport = (file: File, sheetsConfig: SheetConfig[]) => {
-    // TODO: Implémenter la logique d'import et de relier le parsing des données Excel
+  const handleExcelImport = async (file: File, sheetsConfig: SheetConfig[]) => {
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+
+      const { importExcelData } = await import("@/features/excel-import/excel-import.action");
+      const result = await importExcelData(arrayBuffer, sheetsConfig);
+
+      if (result.success) {
+        toast.success(result.message);
+        router.push("/admin/pending");
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'import Excel:", error);
+      toast.error("Une erreur s'est produite lors de l'import des données Excel");
+    }
   };
 
   const onSubmit = async (data: CreateInternshipFormData) => {

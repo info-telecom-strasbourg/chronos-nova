@@ -6,6 +6,7 @@ import { FileSpreadsheetIcon, UploadIcon } from "lucide-react";
 import { type ChangeEvent, useCallback, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -111,6 +112,20 @@ export function ExcelImportDialog({ open, onOpenChange, onImport }: ExcelImportD
         .filter((sheet) => sheet.selected)
         .map(({ selected, ...sheetConfig }) => sheetConfig);
 
+      // Vérifier que toutes les feuilles sélectionnées sont supportées
+      const unsupportedSheets = selectedSheets.filter(
+        (sheet) => sheet.name !== "2A - Récap. stage" && sheet.name !== "Stage substitution",
+      );
+
+      if (unsupportedSheets.length > 0) {
+        toast.error(
+          `Les feuilles suivantes ne peuvent pas être parsées : ${unsupportedSheets
+            .map((s) => s.name)
+            .join(", ")}`,
+        );
+        return;
+      }
+
       onImport?.(selectedFile, selectedSheets);
       resetDialog();
       onOpenChange(false);
@@ -134,7 +149,6 @@ export function ExcelImportDialog({ open, onOpenChange, onImport }: ExcelImportD
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Sélection du fichier */}
           <div className="space-y-2">
             <Label htmlFor="excel-file">Fichier Excel (.xlsx)</Label>
             <div className="relative">
@@ -162,12 +176,11 @@ export function ExcelImportDialog({ open, onOpenChange, onImport }: ExcelImportD
                 {sheets.map((sheet, sheetIndex) => (
                   <div key={sheet.name} className="space-y-2 rounded-lg border p-3">
                     <div className="flex items-center gap-3">
-                      <input
-                        type="checkbox"
+                      <Checkbox
                         id={`sheet-${sheetIndex}`}
                         checked={sheet.selected}
-                        onChange={() => handleSheetToggle(sheetIndex)}
-                        className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
+                        onCheckedChange={() => handleSheetToggle(sheetIndex)}
+                        className="size-4"
                       />
                       <label
                         htmlFor={`sheet-${sheetIndex}`}
@@ -180,18 +193,30 @@ export function ExcelImportDialog({ open, onOpenChange, onImport }: ExcelImportD
 
                     {sheet.selected && (
                       <div className="ml-7 space-y-1">
-                        <Label htmlFor={`start-row-${sheetIndex}`} className="text-xs">
-                          Première ligne à analyser
-                        </Label>
-                        <Input
-                          id={`start-row-${sheetIndex}`}
-                          type="number"
-                          min="1"
-                          value={sheet.startRow}
-                          onChange={(e) => handleStartRowChange(sheetIndex, e.target.value)}
-                          className="h-8"
-                          placeholder="1"
-                        />
+                        {(sheet.name === "Stage substitution" ||
+                          sheet.name === "2A - Récap. stage") && (
+                          <>
+                            <Label htmlFor={`start-row-${sheetIndex}`} className="text-xs">
+                              Première ligne à analyser
+                            </Label>
+                            <Input
+                              id={`start-row-${sheetIndex}`}
+                              type="number"
+                              min="1"
+                              value={sheet.startRow}
+                              onChange={(e) => handleStartRowChange(sheetIndex, e.target.value)}
+                              className="h-8"
+                              placeholder="1"
+                            />
+                          </>
+                        )}
+                        {sheet.name !== "Stage substitution" &&
+                          sheet.name !== "2A - Récap. stage" && (
+                            <p className="text-destructive text-xs">
+                              Cette feuille ne peut pas être parsée. Seules les feuilles "2A -
+                              Récap. stage" et "Stage substitution" sont supportées.
+                            </p>
+                          )}
                       </div>
                     )}
                   </div>

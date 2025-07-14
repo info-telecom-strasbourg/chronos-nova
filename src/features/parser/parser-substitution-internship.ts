@@ -1,16 +1,17 @@
 import type { Worksheet } from "exceljs";
 import type { Internship, Organization, Student } from "./type-definition";
-import { normalizeOrganizationType } from "./data-normalizer.js";
-import { extractNumberOfWeeks, splitLastNameFirstName } from "./functions.js";
+import { normalizeOrganizationType } from "./data-normalizer";
+import { extractNumberOfWeeks, splitLastNameFirstName } from "./functions";
 
 // ===================================
 // Parsing functions
 // ===================================
-const startingRow = 8; // Row to start parsing from
+const DEFAULT_STARTING_ROW = 8; // Row to start parsing from
 
 export async function parseExcelSubstitutionInternship(
   filePath: string,
   sheetName: string,
+  startRow: number = DEFAULT_STARTING_ROW,
 ): Promise<{
   internships: Internship[];
   students: Student[];
@@ -26,18 +27,18 @@ export async function parseExcelSubstitutionInternship(
   }
 
   // Result arrays
-  const internships: Internship[] = parseInternships(worksheet);
-  const students: Student[] = parseStudents(worksheet);
-  const organizations: Organization[] = parseOrganizations(worksheet);
+  const internships: Internship[] = parseInternships(worksheet, startRow);
+  const students: Student[] = parseStudents(worksheet, startRow);
+  const organizations: Organization[] = parseOrganizations(worksheet, startRow);
 
   return { internships, organizations, students };
 }
 
-function parseInternships(worksheet: Worksheet): Internship[] {
+function parseInternships(worksheet: Worksheet, startRow: number): Internship[] {
   const internships: Internship[] = [];
 
   worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
-    if (rowNumber < startingRow) return; // skip header rows
+    if (rowNumber < startRow) return; // skip header rows
 
     // Extraction directe des données
     const subject = row.getCell(8).text.trim() || "??";
@@ -60,11 +61,11 @@ function parseInternships(worksheet: Worksheet): Internship[] {
   return internships;
 }
 
-function parseStudents(worksheet: Worksheet): Student[] {
+function parseStudents(worksheet: Worksheet, startRow: number): Student[] {
   const students: Student[] = [];
 
   worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
-    if (rowNumber < startingRow) return; // skip header rows
+    if (rowNumber < startRow) return; // skip header rows
 
     // Extraction directe des données
     const fullNameCell = row.getCell(3).text.trim();
@@ -79,11 +80,11 @@ function parseStudents(worksheet: Worksheet): Student[] {
   return students;
 }
 
-function parseOrganizations(worksheet: Worksheet): Organization[] {
+function parseOrganizations(worksheet: Worksheet, startRow: number): Organization[] {
   const organizations: Organization[] = [];
 
   worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
-    if (rowNumber < startingRow) return; // skip header rows
+    if (rowNumber < startRow) return; // skip header rows
 
     // Extraction directe des données
     const orgName = row.getCell(5).text.trim() || "??";

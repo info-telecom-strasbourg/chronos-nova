@@ -1,4 +1,4 @@
-import type { Internship, Organization, Student } from "./type-definition.js";
+import type { Internship, Organization, Student } from "./type-definition";
 
 /**
  * Centralise toutes les opérations de formatage et normalisation des données
@@ -67,15 +67,24 @@ export function splitLastNameFirstName(fullName: string): {
  * Normalise le type d'organisation
  */
 export function normalizeOrganizationType(orgType: string): string {
-  const cleaned = orgType.trim().toUpperCase().replace(/\./g, "");
+  try {
+    if (!orgType || typeof orgType !== "string") {
+      return "not_company"; // Valeur par défaut conforme à la base
+    }
 
-  // Accepter toutes les variantes de "E" ou "ENTREPRISE"
-  if (["E", "ENTREPRISE"].includes(cleaned)) {
-    return "Entreprise";
+    const cleaned = orgType.trim().toUpperCase().replace(/\./g, "");
+
+    // Accepter toutes les variantes de "E" ou "ENTREPRISE"
+    if (["E", "ENTREPRISE"].includes(cleaned)) {
+      return "company";
+    }
+
+    // Tout le reste (L, LABORATOIRE, etc.)
+    return "not_company";
+  } catch (error) {
+    console.error(`Erreur lors de la normalisation du type d'organisation "${orgType}":`, error);
+    return "not_company"; // Valeur par défaut conforme à la base
   }
-
-  // Tout le reste (L, LABORATOIRE, etc.)
-  return "Hors entreprise";
 }
 
 /**
@@ -131,10 +140,10 @@ export function formatOrganizationForDatabase(org: Organization) {
  */
 export function formatStudentForDatabase(student: Student, organizationId: number) {
   return {
-    student_firstname: student.firstName || "??",
-    student_lastname: student.lastName || "??",
-    student_degree: student.major || "??",
-    student_course: student.course || "??",
+    student_firstname: student.firstName || "??", // TODO: valeur temporaire
+    student_lastname: student.lastName || "??", // TODO: valeur temporaire
+    student_degree: student.major || "??", // TODO: valeur temporaire
+    student_course: student.option || "??", // TODO: valeur temporaire
     organization_id: organizationId,
   };
 }
