@@ -2,12 +2,14 @@ import type { Worksheet } from "exceljs";
 import type { Internship, Organization, Student } from "./type-definition";
 import {
   extractNumberOfWeeks,
+  formatCityName,
+  formatCountry,
+  getMajorAlias,
+  getOptionAlias,
   hasSignificantContent,
   normalizeOrganizationType,
   parseConfidential,
   parseDate,
-  parseDiploma,
-  parseOption,
   splitLastNameFirstName,
 } from "./parser-utils";
 
@@ -72,7 +74,7 @@ function parseInternships(worksheet: Worksheet, startRow: number): Internship[] 
 
       const dateCell = row.getCell(16);
       const dateRaw = dateCell?.text?.trim() || "";
-      const date = parseDate(dateRaw);
+      const date = parseDate(dateRaw); // Toujours au format YYYY-MM-DD pour la base
 
       const weeksCell = row.getCell(17);
       const weeksCellText = weeksCell?.text?.trim() || "";
@@ -82,7 +84,7 @@ function parseInternships(worksheet: Worksheet, startRow: number): Internship[] 
 
       internships.push({
         confidential,
-        date,
+        date, // format YYYY-MM-DD pour la base
         subject,
         weeksCount,
         year,
@@ -122,11 +124,11 @@ function parseStudents(worksheet: Worksheet, startRow: number): Student[] {
 
       const majorCell = row.getCell(3);
       const majorRaw = majorCell?.text?.trim() || "";
-      const major = parseDiploma(majorRaw);
+      const major = getMajorAlias(majorRaw);
 
       const optionCell = row.getCell(4);
       const optionRaw = optionCell?.text?.trim() || "";
-      const option = parseOption(optionRaw);
+      const option = getOptionAlias(optionRaw);
 
       students.push({
         firstName,
@@ -176,10 +178,12 @@ function parseOrganizations(worksheet: Worksheet, startRow: number): Organizatio
       const orgType = normalizeOrganizationType(orgTypeRaw);
 
       const countryCell = row.getCell(7);
-      const country = countryCell?.text?.trim() || "??";
+      const countryRaw = countryCell?.text?.trim() || "??";
+      const country = formatCountry(countryRaw);
 
       const cityCell = row.getCell(8);
-      const city = cityCell?.text?.trim() || "??";
+      const cityRaw = cityCell?.text?.trim() || "??";
+      const city = formatCityName(cityRaw);
 
       organizations.push({
         country,

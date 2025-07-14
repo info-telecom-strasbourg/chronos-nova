@@ -105,45 +105,47 @@ export function parseConfidential(value: string): boolean {
 
 /**
  * Convertit un diplôme en alias pour la base de données
- * Exemple: "G" → "gene", "TIS" → "ti-sante", "IR" → "ir"
+ * Exemple: "G" → "Généraliste", "TIS" → "TI Santé", "IR" → "IR"
  */
 export function parseDiploma(value: string): string {
-  if (!value || typeof value !== "string") return "gene";
+  if (!value || typeof value !== "string") return "Généraliste";
 
   const normalized = value.trim().toUpperCase();
 
   switch (normalized) {
     case "G":
-      return "gene";
+      return "Généraliste";
     case "TIS":
-      return "ti-sante";
+      return "TI Santé";
     case "IR":
-      return "ir";
+      return "IR";
     default:
-      return "gene";
+      return "Généraliste";
   }
 }
 
 /**
  * Convertit une option en alias pour la base de données
- * Exemple: "SDIA" → "sdia", "RIO" → "rio"
+ * Exemple: "SDIA" → "SDIA", "RIO" → "RIO"
  */
 export function parseOption(value: string): string {
   if (!value || typeof value !== "string" || value.trim() === "") {
-    return "aucune";
+    return "AUCUNE";
   }
 
   const normalized = value.trim().toUpperCase();
 
   switch (normalized) {
     case "SDIA":
-      return "sdia";
+      return "SDIA";
     case "RIO":
-      return "rio";
+      return "RIO";
     case "TI":
-      return "ti";
+      return "TI";
+    case "DTMI":
+      return "DTMI";
     default:
-      return "aucune";
+      return "AUCUNE";
   }
 }
 
@@ -263,4 +265,89 @@ export function hasSignificantContent(row: import("exceljs").Row): boolean {
   } catch {
     return false;
   }
+}
+
+// ===============================
+// FORMATAGE GÉOGRAPHIQUE
+// ===============================
+
+/**
+ * Formate un pays en majuscules
+ * Exemple: "france" → "FRANCE", "États-Unis" → "ÉTATS-UNIS"
+ */
+export function formatCountry(country: string): string {
+  if (!country || typeof country !== "string") return "";
+  return country.trim().toUpperCase();
+}
+
+/**
+ * Formate un nom de ville avec majuscules appropriées
+ * Met une majuscule à la première lettre de chaque mot,
+ * sauf pour les déterminants et prépositions qui restent en minuscules
+ * Exemple: "le kremlin-bicêtre" → "Le Kremlin-Bicêtre"
+ *          "sainte-marie-aux-mines" → "Sainte-Marie-aux-Mines"
+ */
+export function formatCityName(city: string): string {
+  if (!city || typeof city !== "string") return "";
+
+  const lowercaseWords = new Set([
+    "de",
+    "du",
+    "des",
+    "d'",
+    "d",
+    "la",
+    "le",
+    "les",
+    "l'",
+    "l",
+    "au",
+    "aux",
+    "à",
+    "en",
+    "et",
+    "sur",
+    "sous",
+  ]);
+
+  return city
+    .trim()
+    .toLowerCase()
+    .split(/(\s+|-+)/) // Diviser sur espaces et tirets en gardant les séparateurs
+    .map((part, index) => {
+      // Si c'est un espace ou un tiret, le garder tel quel
+      if (/^(\s+|-+)$/.test(part)) return part;
+
+      // Premier mot toujours en majuscule
+      if (index === 0) {
+        return part.charAt(0).toUpperCase() + part.slice(1);
+      }
+
+      // Vérifier si c'est un déterminant/préposition
+      if (lowercaseWords.has(part)) {
+        return part;
+      }
+
+      // Sinon, mettre la première lettre en majuscule
+      return part.charAt(0).toUpperCase() + part.slice(1);
+    })
+    .join("");
+}
+
+// ===============================
+// MAPPING DIPLÔME/OPTION
+// ===============================
+
+export function getMajorAlias(excelValue: string): string {
+  if (!excelValue || typeof excelValue !== "string") {
+    return "Généraliste";
+  }
+  return parseDiploma(excelValue);
+}
+
+export function getOptionAlias(excelValue: string): string {
+  if (!excelValue || typeof excelValue !== "string" || excelValue.trim() === "") {
+    return "AUCUNE";
+  }
+  return parseOption(excelValue);
 }

@@ -144,27 +144,32 @@ export const createInternship = async (data: CreateInternshipFormData): Promise<
 
   if (orgError) throw orgError;
 
-  // Ensure major exists
+  // Ensure major exists - use transformMajorAlias for consistency
+  const { transformMajorAlias } = await import("@/types/correspondance");
+  const majorAlias = transformMajorAlias(data.studentMajor);
+
   const { error: majorError } = await supabase
     .from("major")
     .upsert({
-      alias: data.studentMajor,
+      alias: majorAlias,
       name: data.studentMajor,
     })
     .select("alias");
 
   if (majorError) throw majorError;
 
-  // Ensure option exists (if provided, otherwise use default)
-  const optionAlias =
-    data.studentOption && data.studentOption.trim() !== "" ? data.studentOption.trim() : "aucune"; // Default option for cases where no option is selected
+  // Ensure option exists - use transformOptionAlias for consistency
+  const { transformOptionAlias } = await import("@/types/correspondance");
+  const rawOptionAlias =
+    data.studentOption && data.studentOption.trim() !== "" ? data.studentOption.trim() : "aucune";
+  const optionAlias = transformOptionAlias(rawOptionAlias);
 
   // Ensure the option exists in database
   const { error: optionError } = await supabase
     .from("option")
     .upsert({
       alias: optionAlias,
-      name: optionAlias === "aucune" ? "Aucune" : optionAlias,
+      name: optionAlias === "AUCUNE" ? "Aucune" : data.studentOption || "Aucune",
     })
     .select("alias");
 
@@ -176,7 +181,7 @@ export const createInternship = async (data: CreateInternshipFormData): Promise<
     .insert({
       firstName: data.studentFirstName,
       lastName: data.studentLastName,
-      majorAlias: data.studentMajor,
+      majorAlias: majorAlias,
       optionAlias: optionAlias,
     })
     .select("id")
@@ -237,22 +242,26 @@ export const updateInternship = async (
 
   if (orgError) throw orgError;
 
-  // Ensure major exists
+  // Ensure major exists - use transformMajorAlias for consistency
+  const { transformMajorAlias, transformOptionAlias } = await import("@/types/correspondance");
+  const majorAlias = transformMajorAlias(data.studentMajor);
+
   const { error: majorError } = await supabase.from("major").upsert({
-    alias: data.studentMajor,
+    alias: majorAlias,
     name: data.studentMajor,
   });
 
   if (majorError) throw majorError;
 
-  // Ensure option exists (if provided, otherwise use default)
-  const optionAlias =
-    data.studentOption && data.studentOption.trim() !== "" ? data.studentOption.trim() : "aucune"; // Default option for cases where no option is selected
+  // Ensure option exists - use transformOptionAlias for consistency
+  const rawOptionAlias =
+    data.studentOption && data.studentOption.trim() !== "" ? data.studentOption.trim() : "aucune";
+  const optionAlias = transformOptionAlias(rawOptionAlias);
 
   // Ensure the option exists in database
   const { error: optionError } = await supabase.from("option").upsert({
     alias: optionAlias,
-    name: optionAlias === "aucune" ? "Aucune" : optionAlias,
+    name: optionAlias === "AUCUNE" ? "Aucune" : data.studentOption || "Aucune",
   });
 
   if (optionError) throw optionError;
@@ -263,7 +272,7 @@ export const updateInternship = async (
     .update({
       firstName: data.studentFirstName,
       lastName: data.studentLastName,
-      majorAlias: data.studentMajor,
+      majorAlias: majorAlias,
       optionAlias: optionAlias,
     })
     .eq("id", currentInternship.studentId);
