@@ -1,19 +1,23 @@
-export const COURSE_MAPPING: Record<string, string> = {
-  SDIA: "Science des données et intelligence artificielle",
-  RIO: "Réseaux et internet des objets",
-  titi: "",
-  dtmi: "",
-};
+import type { InternshipData } from "@/types/drizzle";
 
-export const MAJOR_MAPPING: Record<string, string> = {
-  "TI Santé": "Technologies de l'information pour la santé",
-  IR: "Informatique et Réseaux",
-};
-
-export function getFullCourseName(acronym: string): string {
-  return COURSE_MAPPING[acronym] || "";
+/**
+ * Formate l'affichage d'un alias et nom sous la forme: alias (nom complet)
+ */
+export function formatAliasName(item: { alias: string; name: string } | null): string {
+  if (!item) return "";
+  return `${item.alias} (${item.name})`;
 }
 
-export function getFullMajorName(acronym: string): string {
-  return MAJOR_MAPPING[acronym] || "";
+/**
+ * Hook personnalisé pour formater l'affichage diplôme/filière
+ */
+export function formatStudentInfo(student: InternshipData["student"]) {
+  return {
+    formattedMajor: formatAliasName(student.major),
+    formattedOption: formatAliasName(student.option),
+    majorAlias: student.major?.alias || "",
+    majorName: student.major?.name || "",
+    optionAlias: student.option?.alias || "",
+    optionName: student.option?.name || "",
+  };
 }

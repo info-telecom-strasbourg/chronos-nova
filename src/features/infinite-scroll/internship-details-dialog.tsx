@@ -7,7 +7,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { formatDate } from "@/lib/scripts/date";
-import { getFullCourseName, getFullMajorName } from "@/types/correspondance";
 
 type InternshipDetailsDialogProps = {
   internship: InternshipData;
@@ -55,14 +54,7 @@ export function InternshipDetailsDialog({ internship }: InternshipDetailsDialogP
               <GraduationCap className="h-4 w-4 text-muted-foreground" />
             </span>
             <span>
-              <b>Diplôme :</b> {internship.student.major.name}
-              {internship.student.major && getFullMajorName(internship.student.major.name) && (
-                <span className="text-muted-foreground">
-                  {" ("}
-                  {getFullMajorName(internship.student.major.name)}
-                  {")"}
-                </span>
-              )}
+              <b>Diplôme :</b> {internship.student.major.alias} ({internship.student.major.name})
             </span>
           </span>
           {internship.student.option && (
@@ -71,10 +63,8 @@ export function InternshipDetailsDialog({ internship }: InternshipDetailsDialogP
                 <School className="h-4 w-4 text-muted-foreground" />
               </span>
               <span>
-                <b>Filière :</b> {internship.student.option.name}
-                {" ("}
-                {getFullCourseName(internship.student.option.name)}
-                {")"}
+                <b>Filière :</b> {internship.student.option.alias} ({internship.student.option.name}
+                )
               </span>
             </span>
           )}

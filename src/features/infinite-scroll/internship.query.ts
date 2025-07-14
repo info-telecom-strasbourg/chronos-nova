@@ -287,3 +287,74 @@ export const updateInternship = async (
   const { revalidateAdmin } = await import("@/lib/revalidation");
   await revalidateAdmin();
 };
+
+/**
+ * Récupère la liste des stages avec jointure sur major et option
+ * pour afficher alias + nom complet
+ */
+export async function getInternshipsWithDetails({
+  page = 1,
+  limit = 10,
+  state = "visible",
+}: {
+  page?: number;
+  limit?: number;
+  state?: "visible" | "draft" | "deleted";
+} = {}): Promise<{
+  data: InternshipData[];
+  count: number;
+  hasMore: boolean;
+}> {
+  const supabase = await createSupabaseServerClient();
+
+  // Calculer l'offset pour la pagination
+  const offset = (page - 1) * limit;
+
+  // Requête avec jointures pour récupérer alias + nom complet
+  const { data, error, count } = await supabase
+    .from("internship")
+    .select(
+      `
+      *,
+      organization:organizationId (
+        id,
+        name,
+        type,
+        country,
+        city
+      ),
+      student:studentId (
+        id,
+        firstName,
+        lastName,
+        majorAlias,
+        optionAlias,
+        major:majorAlias (
+          alias,
+          name
+        ),
+        option:optionAlias (
+          alias,
+          name
+        )
+      )
+    `,
+      { count: "exact" },
+    )
+    .eq("state", state)
+    .order("beginDate", { ascending: false })
+    .range(offset, offset + limit - 1);
+
+  if (error) {
+    console.error("Erreur lors de la récupération des stages:", error);
+    throw error;
+  }
+
+  const hasMore = count ? offset + limit < count : false;
+
+  return {
+    data: data as InternshipData[],
+    count: count || 0,
+    hasMore,
+  };
+}
