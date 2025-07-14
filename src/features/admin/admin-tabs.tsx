@@ -2,10 +2,9 @@
 
 import { Plus } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface AdminTabsProps {
   pendingCount?: number;
@@ -13,27 +12,12 @@ interface AdminTabsProps {
 
 export function AdminTabs({ pendingCount = 0 }: AdminTabsProps) {
   const pathname = usePathname();
-  const router = useRouter();
 
   const getActiveTab = () => {
     if (pathname === "/admin") return "visible";
     if (pathname === "/admin/pending") return "draft";
     if (pathname === "/admin/deleted") return "deleted";
     return "visible";
-  };
-
-  const handleTabChange = (value: string) => {
-    switch (value) {
-      case "visible":
-        router.push("/admin");
-        break;
-      case "draft":
-        router.push("/admin/pending");
-        break;
-      case "deleted":
-        router.push("/admin/deleted");
-        break;
-    }
   };
 
   return (
@@ -51,20 +35,36 @@ export function AdminTabs({ pendingCount = 0 }: AdminTabsProps) {
         </Button>
       </div>
 
-      <Tabs value={getActiveTab()} onValueChange={handleTabChange}>
-        <TabsList className="grid w-full grid-cols-3 sm:w-auto">
-          <TabsTrigger value="visible">Actifs</TabsTrigger>
-          <TabsTrigger value="draft" className="relative">
+      <div className="flex w-full flex-col gap-2 sm:flex-row sm:gap-2">
+        <Button
+          asChild
+          variant={getActiveTab() === "visible" ? "default" : "outline"}
+          className="flex-1 justify-center text-center"
+        >
+          <Link href="/admin">Actifs</Link>
+        </Button>
+        <Button
+          asChild
+          variant={getActiveTab() === "draft" ? "default" : "outline"}
+          className="relative flex-1 justify-center text-center"
+        >
+          <Link href="/admin/pending">
             En attente
             {pendingCount > 0 && (
               <Badge variant="destructive" className="ml-2 text-xs">
                 {pendingCount}
               </Badge>
             )}
-          </TabsTrigger>
-          <TabsTrigger value="deleted">Supprimés</TabsTrigger>
-        </TabsList>
-      </Tabs>
+          </Link>
+        </Button>
+        <Button
+          asChild
+          variant={getActiveTab() === "deleted" ? "default" : "outline"}
+          className="flex-1 justify-center text-center"
+        >
+          <Link href="/admin/deleted">Supprimés</Link>
+        </Button>
+      </div>
     </div>
   );
 }
