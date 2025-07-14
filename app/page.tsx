@@ -5,12 +5,12 @@ import { InternshipListSkeleton } from "@/features/infinite-scroll/internship-sk
 import { InternshipHeader } from "@/features/search/internship-header";
 
 export default async function RoutePage() {
-  const totalInternships = await getInternshipsCount();
+  const totalInternships = await getInternshipsCount("visible");
   return (
     <div className="space-y-8">
       <InternshipHeader />
       <Suspense fallback={<InternshipListSkeleton />}>
-        <InternshipInfiniteScroll totalItems={totalInternships} />
+        <InternshipInfiniteScroll totalItems={totalInternships} state="visible" />
       </Suspense>
     </div>
   );
