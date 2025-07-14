@@ -7,8 +7,8 @@ export const major2str = {
 export const option2str = {
   SDIA: "Science des Données et Intelligence Artificielle",
   RIO: "Réseaux et Internet des Objets",
-  TI: "Je sais pas",
-  DTMI: "Aucune idée",
+  TI: "Thérapeutiques Innovantes",
+  DTMI: "Diagnostics et Traitement Médicaux Innovants",
   AUCUNE: "Aucune",
 };
 

@@ -214,7 +214,9 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
             <GraduationCap className="h-4 w-4" />
             <span>
               {internship.academicYear} - {internship.student.major.alias || "??"}
-              {` - ${internship.student.option.alias}` || ""}
+              {internship.student.option && internship.student.option.alias !== "AUCUNE"
+                ? ` - ${internship.student.option.alias}`
+                : ""}
             </span>
           </div>
           <div className="flex items-center gap-2">
