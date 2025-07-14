@@ -85,6 +85,7 @@ export function InternshipForm({ mode, defaultValues, internshipId }: Internship
       if (result.success) {
         toast.success(result.message);
         router.push("/admin/pending");
+        router.refresh();
       } else {
         toast.error(result.message);
       }

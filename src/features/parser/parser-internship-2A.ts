@@ -1,4 +1,4 @@
-import type { Worksheet } from "exceljs";
+import type { Row, Worksheet } from "exceljs";
 import type { Internship, Organization, Student } from "./type-definition";
 import {
   extractNumberOfWeeks,
@@ -13,12 +13,10 @@ import {
   splitLastNameFirstName,
 } from "./parser-utils";
 
-const DEFAULT_STARTING_ROW = 12;
-
 export async function parseExcelInternship2A(
   filePath: string,
   sheetName: string,
-  startRow: number = DEFAULT_STARTING_ROW,
+  startRow: number,
 ): Promise<{
   internships: Internship[];
   students: Student[];
@@ -45,158 +43,116 @@ export async function parseExcelInternship2A(
   }
 }
 
-function parseInternships(worksheet: Worksheet, startRow: number): Internship[] {
-  const internships: Internship[] = [];
+function parseRowsWithContent<T>(
+  worksheet: Worksheet,
+  startRow: number,
+  maxEmptyRows: number,
+  parseRow: (row: Row, rowNumber: number) => T | null,
+): T[] {
+  const results: T[] = [];
   let emptyRowCount = 0;
-  const maxEmptyRows = 5; // Arrêter après 5 lignes vides consécutives
-
   worksheet.eachRow({ includeEmpty: true }, (row, rowNumber) => {
     if (rowNumber < startRow) return;
-
-    // Vérifier si la ligne a du contenu significatif
     if (!hasSignificantContent(row)) {
       emptyRowCount++;
       if (emptyRowCount >= maxEmptyRows) {
-        return false; // Arrêter le parsing
+        return false;
       }
-      return; // Ignorer cette ligne vide
+      return;
     }
-
-    emptyRowCount = 0; // Réinitialiser le compteur de lignes vides
-
+    emptyRowCount = 0;
     try {
-      const subjectCell = row.getCell(13);
-      const subject = subjectCell?.text?.trim() || "??";
-
-      const confidentialCell = row.getCell(12);
-      const confidentialRaw = confidentialCell?.text?.trim() || "";
-      const confidential = parseConfidential(confidentialRaw);
-
-      const dateCell = row.getCell(16);
-      const dateRaw = dateCell?.text?.trim() || "";
-      const date = parseDate(dateRaw); // Toujours au format YYYY-MM-DD pour la base
-
-      const weeksCell = row.getCell(17);
-      const weeksCellText = weeksCell?.text?.trim() || "";
-      const weeksCount = extractNumberOfWeeks(weeksCellText);
-
-      const year = "2A";
-
-      internships.push({
-        confidential,
-        date, // format YYYY-MM-DD pour la base
-        subject,
-        weeksCount,
-        year,
-      });
+      const parsed = parseRow(row, rowNumber);
+      if (parsed) results.push(parsed);
     } catch (error) {
-      console.error(`Error parsing row ${rowNumber} (internships):`, error);
+      console.error(`Error parsing row ${rowNumber}:`, error);
     }
   });
+  return results;
+}
 
-  return internships;
+function parseInternships(worksheet: Worksheet, startRow: number): Internship[] {
+  return parseRowsWithContent(worksheet, startRow, 5, (row) => {
+    const subjectCell = row.getCell(13);
+    const subject = subjectCell?.text?.trim() || "??";
+
+    const confidentialCell = row.getCell(12);
+    const confidentialRaw = confidentialCell?.text?.trim() || "";
+    const confidential = parseConfidential(confidentialRaw);
+
+    const dateCell = row.getCell(16);
+    const dateRaw = dateCell?.text?.trim() || "";
+    const date = parseDate(dateRaw);
+
+    const weeksCell = row.getCell(17);
+    const weeksCellText = weeksCell?.text?.trim() || "";
+    const weeksCount = extractNumberOfWeeks(weeksCellText);
+
+    const year = "2A";
+
+    return {
+      confidential,
+      date,
+      subject,
+      weeksCount,
+      year,
+    };
+  });
 }
 
 function parseStudents(worksheet: Worksheet, startRow: number): Student[] {
-  const students: Student[] = [];
-  let emptyRowCount = 0;
-  const maxEmptyRows = 1; // Arrêter après 1 ligne vide consécutive
+  return parseRowsWithContent(worksheet, startRow, 1, (row) => {
+    const fullNameCell = row.getCell(2);
+    const fullNameText = fullNameCell?.text?.trim() || "??";
 
-  worksheet.eachRow({ includeEmpty: true }, (row, rowNumber) => {
-    if (rowNumber < startRow) return;
+    const { lastName, firstName } = splitLastNameFirstName(fullNameText);
 
-    // Vérifier si la ligne a du contenu significatif
-    if (!hasSignificantContent(row)) {
-      emptyRowCount++;
-      if (emptyRowCount >= maxEmptyRows) {
-        return false; // Arrêter le parsing
-      }
-      return; // Ignorer cette ligne vide
-    }
+    const majorCell = row.getCell(3);
+    const majorRaw = majorCell?.text?.trim() || "";
+    const major = getMajorAlias(majorRaw);
 
-    emptyRowCount = 0; // Réinitialiser le compteur de lignes vides
+    const optionCell = row.getCell(4);
+    const optionRaw = optionCell?.text?.trim() || "";
+    const option = getOptionAlias(optionRaw);
 
-    try {
-      const fullNameCell = row.getCell(2);
-      const fullNameText = fullNameCell?.text?.trim() || "??";
-
-      const { lastName, firstName } = splitLastNameFirstName(fullNameText);
-
-      const majorCell = row.getCell(3);
-      const majorRaw = majorCell?.text?.trim() || "";
-      const major = getMajorAlias(majorRaw);
-
-      const optionCell = row.getCell(4);
-      const optionRaw = optionCell?.text?.trim() || "";
-      const option = getOptionAlias(optionRaw);
-
-      students.push({
-        firstName,
-        lastName,
-        major,
-        option,
-      });
-    } catch (error) {
-      console.error(`Error parsing row ${rowNumber} (students):`, error);
-    }
+    return {
+      firstName,
+      lastName,
+      major,
+      option,
+    };
   });
-
-  return students;
 }
 
 function parseOrganizations(worksheet: Worksheet, startRow: number): Organization[] {
-  const organizations: Organization[] = [];
-  let emptyRowCount = 0;
-  const maxEmptyRows = 5; // Arrêter après 5 lignes vides consécutives
+  return parseRowsWithContent(worksheet, startRow, 5, (row) => {
+    const orgNameCell = row.getCell(5);
+    const orgName = orgNameCell?.text?.trim() || "??";
 
-  worksheet.eachRow({ includeEmpty: true }, (row, rowNumber) => {
-    if (rowNumber < startRow) return;
+    const tutorFullNameCell = row.getCell(15);
+    const tutorFullNameText = tutorFullNameCell?.text?.trim() || "??";
+    const { lastName: tutorLastName, firstName: tutorFirstName } =
+      splitLastNameFirstName(tutorFullNameText);
 
-    // Vérifier si la ligne a du contenu significatif
-    if (!hasSignificantContent(row)) {
-      emptyRowCount++;
-      if (emptyRowCount >= maxEmptyRows) {
-        return false; // Arrêter le parsing
-      }
-      return; // Ignorer cette ligne vide
-    }
+    const orgTypeCell = row.getCell(6);
+    const orgTypeRaw = orgTypeCell?.text?.trim() || "??";
+    const orgType = normalizeOrganizationType(orgTypeRaw);
 
-    emptyRowCount = 0; // Réinitialiser le compteur de lignes vides
+    const countryCell = row.getCell(7);
+    const countryRaw = countryCell?.text?.trim() || "??";
+    const country = formatCountry(countryRaw);
 
-    try {
-      const orgNameCell = row.getCell(5);
-      const orgName = orgNameCell?.text?.trim() || "??";
+    const cityCell = row.getCell(8);
+    const cityRaw = cityCell?.text?.trim() || "??";
+    const city = formatCityName(cityRaw);
 
-      const tutorFullNameCell = row.getCell(15);
-      const tutorFullNameText = tutorFullNameCell?.text?.trim() || "??";
-
-      const { lastName: tutorLastName, firstName: tutorFirstName } =
-        splitLastNameFirstName(tutorFullNameText);
-
-      const orgTypeCell = row.getCell(6);
-      const orgTypeRaw = orgTypeCell?.text?.trim() || "??";
-      const orgType = normalizeOrganizationType(orgTypeRaw);
-
-      const countryCell = row.getCell(7);
-      const countryRaw = countryCell?.text?.trim() || "??";
-      const country = formatCountry(countryRaw);
-
-      const cityCell = row.getCell(8);
-      const cityRaw = cityCell?.text?.trim() || "??";
-      const city = formatCityName(cityRaw);
-
-      organizations.push({
-        country,
-        orgName,
-        orgType,
-        tutorFirstName,
-        tutorLastName,
-        city,
-      });
-    } catch (error) {
-      console.error(`Error parsing row ${rowNumber} (organizations):`, error);
-    }
+    return {
+      country,
+      orgName,
+      orgType,
+      tutorFirstName,
+      tutorLastName,
+      city,
+    };
   });
-
-  return organizations;
 }
