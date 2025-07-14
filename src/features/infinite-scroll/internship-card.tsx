@@ -35,6 +35,8 @@ import {
   restoreInternship,
   softDeleteInternship,
 } from "@/features/infinite-scroll/internship.query";
+import { getOrganizationTypeLabel } from "@/lib/const/organization-labels";
+import { formatDate } from "@/lib/scripts/date";
 import { InternshipDetailsDialog } from "./internship-details-dialog";
 
 type InternshipCardProps = {
@@ -197,7 +199,7 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
         <CardDescription>
           <span className="inline-flex items-center gap-1">
             <Building className="inline h-4 w-4 align-text-bottom" />
-            {internship.organization.type}
+            {getOrganizationTypeLabel(internship.organization.type)}
           </span>
         </CardDescription>
       </CardHeader>
@@ -228,7 +230,7 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
           </div>
           <div className="flex items-center gap-2">
             <Calendar1 className="h-4 w-4" />
-            <span>{internship.beginDate}</span>
+            <span>{formatDate(internship.beginDate)}</span>
           </div>
         </div>
       </CardContent>
