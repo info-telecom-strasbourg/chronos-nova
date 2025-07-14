@@ -1,7 +1,10 @@
 import type { Worksheet } from "exceljs";
 import type { Internship, Organization, Student } from "./type-definition";
-import { normalizeOrganizationType } from "./data-normalizer";
-import { extractNumberOfWeeks, splitLastNameFirstName } from "./functions";
+import {
+  extractNumberOfWeeks,
+  normalizeOrganizationType,
+  splitLastNameFirstName,
+} from "./parser-utils";
 
 // ===================================
 // Parsing functions

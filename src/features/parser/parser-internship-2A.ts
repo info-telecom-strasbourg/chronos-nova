@@ -1,13 +1,15 @@
 import type { Worksheet } from "exceljs";
 import type { Internship, Organization, Student } from "./type-definition";
-import { normalizeOrganizationType } from "./data-normalizer";
-import { extractNumberOfWeeks, splitLastNameFirstName } from "./functions";
 import {
+  extractNumberOfWeeks,
+  hasSignificantContent,
+  normalizeOrganizationType,
   parseConfidential,
   parseDate,
   parseDiploma,
   parseOption,
-} from "./parser-2A-transformations";
+  splitLastNameFirstName,
+} from "./parser-utils";
 
 const DEFAULT_STARTING_ROW = 12;
 
@@ -38,27 +40,6 @@ export async function parseExcelInternship2A(
   } catch (error) {
     console.error(`Error parsing Excel file "${filePath}", sheet "${sheetName}":`, error);
     return { internships: [], students: [], organizations: [] };
-  }
-}
-
-function hasSignificantContent(row: import("exceljs").Row): boolean {
-  try {
-    if (!row || row.cellCount === 0) return false;
-
-    // Vérifier les cellules importantes pour les stages 2A
-    const importantCells = [2, 5, 13, 15]; // Nom étudiant, organisation, sujet, tuteur
-
-    for (const cellIndex of importantCells) {
-      const cell = row.getCell(cellIndex);
-      const text = cell?.text?.trim();
-      if (text && text !== "" && text !== "??") {
-        return true;
-      }
-    }
-
-    return false;
-  } catch {
-    return false;
   }
 }
 
