@@ -3,6 +3,19 @@
  * Centralise toutes les fonctions de normalisation, transformation et formatage
  */
 
+import {
+  parseCountry,
+  getCountryLabel,
+  getMajorFullLabel,
+  getMajorShortLabel,
+  getOptionFullLabel,
+  getOptionShortLabel,
+  getOrganizationTypeLabel,
+  parseMajor,
+  parseOption,
+  parseOrganizationType,
+} from "./mappings";
+
 // ===============================
 // FORMATAGE DE TEXTE ET NOMS
 // ===============================
@@ -104,111 +117,6 @@ export function parseConfidential(value: string): boolean {
 }
 
 /**
- * Convertit un diplôme vers sa value courte pour la base de données
- * Exemple: "G" → "gene", "TIS" → "ti-sante", "ti-sante" → "ti-sante"
- */
-export function parseDiploma(value: string): string {
-  if (!value || typeof value !== "string") return "gene";
-
-  // Normalisation intelligente : garder les caractères importants
-  const normalized = value
-    .trim()
-    .toLowerCase()
-    .replace(/[àáâãäå]/g, "a")
-    .replace(/[èéêë]/g, "e")
-    .replace(/[ìíîï]/g, "i")
-    .replace(/[òóôõö]/g, "o")
-    .replace(/[ùúûü]/g, "u")
-    .replace(/[ç]/g, "c")
-    .replace(/[^a-z0-9\s-]/g, "") // Garder lettres, chiffres, espaces et tirets
-    .replace(/\s+/g, "") // Supprimer tous les espaces
-    .replace(/-+/g, "-"); // Normaliser les tirets multiples
-
-  switch (normalized) {
-    case "g":
-      return "gene";
-    case "tis":
-      return "ti-sante";
-    case "ir":
-      return "ir";
-    case "master":
-      return "master";
-    default:
-      console.warn(
-        `Diplôme non reconnu: "${value}" (normalisé: "${normalized}"). Fallback vers "gene".`,
-      );
-      return "gene";
-  }
-}
-
-/**
- * Convertit une option vers sa value courte pour la base de données
- */
-export function parseOption(value: string): string {
-  if (!value || typeof value !== "string" || value.trim() === "") {
-    return "aucune";
-  }
-
-  // Normalisation intelligente : garder les caractères importants
-  const normalized = value
-    .trim()
-    .toLowerCase()
-    .replace(/[àáâãäå]/g, "a")
-    .replace(/[èéêë]/g, "e")
-    .replace(/[ìíîï]/g, "i")
-    .replace(/[òóôõö]/g, "o")
-    .replace(/[ùúûü]/g, "u")
-    .replace(/[ç]/g, "c")
-    .replace(/[^a-z0-9\s-]/g, "") // Garder lettres, chiffres, espaces et tirets
-    .replace(/\s+/g, "") // Supprimer tous les espaces
-    .replace(/-+/g, "-"); // Normaliser les tirets multiples
-
-  switch (normalized) {
-    case "sdia":
-      return "sdia";
-    case "rio":
-      return "rio";
-    case "ti":
-      return "ti";
-    case "dtmi":
-      return "dtmi";
-    case "stq":
-      return "stq";
-    case "ispv":
-      return "ispv";
-    case "issd":
-      return "issd";
-    case "isav":
-      return "isav";
-    case "photo":
-      return "photo";
-    case "asi":
-      return "asi";
-    case "ht":
-      return "ht";
-    case "imed":
-      return "imed";
-    case "phynano":
-      return "phynano";
-    case "ar":
-      return "ar";
-    case "id":
-      return "id";
-    case "irmc":
-      return "irmc";
-    case "mphot":
-      return "mphot";
-    case "topo":
-      return "topo";
-    case "aucune":
-    case "":
-      return "aucune";
-    default:
-      return "aucune";
-  }
-}
-
-/**
  * Convertit une date au format YYYY-MM-DD
  * Gère aussi les plages de dates (ex: "02/06/2025 - 22/08/2025") en prenant la première date
  * Exemple: "15/03/2025" → "2025-03-15"
@@ -269,35 +177,6 @@ export function parseDate(value: string): string {
 }
 
 // ===============================
-// NORMALISATION D'ORGANISATIONS
-// ===============================
-
-/**
- * Normalise le type d'organisation pour la base de données
- * Exemple: "E" → "company", "Hors entreprise" → "not_company"
- */
-export function normalizeOrganizationType(orgType: string): string {
-  try {
-    if (!orgType || typeof orgType !== "string") {
-      return "not_company";
-    }
-
-    const cleaned = orgType.trim().toUpperCase().replace(/\./g, "");
-
-    if (["E", "ENTREPRISE"].includes(cleaned)) {
-      console.log(`Type organisation "${orgType}" → "company"`);
-      return "company";
-    }
-
-    console.log(`Type organisation "${orgType}" → "not_company"`);
-    return "not_company";
-  } catch (error) {
-    console.error(`Erreur lors de la normalisation du type d'organisation "${orgType}":`, error);
-    return "not_company";
-  }
-}
-
-// ===============================
 // VALIDATION DE CONTENU
 // ===============================
 
@@ -329,37 +208,6 @@ export function hasSignificantContent(row: import("exceljs").Row): boolean {
 // ===============================
 // FORMATAGE GÉOGRAPHIQUE
 // ===============================
-
-/**
- * Formate un pays en value courte
- * Exemple: "FRANCE" → "france", "LUXEMBOURG" → "luxembourg"
- */
-export function formatCountry(country: string): string {
-  if (!country || typeof country !== "string") return "france";
-
-  const normalized = country.trim().toUpperCase();
-
-  switch (normalized) {
-    case "FRANCE":
-      return "france";
-    case "ALLEMAGNE":
-      return "allemagne";
-    case "LUXEMBOURG":
-      return "luxembourg";
-    case "BELGIQUE":
-      return "belgique";
-    case "SUISSE":
-      return "suisse";
-    case "ESPAGNE":
-      return "espagne";
-    case "ITALIE":
-      return "italie";
-    case "PORTUGAL":
-      return "portugal";
-    default:
-      return "france"; // Fallback par défaut
-  }
-}
 
 /**
  * Formate un nom de ville avec majuscules appropriées
@@ -411,188 +259,4 @@ export function formatCityName(city: string): string {
       return part.charAt(0).toUpperCase() + part.slice(1);
     })
     .join("");
-}
-
-// ===============================
-// MAPPING ENRICHI POUR AFFICHAGE
-// ===============================
-
-/**
- * Convertit une value courte de diplôme en nom court pour l'affichage des cartes
- * Exemple: "ti-sante" → "TI Santé", "gene" → "Généraliste", "ir" → "IR"
- */
-export function getMajorShortLabel(value: string): string {
-  if (!value || typeof value !== "string") return "Généraliste";
-
-  const normalized = value.trim().toLowerCase();
-
-  switch (normalized) {
-    case "gene":
-      return "Généraliste";
-    case "ir":
-      return "IR";
-    case "ti-sante":
-      return "TI Santé";
-    case "master":
-      return "Master";
-    default:
-      return value; // Fallback sur la value si pas de mapping
-  }
-}
-
-/**
- * Convertit une value courte d'option en nom court pour l'affichage des cartes
- * Exemple: "sdia" → "SDIA", "rio" → "RIO", "ti" → "TI"
- */
-export function getOptionShortLabel(value: string): string {
-  if (!value || typeof value !== "string" || value.trim() === "aucune") return "";
-
-  const normalized = value.trim().toLowerCase();
-
-  switch (normalized) {
-    case "sdia":
-      return "SDIA";
-    case "rio":
-      return "RIO";
-    case "ti":
-      return "TI";
-    case "dtmi":
-      return "DTMI";
-    case "stq":
-      return "STQ";
-    case "ispv":
-      return "ISPV";
-    case "issd":
-      return "ISSD";
-    case "isav":
-      return "ISAV";
-    case "photo":
-      return "Photonique";
-    case "pm":
-      return "PM";
-    case "asi":
-      return "ASI";
-    case "ht":
-      return "HT";
-    case "imed":
-      return "IMed";
-    case "phynano":
-      return "PhyNano";
-    case "ar":
-      return "AR";
-    case "id":
-      return "ID";
-    case "irmc":
-      return "IRMC";
-    case "mphot":
-      return "MPHOT";
-    case "topo":
-      return "Topo";
-    default:
-      return value.toUpperCase(); // Fallback en majuscules
-  }
-}
-
-/**
- * Convertit une value courte de diplôme en label enrichi pour l'affichage
- * Exemple: "ti-sante" → "TI Santé (Technologie de l'Information pour la Santé)"
- */
-export function getMajorEnrichedLabel(value: string): string {
-  if (!value || typeof value !== "string") return "Généraliste";
-
-  const normalized = value.trim().toLowerCase();
-
-  switch (normalized) {
-    case "gene":
-      return "Généraliste";
-    case "ir":
-      return "IR (Informatique et Réseaux)";
-    case "ti-sante":
-      return "TI Santé (Technologie de l'Information pour la Santé)";
-    case "master":
-      return "Master";
-    default:
-      return value; // Fallback sur la value si pas de mapping
-  }
-}
-
-/**
- * Convertit une value courte d'option en label enrichi pour l'affichage
- * Exemple: "sdia" → "SDIA (Science des Données et Intelligence Artificielle)"
- */
-export function getOptionEnrichedLabel(value: string): string {
-  if (!value || typeof value !== "string" || value.trim() === "aucune") return "Aucune";
-
-  const normalized = value.trim().toLowerCase();
-
-  switch (normalized) {
-    case "sdia":
-      return "SDIA (Science des Données et Intelligence Artificielle)";
-    case "rio":
-      return "RIO (Réseaux Informatiques et Objets connectés)";
-    case "ti":
-      return "TI (Technologie de l'Information)";
-    case "dtmi":
-      return "DTMI (Dispositifs Thérapeutiques et Maintenance Industrielle)";
-    case "stq":
-      return "STQ (Sciences et Technologies Quantiques)";
-    case "ispv":
-      return "ISPV (Image, Signal, Photonique et Vision)";
-    case "issd":
-      return "ISSD (Ingénierie des Systèmes et Sécurité des Données)";
-    case "isav":
-      return "ISAV (Ingénierie des Systèmes Automobiles et de Véhicules)";
-    case "photo":
-      return "Photonique";
-    case "pm":
-      return "PM (Physique et Modélisation)";
-    case "asi":
-      return "ASI (Automatique, Signal, Informatique)";
-    case "ht":
-      return "HT (HealthTech)";
-    case "imed":
-      return "IMed (Imagerie Médicale)";
-    case "phynano":
-      return "PhyNano (Physique et Nanophotonique)";
-    case "ar":
-      return "AR (Automatique et Robotique)";
-    case "id":
-      return "ID (Images et Données)";
-    case "irmc":
-      return "IRMC (Imagerie, Robotique Médicale et Chirurgicale)";
-    case "mphot":
-      return "MPHOT (Photonique pour les nanosciences et le vivant)";
-    case "topo":
-      return "Topo (Topographie et photogrammétrie)";
-    default:
-      return value; // Fallback sur la value si pas de mapping
-  }
-}
-
-/**
- * Convertit une value courte de pays en label enrichi pour l'affichage
- * Exemple: "france" → "FRANCE"
- */
-export function getCountryEnrichedLabel(value: string): string {
-  if (!value || typeof value !== "string") return "??";
-  return value.toUpperCase();
-}
-
-/**
- * Convertit une value courte de type d'organisation en label enrichi pour l'affichage
- * Exemple: "company" → "Entreprise"
- */
-export function getOrganizationTypeEnrichedLabel(value: string): string {
-  if (!value || typeof value !== "string") return "Non spécifié";
-
-  const normalized = value.trim().toLowerCase();
-
-  switch (normalized) {
-    case "company":
-      return "Entreprise";
-    case "not_company":
-      return "Hors Entreprise";
-    default:
-      return value;
-  }
 }

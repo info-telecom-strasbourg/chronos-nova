@@ -6,11 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  getCountryEnrichedLabel,
-  getMajorEnrichedLabel,
-  getOptionEnrichedLabel,
-} from "@/features/parser/parser-utils";
+import { getCountryLabel, getMajorFullLabel, getOptionFullLabel } from "@/features/parser/mappings";
 import { formatDate } from "@/lib/scripts/date";
 
 type InternshipDetailsDialogProps = {
@@ -35,7 +31,7 @@ export function InternshipDetailsDialog({ internship }: InternshipDetailsDialogP
               <Landmark className="h-4 w-4 text-muted-foreground" />
             </span>
             <span>
-              <b>Pays :</b> {getCountryEnrichedLabel(internship.organization.country)}
+              <b>Pays :</b> {getCountryLabel(internship.organization.country)}
             </span>
           </span>
           <span className="flex items-start gap-2">
@@ -59,7 +55,7 @@ export function InternshipDetailsDialog({ internship }: InternshipDetailsDialogP
               <GraduationCap className="h-4 w-4 text-muted-foreground" />
             </span>
             <span>
-              <b>Diplôme :</b> {getMajorEnrichedLabel(internship.student.major.alias)}
+              <b>Diplôme :</b> {getMajorFullLabel(internship.student.major.alias)}
             </span>
           </span>
           {internship.student.option && internship.student.option.alias !== "aucune" && (
@@ -68,7 +64,7 @@ export function InternshipDetailsDialog({ internship }: InternshipDetailsDialogP
                 <School className="h-4 w-4 text-muted-foreground" />
               </span>
               <span>
-                <b>Filière :</b> {getOptionEnrichedLabel(internship.student.option.alias)}
+                <b>Filière :</b> {getOptionFullLabel(internship.student.option.alias)}
               </span>
             </span>
           )}

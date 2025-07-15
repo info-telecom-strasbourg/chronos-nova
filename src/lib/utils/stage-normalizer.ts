@@ -1,13 +1,15 @@
 import {
   formatCityName,
-  formatCountry,
-  normalizeOrganizationType,
   parseConfidential,
   parseDate,
-  parseDiploma,
-  parseOption,
   splitLastNameFirstName,
 } from "@/features/parser/parser-utils";
+import {
+  parseMajor,
+  parseOption,
+   parseCountry,
+  parseOrganizationType,
+} from "@/features/parser/mappings";
 
 export interface NormalizedStudentData {
   firstName: string;
@@ -60,7 +62,7 @@ export function normalizeStudentData(
   let option: string;
 
   if (fromExcel) {
-    major = parseDiploma(rawData.major || "");
+    major = parseMajor(rawData.major || "");
     option = parseOption(rawData.option || "");
   } else {
     const majorKey = rawData.major?.trim() || "";
@@ -98,8 +100,8 @@ export function normalizeOrganizationData(
   let type: string;
 
   if (fromExcel) {
-    country = formatCountry(rawData.country || "");
-    type = normalizeOrganizationType(rawData.type || "");
+    country = parseCountry(rawData.country || "");
+    type = parseOrganizationType(rawData.type || "");
   } else {
     const countryKey = rawData.country?.trim() || "";
     const typeKey = rawData.type?.trim() || "";

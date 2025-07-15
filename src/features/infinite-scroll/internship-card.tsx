@@ -36,11 +36,11 @@ import {
   softDeleteInternship,
 } from "@/features/infinite-scroll/internship.query";
 import {
-  getCountryEnrichedLabel,
+  getCountryLabel,
   getMajorShortLabel,
   getOptionShortLabel,
-  getOrganizationTypeEnrichedLabel,
-} from "@/features/parser/parser-utils";
+  getOrganizationTypeLabel,
+} from "@/features/parser/mappings";
 import { formatDate } from "@/lib/scripts/date";
 import { InternshipDetailsDialog } from "./internship-details-dialog";
 
@@ -204,7 +204,7 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
         <CardDescription>
           <span className="inline-flex items-center gap-1">
             <Building className="inline h-4 w-4 align-text-bottom" />
-            {getOrganizationTypeEnrichedLabel(internship.organization.type)}
+            {getOrganizationTypeLabel(internship.organization.type)}
           </span>
         </CardDescription>
       </CardHeader>
@@ -214,8 +214,7 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
           <div className="flex items-center gap-2">
             <MapPin className="h-4 w-4" />
             <span>
-              {getCountryEnrichedLabel(internship.organization.country)},{" "}
-              {internship.organization.city}
+              {getCountryLabel(internship.organization.country)}, {internship.organization.city}
             </span>
           </div>
           <div className="flex items-center gap-2">

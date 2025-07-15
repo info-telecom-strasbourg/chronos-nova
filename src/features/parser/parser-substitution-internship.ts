@@ -2,7 +2,7 @@ import type { Worksheet } from "exceljs";
 import type { Internship, Organization, Student } from "./type-definition";
 import {
   extractNumberOfWeeks,
-  normalizeOrganizationType,
+  parseOrganizationType,
   splitLastNameFirstName,
 } from "./parser-utils";
 
@@ -95,9 +95,9 @@ function parseOrganizations(worksheet: Worksheet, startRow: number): Organizatio
     const { lastName: tutorLastName, firstName: tutorFirstName } =
       splitLastNameFirstName(tutorFullNameCell);
 
-    // Utiliser normalizeOrganizationType pour convertir "E" en "Entreprise"
+    // Utiliser parseOrganizationType pour convertir "E" en "Entreprise"
     const orgTypeRaw = row.getCell(6).text.trim();
-    const orgType = normalizeOrganizationType(orgTypeRaw);
+    const orgType = parseOrganizationType(orgTypeRaw);
 
     organizations.push({
       orgName,

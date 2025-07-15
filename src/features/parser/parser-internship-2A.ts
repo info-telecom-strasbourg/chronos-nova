@@ -3,15 +3,18 @@ import type { Internship, Organization, Student } from "./type-definition";
 import {
   extractNumberOfWeeks,
   formatCityName,
-  formatCountry,
   hasSignificantContent,
-  normalizeOrganizationType,
   parseConfidential,
   parseDate,
-  parseDiploma,
-  parseOption,
   splitLastNameFirstName,
 } from "./parser-utils";
+
+import {
+  parseOrganizationType,
+  parseOption,
+  parseMajor,
+  parseCountry,
+} from "@/features/parser/mappings";
 
 export async function parseExcelInternship2A(
   filePath: string,
@@ -109,7 +112,7 @@ function parseStudents(worksheet: Worksheet, startRow: number): Student[] {
 
     const majorCell = row.getCell(3);
     const majorRaw = majorCell?.text?.trim() || "";
-    const major = parseDiploma(majorRaw);
+    const major = parseMajor(majorRaw);
 
     const optionCell = row.getCell(4);
     const optionRaw = optionCell?.text?.trim() || "";
@@ -136,11 +139,11 @@ function parseOrganizations(worksheet: Worksheet, startRow: number): Organizatio
 
     const orgTypeCell = row.getCell(6);
     const orgTypeRaw = orgTypeCell?.text?.trim() || "??";
-    const orgType = normalizeOrganizationType(orgTypeRaw);
+    const orgType = parseOrganizationType(orgTypeRaw);
 
     const countryCell = row.getCell(7);
     const countryRaw = countryCell?.text?.trim() || "??";
-    const country = formatCountry(countryRaw);
+    const country = parseCountry(countryRaw);
 
     const cityCell = row.getCell(8);
     const cityRaw = cityCell?.text?.trim() || "??";

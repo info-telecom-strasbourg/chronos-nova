@@ -1,98 +1,99 @@
-export const organizationTypes = [
-  { value: "company", label: "Entreprise" },
-  { value: "not_company", label: "Hors Entreprise" },
-];
+import {
+  COUNTRY_MAPPINGS,
+  getMajorShortLabel,
+  getOptionShortLabel,
+  ORGANIZATION_TYPE_MAPPINGS,
+} from "../parser/mappings";
 
-export const countries = [
-  { value: "france", label: "FRANCE" },
-  { value: "allemagne", label: "ALLEMAGNE" },
-  { value: "luxembourg", label: "LUXEMBOURG" },
-  { value: "belgique", label: "BELGIQUE" },
-  { value: "bresil", label: "BRÉSIL" },
-  { value: "espagne", label: "ESPAGNE" },
-  { value: "italie", label: "ITALIE" },
-  { value: "portugal", label: "PORTUGAL" },
-];
+// Utiliser les mappings centralisés pour la cohérence
+export const organizationTypes = Object.values(ORGANIZATION_TYPE_MAPPINGS)
+  .filter((mapping) => mapping.value === "company" || mapping.value === "not_company")
+  .map((mapping) => ({ value: mapping.value, label: mapping.label }));
+
+export const countries = Object.values(COUNTRY_MAPPINGS).map((mapping) => ({
+  value: mapping.value,
+  label: mapping.label,
+}));
 
 export const academicStructure = {
   "1A": {
     gene: {
-      label: "Généraliste",
+      label: getMajorShortLabel("gene"),
       options: [],
     },
     ir: {
-      label: "IR",
+      label: getMajorShortLabel("ir"),
       options: [],
     },
     "ti-sante": {
-      label: "TI Santé",
+      label: getMajorShortLabel("ti-sante"),
       options: [],
     },
   },
   "2A": {
     gene: {
-      label: "Généraliste",
+      label: getMajorShortLabel("gene"),
       options: [],
     },
     ir: {
-      label: "IR",
+      label: getMajorShortLabel("ir"),
       options: [
-        { value: "rio", label: "RIO" },
-        { value: "sdia", label: "SDIA" },
+        { value: "rio", label: getOptionShortLabel("rio") },
+        { value: "sdia", label: getOptionShortLabel("sdia") },
       ],
     },
     "ti-sante": {
-      label: "TI Santé",
+      label: getMajorShortLabel("ti-sante"),
       options: [
-        { value: "ti", label: "TI" },
-        { value: "dtmi", label: "DTMI" },
+        { value: "ti", label: getOptionShortLabel("ti") },
+        { value: "dtmi", label: getOptionShortLabel("dtmi") },
       ],
     },
     master: {
-      label: "Master",
+      label: getMajorShortLabel("master"),
       options: [
-        { value: "asi", label: "ASI" },
-        { value: "ht", label: "HT" },
-        { value: "imed", label: "IMed" },
-        { value: "phynano", label: "PhyNano" },
+        { value: "asi", label: getOptionShortLabel("asi") },
+        { value: "ht", label: getOptionShortLabel("ht") },
+        { value: "imed", label: getOptionShortLabel("imed") },
+        { value: "phynano", label: getOptionShortLabel("phynano") },
       ],
     },
   },
   "3A": {
     gene: {
-      label: "Généraliste",
+      label: getMajorShortLabel("gene"),
       options: [
-        { value: "pm", label: "Physique et Modélisation" },
-        { value: "stq", label: "STQ" },
-        { value: "photo", label: "Photonique" },
-        { value: "ispv", label: "ISPV" },
-        { value: "issd", label: "ISSD" },
-        { value: "isav", label: "ISAV" },
+        { value: "pm", label: getOptionShortLabel("pm") },
+        { value: "stq", label: getOptionShortLabel("stq") },
+        { value: "photo", label: getOptionShortLabel("photo") },
+        { value: "ispv", label: getOptionShortLabel("ispv") },
+        { value: "issd", label: getOptionShortLabel("issd") },
+        { value: "isav", label: getOptionShortLabel("isav") },
       ],
     },
     ir: {
-      label: "IR",
+      label: getMajorShortLabel("ir"),
       options: [
-        { value: "rio", label: "RIO" },
-        { value: "sdia", label: "SDIA" },
+        { value: "rio", label: getOptionShortLabel("rio") },
+        { value: "sdia", label: getOptionShortLabel("sdia") },
       ],
     },
     "ti-sante": {
-      label: "TI Santé",
+      label: getMajorShortLabel("ti-sante"),
       options: [
-        { value: "ti", label: "TI" },
-        { value: "dtmi", label: "DTMI" },
+        { value: "ti", label: getOptionShortLabel("ti") },
+        { value: "dtmi", label: getOptionShortLabel("dtmi") },
       ],
     },
     master: {
-      label: "Master",
+      label: getMajorShortLabel("master"),
       options: [
-        { value: "id", label: "ID" },
-        { value: "ht", label: "HT" },
-        { value: "ar", label: "AR" },
-        { value: "irmc", label: "IRMC" },
-        { value: "mphot", label: "MPHOT" },
-        { value: "topo", label: "Topo" },
+        { value: "id", label: getOptionShortLabel("id") },
+        { value: "ht", label: getOptionShortLabel("ht") },
+        { value: "ar", label: getOptionShortLabel("ar") },
+        { value: "irmc", label: getOptionShortLabel("irmc") },
+        { value: "mphot", label: getOptionShortLabel("mphot") },
+        { value: "topo", label: getOptionShortLabel("topo") },
       ],
     },
   },
