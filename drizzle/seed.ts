@@ -1,9 +1,11 @@
 import "dotenv/config";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { reset, seed } from "drizzle-seed";
-import { major2str, option2str } from "@/lib/const/major-correspondance";
 import { serverEnv } from "@/lib/env/server";
 import * as schema from "./schema";
+
+const majorValues = ["gene", "ir", "ti-sante"];
+const optionValues = ["aucune", "sdia", "rio", "ti", "dtmi", "stq", "ispv", "issd", "isav", "photo"];
 
 async function main() {
   const db = drizzle(serverEnv.SUPABASE_DB_URL, { logger: true });
@@ -24,17 +26,15 @@ async function main() {
       count: 60,
     },
     majors: {
-      count: Object.keys(major2str).length,
+      count: majorValues.length,
       columns: {
-        alias: f.valuesFromArray({ values: Object.keys(major2str) }),
-        name: f.valuesFromArray({ values: Object.values(major2str) }),
+        alias: f.valuesFromArray({ values: majorValues }),
       },
     },
     options: {
-      count: Object.keys(option2str).length,
+      count: optionValues.length,
       columns: {
-        alias: f.valuesFromArray({ values: Object.keys(option2str) }),
-        name: f.valuesFromArray({ values: Object.values(option2str) }),
+        alias: f.valuesFromArray({ values: optionValues }),
       },
     },
   }));

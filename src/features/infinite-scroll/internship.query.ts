@@ -130,46 +130,39 @@ export const hardDeleteInternship = async (id: string): Promise<void> => {
 export const createInternship = async (data: CreateInternshipFormData): Promise<{ id: string }> => {
   const supabase = await createSupabaseServerClient();
 
+  // Normaliser les données avec validation Zod puis normalisation
+  const { normalizeFormData } = await import("@/lib/utils/stage-normalizer");
+  const normalized = normalizeFormData(data);
+
   // First, create or get organization
   const { data: orgData, error: orgError } = await supabase
     .from("organization")
     .upsert({
-      name: data.organizationName,
-      type: data.organizationType,
-      country: data.organizationCountry,
-      city: data.organizationCity,
+      name: normalized.organization.name,
+      type: normalized.organization.type,
+      country: normalized.organization.country,
+      city: normalized.organization.city,
     })
     .select("id")
     .single();
 
   if (orgError) throw orgError;
 
-  // Ensure major exists - use transformMajorAlias for consistency
-  const { transformMajorAlias } = await import("@/types/correspondance");
-  const majorAlias = transformMajorAlias(data.studentMajor);
-
+  // Ensure major exists
   const { error: majorError } = await supabase
     .from("major")
     .upsert({
-      alias: majorAlias,
-      name: data.studentMajor,
+      alias: normalized.student.major,
     })
     .select("alias");
 
   if (majorError) throw majorError;
 
-  // Ensure option exists - use transformOptionAlias for consistency
-  const { transformOptionAlias } = await import("@/types/correspondance");
-  const rawOptionAlias =
-    data.studentOption && data.studentOption.trim() !== "" ? data.studentOption.trim() : "aucune";
-  const optionAlias = transformOptionAlias(rawOptionAlias);
-
-  // Ensure the option exists in database
+  // Ensure option exists
   const { error: optionError } = await supabase
     .from("option")
     .upsert({
-      alias: optionAlias,
-      name: optionAlias === "AUCUNE" ? "Aucune" : data.studentOption || "Aucune",
+      alias: normalized.student.option,
     })
     .select("alias");
 
@@ -179,10 +172,10 @@ export const createInternship = async (data: CreateInternshipFormData): Promise<
   const { data: studentData, error: studentError } = await supabase
     .from("student")
     .insert({
-      firstName: data.studentFirstName,
-      lastName: data.studentLastName,
-      majorAlias: majorAlias,
-      optionAlias: optionAlias,
+      firstName: normalized.student.firstName,
+      lastName: normalized.student.lastName,
+      majorAlias: normalized.student.major,
+      optionAlias: normalized.student.option,
     })
     .select("id")
     .single();
@@ -195,10 +188,11 @@ export const createInternship = async (data: CreateInternshipFormData): Promise<
     .insert({
       organizationId: orgData.id,
       studentId: studentData.id,
-      subject: data.subject,
-      academicYear: data.academicYear,
-      beginDate: data.beginDate,
-      weeksCount: data.weeksCount,
+      subject: normalized.internship.subject,
+      academicYear: normalized.internship.academicYear,
+      beginDate: normalized.internship.beginDate,
+      weeksCount: normalized.internship.weeksCount,
+      confidential: normalized.internship.confidential,
       state: "draft", // New internships start as draft
     })
     .select("id")
@@ -220,6 +214,10 @@ export const updateInternship = async (
 ): Promise<void> => {
   const supabase = await createSupabaseServerClient();
 
+  // Normaliser les données avec validation Zod puis normalisation
+  const { normalizeFormData } = await import("@/lib/utils/stage-normalizer");
+  const normalized = normalizeFormData(data);
+
   // Get current internship to access related IDs
   const { data: currentInternship, error: fetchError } = await supabase
     .from("internship")
@@ -233,36 +231,32 @@ export const updateInternship = async (
   const { error: orgError } = await supabase
     .from("organization")
     .update({
-      name: data.organizationName,
-      type: data.organizationType,
-      country: data.organizationCountry,
-      city: data.organizationCity,
+      name: normalized.organization.name,
+      type: normalized.organization.type,
+      country: normalized.organization.country,
+      city: normalized.organization.city,
     })
     .eq("id", currentInternship.organizationId);
 
   if (orgError) throw orgError;
 
-  // Ensure major exists - use transformMajorAlias for consistency
-  const { transformMajorAlias, transformOptionAlias } = await import("@/types/correspondance");
-  const majorAlias = transformMajorAlias(data.studentMajor);
-
-  const { error: majorError } = await supabase.from("major").upsert({
-    alias: majorAlias,
-    name: data.studentMajor,
-  });
+  // Ensure major exists
+  const { error: majorError } = await supabase
+    .from("major")
+    .upsert({
+      alias: normalized.student.major,
+    })
+    .select("alias");
 
   if (majorError) throw majorError;
 
-  // Ensure option exists - use transformOptionAlias for consistency
-  const rawOptionAlias =
-    data.studentOption && data.studentOption.trim() !== "" ? data.studentOption.trim() : "aucune";
-  const optionAlias = transformOptionAlias(rawOptionAlias);
-
-  // Ensure the option exists in database
-  const { error: optionError } = await supabase.from("option").upsert({
-    alias: optionAlias,
-    name: optionAlias === "AUCUNE" ? "Aucune" : data.studentOption || "Aucune",
-  });
+  // Ensure option exists
+  const { error: optionError } = await supabase
+    .from("option")
+    .upsert({
+      alias: normalized.student.option,
+    })
+    .select("alias");
 
   if (optionError) throw optionError;
 
@@ -270,10 +264,10 @@ export const updateInternship = async (
   const { error: studentError } = await supabase
     .from("student")
     .update({
-      firstName: data.studentFirstName,
-      lastName: data.studentLastName,
-      majorAlias: majorAlias,
-      optionAlias: optionAlias,
+      firstName: normalized.student.firstName,
+      lastName: normalized.student.lastName,
+      majorAlias: normalized.student.major,
+      optionAlias: normalized.student.option,
     })
     .eq("id", currentInternship.studentId);
 
@@ -283,10 +277,11 @@ export const updateInternship = async (
   const { error: internshipError } = await supabase
     .from("internship")
     .update({
-      subject: data.subject,
-      academicYear: data.academicYear,
-      beginDate: data.beginDate,
-      weeksCount: data.weeksCount,
+      subject: normalized.internship.subject,
+      academicYear: normalized.internship.academicYear,
+      beginDate: normalized.internship.beginDate,
+      weeksCount: normalized.internship.weeksCount,
+      confidential: normalized.internship.confidential,
     })
     .eq("id", id);
 
@@ -298,8 +293,8 @@ export const updateInternship = async (
 };
 
 /**
- * Récupère la liste des stages avec jointure sur major et option
- * pour afficher alias + nom complet
+ * Récupère la liste des stages avec informations simplifiées
+ * Utilise uniquement les alias pour l'affichage
  */
 export async function getInternshipsWithDetails({
   page = 1,
@@ -319,7 +314,6 @@ export async function getInternshipsWithDetails({
   // Calculer l'offset pour la pagination
   const offset = (page - 1) * limit;
 
-  // Requête avec jointures pour récupérer alias + nom complet
   const { data, error, count } = await supabase
     .from("internship")
     .select(
@@ -339,12 +333,10 @@ export async function getInternshipsWithDetails({
         majorAlias,
         optionAlias,
         major:majorAlias (
-          alias,
-          name
+          alias
         ),
         option:optionAlias (
-          alias,
-          name
+          alias
         )
       )
     `,

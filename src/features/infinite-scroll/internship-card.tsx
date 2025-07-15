@@ -35,7 +35,12 @@ import {
   restoreInternship,
   softDeleteInternship,
 } from "@/features/infinite-scroll/internship.query";
-import { getOrganizationTypeLabel } from "@/lib/const/organization-labels";
+import {
+  getCountryEnrichedLabel,
+  getMajorShortLabel,
+  getOptionShortLabel,
+  getOrganizationTypeEnrichedLabel,
+} from "@/features/parser/parser-utils";
 import { formatDate } from "@/lib/scripts/date";
 import { InternshipDetailsDialog } from "./internship-details-dialog";
 
@@ -199,7 +204,7 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
         <CardDescription>
           <span className="inline-flex items-center gap-1">
             <Building className="inline h-4 w-4 align-text-bottom" />
-            {getOrganizationTypeLabel(internship.organization.type)}
+            {getOrganizationTypeEnrichedLabel(internship.organization.type)}
           </span>
         </CardDescription>
       </CardHeader>
@@ -209,15 +214,16 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
           <div className="flex items-center gap-2">
             <MapPin className="h-4 w-4" />
             <span>
-              {internship.organization.country}, {internship.organization.city}
+              {getCountryEnrichedLabel(internship.organization.country)},{" "}
+              {internship.organization.city}
             </span>
           </div>
           <div className="flex items-center gap-2">
             <GraduationCap className="h-4 w-4" />
             <span>
-              {internship.academicYear} - {internship.student.major.alias || "??"}
-              {internship.student.option && internship.student.option.alias !== "AUCUNE"
-                ? ` - ${internship.student.option.alias}`
+              {internship.academicYear} - {getMajorShortLabel(internship.student.major.alias || "")}
+              {internship.student.option && internship.student.option.alias !== "aucune"
+                ? ` - ${getOptionShortLabel(internship.student.option.alias)}`
                 : ""}
             </span>
           </div>

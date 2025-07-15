@@ -6,7 +6,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { major2str, option2str } from "@/lib/const/major-correspondance";
+import {
+  getCountryEnrichedLabel,
+  getMajorEnrichedLabel,
+  getOptionEnrichedLabel,
+} from "@/features/parser/parser-utils";
 import { formatDate } from "@/lib/scripts/date";
 
 type InternshipDetailsDialogProps = {
@@ -31,7 +35,7 @@ export function InternshipDetailsDialog({ internship }: InternshipDetailsDialogP
               <Landmark className="h-4 w-4 text-muted-foreground" />
             </span>
             <span>
-              <b>Pays :</b> {internship.organization.country}
+              <b>Pays :</b> {getCountryEnrichedLabel(internship.organization.country)}
             </span>
           </span>
           <span className="flex items-start gap-2">
@@ -55,26 +59,16 @@ export function InternshipDetailsDialog({ internship }: InternshipDetailsDialogP
               <GraduationCap className="h-4 w-4 text-muted-foreground" />
             </span>
             <span>
-              <b>Diplôme :</b> {internship.student.major.alias}
-              {major2str[internship.student.major.alias as keyof typeof major2str] &&
-              major2str[internship.student.major.alias as keyof typeof major2str] !==
-                internship.student.major.alias
-                ? ` (${major2str[internship.student.major.alias as keyof typeof major2str]})`
-                : ""}
+              <b>Diplôme :</b> {getMajorEnrichedLabel(internship.student.major.alias)}
             </span>
           </span>
-          {internship.student.option && internship.student.option.alias !== "AUCUNE" && (
+          {internship.student.option && internship.student.option.alias !== "aucune" && (
             <span className="flex items-start gap-2">
               <span>
                 <School className="h-4 w-4 text-muted-foreground" />
               </span>
               <span>
-                <b>Filière :</b> {internship.student.option.alias}
-                {option2str[internship.student.option.alias as keyof typeof option2str] &&
-                option2str[internship.student.option.alias as keyof typeof option2str] !==
-                  internship.student.option.alias
-                  ? ` (${option2str[internship.student.option.alias as keyof typeof option2str]})`
-                  : ""}
+                <b>Filière :</b> {getOptionEnrichedLabel(internship.student.option.alias)}
               </span>
             </span>
           )}

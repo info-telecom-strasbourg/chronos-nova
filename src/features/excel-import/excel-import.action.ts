@@ -40,6 +40,7 @@ export interface ExcelImportResult {
 
 async function insertParsedDataToDatabase(data: ParsedData): Promise<number> {
   const supabase = await createSupabaseServerClient();
+  const { normalizeCompleteStageData } = await import("@/lib/utils/stage-normalizer");
 
   let insertedCount = 0;
 
@@ -49,37 +50,30 @@ async function insertParsedDataToDatabase(data: ParsedData): Promise<number> {
     const organization = data.organizations[i];
 
     try {
-      // Vérifications
-      const safeOrganization = {
-        orgName: organization?.orgName || "??",
-        orgType: organization?.orgType || "not_company",
-        country: organization?.country || "??",
-        city: organization?.city || "??",
-      };
-
-      const safeStudent = {
-        firstName: student?.firstName || "??",
-        lastName: student?.lastName || "??",
-        major: student?.major || "??",
-        option: student?.option || "aucune",
-      };
-
-      const safeInternship = {
-        subject: internship?.subject || "??",
-        confidential: internship?.confidential || "??",
-        date: internship?.date || "??",
-        weeksCount: internship?.weeksCount || 0,
-        year: internship?.year || "2A",
-      };
+      const normalized = normalizeCompleteStageData({
+        studentFirstName: student?.firstName,
+        studentLastName: student?.lastName,
+        studentMajor: student?.major,
+        studentOption: student?.option,
+        organizationName: organization?.orgName,
+        organizationType: organization?.orgType,
+        organizationCountry: organization?.country,
+        organizationCity: organization?.city,
+        subject: internship?.subject,
+        confidential: internship?.confidential,
+        beginDate: internship?.date,
+        weeksCount: internship?.weeksCount,
+        academicYear: internship?.year,
+      }, true); // fromExcel = true pour les imports Excel
 
       // 1. Créer ou récupérer l'organisation
       const { data: orgData, error: orgError } = await supabase
         .from("organization")
         .upsert({
-          name: safeOrganization.orgName,
-          type: safeOrganization.orgType,
-          country: safeOrganization.country,
-          city: safeOrganization.city,
+          name: normalized.organization.name,
+          type: normalized.organization.type,
+          country: normalized.organization.country,
+          city: normalized.organization.city,
         })
         .select("id")
         .single();
@@ -90,10 +84,9 @@ async function insertParsedDataToDatabase(data: ParsedData): Promise<number> {
       }
 
       // 2. Assurer que le diplôme existe
-      const majorAlias = safeStudent.major;
       const { error: majorError } = await supabase.from("major").upsert({
-        alias: majorAlias,
-        name: majorAlias === "??" ? "Non spécifié" : majorAlias,
+        alias: normalized.student.major,
+        name: normalized.student.major === "??" ? "Non spécifié" : normalized.student.major,
       });
 
       if (majorError) {
@@ -102,10 +95,9 @@ async function insertParsedDataToDatabase(data: ParsedData): Promise<number> {
       }
 
       // 3. Assurer que l'option existe
-      const optionAlias = safeStudent.option;
       const { error: optionError } = await supabase.from("option").upsert({
-        alias: optionAlias,
-        name: optionAlias === "aucune" ? "Aucune" : optionAlias,
+        alias: normalized.student.option,
+        name: normalized.student.option === "AUCUNE" ? "Aucune" : normalized.student.option,
       });
 
       if (optionError) {
@@ -117,10 +109,10 @@ async function insertParsedDataToDatabase(data: ParsedData): Promise<number> {
       const { data: studentData, error: studentError } = await supabase
         .from("student")
         .insert({
-          firstName: safeStudent.firstName,
-          lastName: safeStudent.lastName,
-          majorAlias: majorAlias,
-          optionAlias: optionAlias,
+          firstName: normalized.student.firstName,
+          lastName: normalized.student.lastName,
+          majorAlias: normalized.student.major,
+          optionAlias: normalized.student.option,
         })
         .select("id")
         .single();
@@ -134,11 +126,11 @@ async function insertParsedDataToDatabase(data: ParsedData): Promise<number> {
       const { error: internshipError } = await supabase.from("internship").insert({
         organizationId: orgData.id,
         studentId: studentData.id,
-        subject: safeInternship.subject,
-        academicYear: safeInternship.year as "1A" | "2A" | "3A",
-        beginDate: safeInternship.date,
-        weeksCount: safeInternship.weeksCount,
-        confidential: normalizeConfidential(safeInternship.confidential),
+        subject: normalized.internship.subject,
+        academicYear: normalized.internship.academicYear,
+        beginDate: normalized.internship.beginDate,
+        weeksCount: normalized.internship.weeksCount,
+        confidential: normalized.internship.confidential,
         state: "draft",
       });
 
@@ -156,13 +148,6 @@ async function insertParsedDataToDatabase(data: ParsedData): Promise<number> {
   return insertedCount;
 }
 
-function normalizeConfidential(value: string | boolean): boolean {
-  if (typeof value === "boolean") {
-    return value;
-  }
-  const normalized = value.toString().trim().toLowerCase();
-  return normalized === "oui" || normalized === "x";
-}
 
 /**
  * Action principale d'import Excel

@@ -6,6 +6,12 @@ export const organizationTypes = [
 export const countries = [
   { value: "france", label: "FRANCE" },
   { value: "allemagne", label: "ALLEMAGNE" },
+  { value: "luxembourg", label: "LUXEMBOURG" },
+  { value: "belgique", label: "BELGIQUE" },
+  { value: "bresil", label: "BRÉSIL" },
+  { value: "espagne", label: "ESPAGNE" },
+  { value: "italie", label: "ITALIE" },
+  { value: "portugal", label: "PORTUGAL" },
 ];
 
 export const academicStructure = {

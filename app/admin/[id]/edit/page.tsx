@@ -12,11 +12,10 @@ export default async function EditInternshipPage({ params }: PageParams<{ id: st
     notFound();
   }
 
-  // Transformer les données de l'internship en defaultValues pour le formulaire
   const defaultValues = {
     organizationName: internship.organization?.name || "",
     organizationType: internship.organization?.type || undefined,
-    organizationCountry: internship.organization?.country || undefined,
+    organizationCountry: internship.organization?.country || "",
     organizationCity: internship.organization?.city || "",
     subject: internship.subject || "",
     academicYear: internship.academicYear || undefined,
@@ -24,8 +23,8 @@ export default async function EditInternshipPage({ params }: PageParams<{ id: st
     weeksCount: internship.weeksCount || undefined,
     studentFirstName: internship.student?.firstName || "",
     studentLastName: internship.student?.lastName || "",
-    studentMajor: internship.student?.major?.name || undefined,
-    studentOption: internship.student?.option?.name || undefined,
+    studentMajor: internship.student?.major?.alias || "",
+    studentOption: internship.student?.option?.alias || "",
   };
 
   return <InternshipForm mode="edit" defaultValues={defaultValues} internshipId={id} />;

@@ -4,12 +4,12 @@ import {
   extractNumberOfWeeks,
   formatCityName,
   formatCountry,
-  getMajorAlias,
-  getOptionAlias,
   hasSignificantContent,
   normalizeOrganizationType,
   parseConfidential,
   parseDate,
+  parseDiploma,
+  parseOption,
   splitLastNameFirstName,
 } from "./parser-utils";
 
@@ -109,11 +109,11 @@ function parseStudents(worksheet: Worksheet, startRow: number): Student[] {
 
     const majorCell = row.getCell(3);
     const majorRaw = majorCell?.text?.trim() || "";
-    const major = getMajorAlias(majorRaw);
+    const major = parseDiploma(majorRaw);
 
     const optionCell = row.getCell(4);
     const optionRaw = optionCell?.text?.trim() || "";
-    const option = getOptionAlias(optionRaw);
+    const option = parseOption(optionRaw);
 
     return {
       firstName,
