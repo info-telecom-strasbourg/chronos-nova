@@ -47,21 +47,18 @@ async function insertParsedDataToDatabase(data: ParsedData): Promise<number> {
     const organization = data.organizations[i];
 
     try {
-      const normalized = normalizeCompleteStageData(
-        {
-          studentMajor: student?.major,
-          studentOption: student?.option,
-          organizationName: organization?.orgName,
-          organizationType: organization?.orgType,
-          organizationCountry: organization?.country,
-          organizationCity: organization?.city,
-          subject: internship?.subject,
-          beginDate: internship?.date,
-          weeksCount: internship?.weeksCount,
-          academicYear: internship?.year,
-        },
-        true,
-      ); // fromExcel = true pour les imports Excel
+      const normalized = normalizeCompleteStageData({
+        studentMajor: student?.major,
+        studentOption: student?.option,
+        organizationName: organization?.orgName,
+        organizationType: organization?.orgType,
+        organizationCountry: organization?.country,
+        organizationCity: organization?.city,
+        subject: internship?.subject,
+        beginDate: internship?.date,
+        weeksCount: internship?.weeksCount,
+        academicYear: internship?.year,
+      });
 
       // 1. Créer ou récupérer l'organisation
       const { data: orgData, error: orgError } = await supabase
@@ -164,9 +161,8 @@ export async function importExcelData(
 
       let parsedData: ParsedData;
 
-      // Détecter et utiliser le bon parser selon le nom de la feuille
+      // Utiliser le parser 2A avec startRow configurable
       if (sheetName === "2A - Récap. stage") {
-        // Utiliser le parser 2A avec startRow configurable
         try {
           const result = await parseExcelInternship2A(tempFilePath, sheetName, startRow);
 
@@ -204,7 +200,7 @@ export async function importExcelData(
         fs.unlinkSync(tempFilePath);
         return {
           success: false,
-          message: `La feuille "${sheetName}" ne peut pas être parsée. Seules les feuilles "2A Récap. stage" et "Stage substitution" sont supportées.`,
+          message: `La feuille "${sheetName}" ne peut pas être parsée. Seule la feuille "2A - Récap. stage" est supportée.`,
         };
       }
 

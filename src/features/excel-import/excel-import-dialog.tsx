@@ -114,7 +114,7 @@ export function ExcelImportDialog({ open, onOpenChange, onImport }: ExcelImportD
 
       // Vérifier que toutes les feuilles sélectionnées sont supportées
       const unsupportedSheets = selectedSheets.filter(
-        (sheet) => sheet.name !== "2A - Récap. stage" && sheet.name !== "Stage substitution",
+        (sheet) => sheet.name !== "2A - Récap. stage",
       );
 
       if (unsupportedSheets.length > 0) {
@@ -193,8 +193,7 @@ export function ExcelImportDialog({ open, onOpenChange, onImport }: ExcelImportD
 
                     {sheet.selected && (
                       <div className="ml-7 space-y-1">
-                        {(sheet.name === "Stage substitution" ||
-                          sheet.name === "2A - Récap. stage") && (
+                        {sheet.name === "2A - Récap. stage" && (
                           <>
                             <Label htmlFor={`start-row-${sheetIndex}`} className="text-xs">
                               Première ligne à analyser
@@ -210,13 +209,12 @@ export function ExcelImportDialog({ open, onOpenChange, onImport }: ExcelImportD
                             />
                           </>
                         )}
-                        {sheet.name !== "Stage substitution" &&
-                          sheet.name !== "2A - Récap. stage" && (
-                            <p className="text-destructive text-xs">
-                              Cette feuille ne peut pas être parsée. Seules les feuilles "2A -
-                              Récap. stage" et "Stage substitution" sont supportées.
-                            </p>
-                          )}
+                        {sheet.name !== "2A - Récap. stage" && (
+                          <p className="text-destructive text-xs">
+                            Cette feuille ne peut pas être parsée. Seule la feuille "2A -
+                            Récap. stage" est supportée.
+                          </p>
+                        )}
                       </div>
                     )}
                   </div>
