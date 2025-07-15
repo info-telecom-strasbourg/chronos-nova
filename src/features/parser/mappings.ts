@@ -178,15 +178,20 @@ export const COUNTRY_MAPPINGS: Record<string, CountryMapping> = {
 } as const;
 
 // ========================================================
-// MAPPINGS DES TYPES D'ORGANISATION (Parsing et Affichage)
+// MAPPINGS DES TYPES D'ORGANISATION (Affichage et Parsing)
 // ========================================================
 
+// Affichage
 export const ORGANIZATION_TYPE_MAPPINGS: Record<string, OrganizationTypeMapping> = {
   company: { value: "company", label: "Entreprise" },
   not_company: { value: "not_company", label: "Hors Entreprise" },
+} as const;
+
+// Parsing
+const ORGANIZATION_TYPE_ALIASES: Record<string, OrganizationTypeMapping> = {
   e: { value: "company", label: "Entreprise" },
   l: { value: "not_company", label: "Hors Entreprise" },
-} as const;
+};
 
 // ===============================
 // FONCTIONS DE NORMALISATION
@@ -279,14 +284,13 @@ export function parseCountry(value: string): string {
  */
 export function parseOrganizationType(value: string): string {
   if (!value || typeof value !== "string") return "not_company";
-
   const normalized = normalizeForMatching(value);
-  const mapping = ORGANIZATION_TYPE_MAPPINGS[normalized];
-
-  if (mapping) {
-    return mapping.value;
+  if (ORGANIZATION_TYPE_ALIASES[normalized]) {
+    return ORGANIZATION_TYPE_ALIASES[normalized].value;
   }
-
+  if (ORGANIZATION_TYPE_MAPPINGS[normalized]) {
+    return ORGANIZATION_TYPE_MAPPINGS[normalized].value;
+  }
   return "not_company";
 }
 
