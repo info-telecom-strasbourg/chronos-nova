@@ -6,7 +6,6 @@ import { InternshipListSkeleton } from "@/features/infinite-scroll/internship-sk
 import { InternshipHeader } from "@/features/search/internship-header";
 
 export default async function AdminPage() {
-  const totalInternships = await getInternshipsCount("visible");
   const pendingCount = await getInternshipsCount("draft");
 
   return (
@@ -15,8 +14,8 @@ export default async function AdminPage() {
 
       <div className="space-y-8">
         <InternshipHeader />
-        <Suspense fallback={<InternshipListSkeleton admin />}>
-          <InternshipInfiniteScroll totalItems={totalInternships} admin state="visible" />
+        <Suspense fallback={<InternshipListSkeleton admin actions={2} />}>
+          <InternshipInfiniteScroll admin state="visible" />
         </Suspense>
       </div>
     </div>

@@ -3,9 +3,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 // TODO: Reimplement this component in loading state
 export type InternshipCardSkeletonProps = {
   admin?: boolean;
+  actions?: number; // nombre de boutons d'action en mode admin
 };
 
-export function InternshipCardSkeleton({ admin = false }: InternshipCardSkeletonProps) {
+export function InternshipCardSkeleton({
+  admin = false,
+  actions = 2,
+}: InternshipCardSkeletonProps) {
   return (
     <div className="flex w-full flex-col gap-6 rounded-xl border bg-card py-6 text-card-foreground shadow-sm">
       {/* Header */}
@@ -50,8 +54,9 @@ export function InternshipCardSkeleton({ admin = false }: InternshipCardSkeleton
       <div className="flex items-center justify-center gap-2 px-6 sm:justify-between">
         {admin && (
           <div className="flex gap-2">
-            <Skeleton className="h-10 w-26" />
-            <Skeleton className="h-10 w-30" />
+            {Array.from({ length: actions }).map((_, i) => (
+              <Skeleton key={`admin-action-skeleton-${Date.now()}-${i}`} className="h-10 w-24" />
+            ))}
           </div>
         )}
         <div className="sm:ml-auto">
@@ -62,12 +67,18 @@ export function InternshipCardSkeleton({ admin = false }: InternshipCardSkeleton
   );
 }
 
-export function InternshipListSkeleton({ admin = false }: { admin?: boolean } = {}) {
+export function InternshipListSkeleton({
+  admin = false,
+  actions = 2,
+}: {
+  admin?: boolean;
+  actions?: number;
+} = {}) {
   return (
     <div className="flex w-full flex-col gap-4" style={{ zIndex: 1 }}>
       {/* Cards skeleton */}
       {[1, 2, 3].map((i) => (
-        <InternshipCardSkeleton key={`skeleton-${i}`} admin={admin} />
+        <InternshipCardSkeleton key={`skeleton-${i}`} admin={admin} actions={actions} />
       ))}
     </div>
   );
@@ -76,14 +87,20 @@ export function InternshipListSkeleton({ admin = false }: { admin?: boolean } = 
 export function InternshipPaginationSkeleton({
   count,
   admin = false,
+  actions = 2,
 }: {
   count: number;
   admin?: boolean;
+  actions?: number;
 }) {
   return (
     <div className="flex w-full flex-col gap-4">
       {Array.from({ length: count }, (_, i) => (
-        <InternshipCardSkeleton key={`pagination-skeleton-${Date.now()}-${i}`} admin={admin} />
+        <InternshipCardSkeleton
+          key={`pagination-skeleton-${Date.now()}-${i}`}
+          admin={admin}
+          actions={actions}
+        />
       ))}
     </div>
   );
