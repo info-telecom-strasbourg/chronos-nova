@@ -1,6 +1,7 @@
 "use client";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import { pluralize } from "@/lib/scripts/string";
@@ -11,7 +12,6 @@ import { InternshipListSkeleton, InternshipPaginationSkeleton } from "./internsh
 export type InternshipInfiniteScrollProps = {
   initialPage?: number;
   limit?: number;
-  totalItems: number;
   admin?: boolean;
   state?: "visible" | "draft" | "deleted";
 };
@@ -19,13 +19,21 @@ export type InternshipInfiniteScrollProps = {
 export const InternshipInfiniteScroll = ({
   initialPage = 0,
   limit = 10,
-  totalItems,
   admin = false,
   state,
 }: InternshipInfiniteScrollProps) => {
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get("q") || "";
+
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteQuery({
-    queryKey: ["internships", { state }],
-    queryFn: ({ pageParam }) => getInternshipsQuery({ page: pageParam, limit, state }),
+    queryKey: ["internships", { state, q: searchQuery }],
+    queryFn: ({ pageParam }) =>
+      getInternshipsQuery({
+        page: pageParam,
+        limit,
+        state,
+        q: searchQuery || undefined,
+      }),
     initialPageParam: initialPage,
     getNextPageParam: (lastPage) => lastPage.nextPage,
   });
@@ -37,9 +45,10 @@ export const InternshipInfiniteScroll = ({
   }, [inView, fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   const allInternships = data?.pages?.flatMap((page) => page.data) || [];
-
-  const loadedInternshipsCount = allInternships.length;
-  const remainingInternships = totalItems - loadedInternshipsCount;
+  const lastPage = data?.pages?.[data?.pages?.length - 1] || data?.pages?.[0];
+  const totalItems = lastPage?.total ?? 0;
+  const loadedInternships = allInternships.length;
+  const remainingInternships = totalItems - loadedInternships;
   const skeletonsToShow = Math.min(limit, remainingInternships);
 
   if (isPending) {

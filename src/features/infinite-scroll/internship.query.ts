@@ -19,55 +19,91 @@ export type GetInternshipsResponse = {
   data: InternshipData[];
   nextPage?: number;
   hasMore: boolean;
+  total: number;
 };
 
-// TODO: Implement search params handling in loadInternships function
 export const getInternshipsQuery = async ({
   q,
-  filter,
-  sort,
-  order,
   page = 0,
   limit,
   state,
-}: z.infer<typeof getInternshipsQuerySchema>): Promise<GetInternshipsResponse> => {
+}: Pick<
+  z.infer<typeof getInternshipsQuerySchema>,
+  "q" | "page" | "limit" | "state"
+>): Promise<GetInternshipsResponse> => {
   const supabase = await createSupabaseServerClient();
   const from = page * limit;
   const to = from + limit - 1;
+  const targetState = state || "visible";
 
-  let query = supabase
-    .from("internship")
-    .select("*, organization(*), student(*, major(*), option(*))")
-    .range(from, to);
+  // Si pas de recherche, requête simple (ne commence qu'à partir de 2 caractères)
+  if (!q || q.length < 2) {
+    const query = supabase
+      .from("internship")
+      .select("*, organization(*), student(*, major(*), option(*))", { count: "exact" })
+      .eq("state", targetState)
+      .range(from, to);
 
-  // Filter by state if provided
-  if (state) {
-    query = query.eq("state", state);
+    const { data, error, count } = await query;
+    if (error) throw error;
+
+    return {
+      data: data || [],
+      nextPage: data && data.length === limit ? page + 1 : undefined,
+      hasMore: data && data.length === limit,
+      total: count || 0,
+    };
   }
 
-  const { data, error } = await query;
+  const escapedQuery = q.replace(/[%_\\]/g, "\\$&");
 
-  if (error) throw error;
+  // Recherche dans le nom d'organisation
+  const orgQuery = supabase
+    .from("internship")
+    .select("*, organization!inner(*), student(*, major(*), option(*))")
+    .eq("state", targetState)
+    .ilike("organization.name", `%${escapedQuery}%`);
+
+  // Recherche dans le sujet
+  const subjectQuery = supabase
+    .from("internship")
+    .select("*, organization(*), student(*, major(*), option(*))")
+    .eq("state", targetState)
+    .ilike("subject", `%${escapedQuery}%`);
+
+  const [orgResults, subjectResults] = await Promise.all([orgQuery, subjectQuery]);
+
+  if (orgResults.error && subjectResults.error) {
+    throw orgResults.error;
+  }
+
+  // Combiner et dédupliquer les résultats
+  const allResults = [...(orgResults.data || []), ...(subjectResults.data || [])];
+
+  const uniqueResults = allResults.filter(
+    (item, index, arr) => arr.findIndex((t) => t.id === item.id) === index,
+  );
+
+  const total = uniqueResults.length;
+  const paginatedResults = uniqueResults.slice(from, to + 1);
 
   return {
-    data: data || [],
-    nextPage: data && data.length === limit ? page + 1 : undefined,
-    hasMore: data && data.length === limit,
+    data: paginatedResults,
+    nextPage: paginatedResults.length === limit ? page + 1 : undefined,
+    hasMore: paginatedResults.length === limit,
+    total,
   };
 };
 
 export const getInternshipsCount = async (
-  state?: "visible" | "draft" | "deleted",
+  state: "visible" | "draft" | "deleted" = "visible",
 ): Promise<number> => {
   const supabase = await createSupabaseServerClient();
 
-  let query = supabase.from("internship").select("*", { count: "exact", head: true });
-
-  if (state) {
-    query = query.eq("state", state);
-  }
-
-  const { count, error } = await query;
+  const { count, error } = await supabase
+    .from("internship")
+    .select("*", { count: "exact", head: true })
+    .eq("state", state);
 
   if (error) throw error;
 

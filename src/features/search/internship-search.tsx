@@ -21,7 +21,12 @@ export function InternshipSearch() {
     setSearch("");
   };
 
-  const debouncedSetSearch = useDebouncedCallback((val) => setSearch(val), 300);
+  const debouncedSetSearch = useDebouncedCallback((val) => {
+    // Déclencher la recherche seulement à partir de 2 caractères ou si vide
+    if (val.length >= 2 || val === "") {
+      setSearch(val);
+    }
+  }, 300);
 
   return (
     <div className="w-full space-y-2">
@@ -39,7 +44,7 @@ export function InternshipSearch() {
               e.currentTarget.blur();
             }
           }}
-          placeholder={"Rechercher..."}
+          placeholder="Rechercher..."
           className="h-11 w-full pr-10 pl-10"
         />
         {searchInput && (
