@@ -446,6 +446,8 @@ export function getOptionShortLabel(value: string): string {
       return "ISAV";
     case "photo":
       return "Photonique";
+    case "pm":
+      return "PM";
     default:
       return value.toUpperCase(); // Fallback en majuscules
   }
@@ -500,6 +502,8 @@ export function getOptionEnrichedLabel(value: string): string {
       return "ISAV (Ingénierie des Systèmes Automobiles et de Véhicules)";
     case "photo":
       return "Photonique";
+    case "pm":
+      return "PM (Physique et Modélisation)";
     default:
       return value; // Fallback sur la value si pas de mapping
   }

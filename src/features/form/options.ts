@@ -53,6 +53,7 @@ export const academicStructure = {
     gene: {
       label: "Généraliste",
       options: [
+        { value: "pm", label: "Physique et Modélisation" },
         { value: "stq", label: "STQ" },
         { value: "photo", label: "Photonique" },
         { value: "ispv", label: "ISPV" },

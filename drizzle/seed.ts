@@ -5,7 +5,19 @@ import { serverEnv } from "@/lib/env/server";
 import * as schema from "./schema";
 
 const majorValues = ["gene", "ir", "ti-sante"];
-const optionValues = ["aucune", "sdia", "rio", "ti", "dtmi", "stq", "ispv", "issd", "isav", "photo"];
+const optionValues = [
+  "aucune",
+  "sdia",
+  "rio",
+  "ti",
+  "dtmi",
+  "stq",
+  "ispv",
+  "issd",
+  "isav",
+  "photo",
+  "pm"
+];
 
 async function main() {
   const db = drizzle(serverEnv.SUPABASE_DB_URL, { logger: true });
