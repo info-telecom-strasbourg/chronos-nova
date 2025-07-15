@@ -11,14 +11,11 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 interface ParsedData {
   internships: Array<{
     subject: string;
-    confidential: string;
     date: string;
     weeksCount: number;
     year: string;
   }>;
   students: Array<{
-    firstName: string;
-    lastName: string;
     major: string;
     option?: string;
   }>;
@@ -50,21 +47,21 @@ async function insertParsedDataToDatabase(data: ParsedData): Promise<number> {
     const organization = data.organizations[i];
 
     try {
-      const normalized = normalizeCompleteStageData({
-        studentFirstName: student?.firstName,
-        studentLastName: student?.lastName,
-        studentMajor: student?.major,
-        studentOption: student?.option,
-        organizationName: organization?.orgName,
-        organizationType: organization?.orgType,
-        organizationCountry: organization?.country,
-        organizationCity: organization?.city,
-        subject: internship?.subject,
-        confidential: internship?.confidential,
-        beginDate: internship?.date,
-        weeksCount: internship?.weeksCount,
-        academicYear: internship?.year,
-      }, true); // fromExcel = true pour les imports Excel
+      const normalized = normalizeCompleteStageData(
+        {
+          studentMajor: student?.major,
+          studentOption: student?.option,
+          organizationName: organization?.orgName,
+          organizationType: organization?.orgType,
+          organizationCountry: organization?.country,
+          organizationCity: organization?.city,
+          subject: internship?.subject,
+          beginDate: internship?.date,
+          weeksCount: internship?.weeksCount,
+          academicYear: internship?.year,
+        },
+        true,
+      ); // fromExcel = true pour les imports Excel
 
       // 1. Créer ou récupérer l'organisation
       const { data: orgData, error: orgError } = await supabase
@@ -109,8 +106,6 @@ async function insertParsedDataToDatabase(data: ParsedData): Promise<number> {
       const { data: studentData, error: studentError } = await supabase
         .from("student")
         .insert({
-          firstName: normalized.student.firstName,
-          lastName: normalized.student.lastName,
           majorAlias: normalized.student.major,
           optionAlias: normalized.student.option,
         })
@@ -130,7 +125,6 @@ async function insertParsedDataToDatabase(data: ParsedData): Promise<number> {
         academicYear: normalized.internship.academicYear,
         beginDate: normalized.internship.beginDate,
         weeksCount: normalized.internship.weeksCount,
-        confidential: normalized.internship.confidential,
         state: "draft",
       });
 
@@ -147,7 +141,6 @@ async function insertParsedDataToDatabase(data: ParsedData): Promise<number> {
 
   return insertedCount;
 }
-
 
 /**
  * Action principale d'import Excel
@@ -181,17 +174,11 @@ export async function importExcelData(
           parsedData = {
             internships: result.internships.map((i) => ({
               subject: i.subject || "??",
-              confidential:
-                typeof i.confidential === "boolean"
-                  ? i.confidential.toString()
-                  : i.confidential?.toString() || "false",
               date: i.date || "2025-01-01",
               weeksCount: typeof i.weeksCount === "number" ? i.weeksCount : 0,
               year: i.year || "2A",
             })),
             students: result.students.map((s) => ({
-              firstName: s.firstName || "??",
-              lastName: s.lastName || "??",
               major: s.major || "gene",
               option: s.option || "aucune",
             })),

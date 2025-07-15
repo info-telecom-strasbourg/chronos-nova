@@ -44,8 +44,6 @@ export function InternshipForm({ mode, defaultValues, internshipId }: Internship
       academicYear: undefined,
       beginDate: "",
       weeksCount: undefined,
-      studentFirstName: "",
-      studentLastName: "",
       studentMajor: undefined,
       studentOption: undefined,
       ...defaultValues,

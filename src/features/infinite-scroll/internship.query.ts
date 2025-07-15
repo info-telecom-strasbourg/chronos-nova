@@ -218,8 +218,6 @@ export const createInternship = async (data: CreateInternshipFormData): Promise<
   const { data: studentData, error: studentError } = await supabase
     .from("student")
     .insert({
-      firstName: normalized.student.firstName,
-      lastName: normalized.student.lastName,
       majorAlias: normalized.student.major,
       optionAlias: normalized.student.option,
     })
@@ -238,7 +236,6 @@ export const createInternship = async (data: CreateInternshipFormData): Promise<
       academicYear: normalized.internship.academicYear,
       beginDate: normalized.internship.beginDate,
       weeksCount: normalized.internship.weeksCount,
-      confidential: normalized.internship.confidential,
       state: "draft", // New internships start as draft
     })
     .select("id")
@@ -320,8 +317,6 @@ export const updateInternship = async (
   const { error: studentError } = await supabase
     .from("student")
     .update({
-      firstName: normalized.student.firstName,
-      lastName: normalized.student.lastName,
       majorAlias: normalized.student.major,
       optionAlias: normalized.student.option,
     })
@@ -337,7 +332,6 @@ export const updateInternship = async (
       academicYear: normalized.internship.academicYear,
       beginDate: normalized.internship.beginDate,
       weeksCount: normalized.internship.weeksCount,
-      confidential: normalized.internship.confidential,
     })
     .eq("id", id);
 
@@ -384,8 +378,6 @@ export async function getInternshipsWithDetails({
       ),
       student:studentId (
         id,
-        firstName,
-        lastName,
         majorAlias,
         optionAlias,
         major:majorAlias (

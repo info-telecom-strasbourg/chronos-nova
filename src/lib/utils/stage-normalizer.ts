@@ -1,19 +1,12 @@
 import {
-  formatCityName,
-  parseConfidential,
-  parseDate,
-  splitLastNameFirstName,
-} from "@/features/parser/parser-utils";
-import {
+  parseCountry,
   parseMajor,
   parseOption,
-   parseCountry,
   parseOrganizationType,
 } from "@/features/parser/mappings";
+import { formatCityName, parseDate } from "@/features/parser/parser-utils";
 
 export interface NormalizedStudentData {
-  firstName: string;
-  lastName: string;
   major: string; // "gene", "ir", "ti-sante"
   option: string; // "stq", "sdia", "rio", "aucune", etc.
 }
@@ -27,7 +20,6 @@ export interface NormalizedOrganizationData {
 
 export interface NormalizedInternshipData {
   subject: string;
-  confidential: boolean;
   beginDate: string;
   weeksCount: number;
   academicYear: "1A" | "2A" | "3A";
@@ -38,26 +30,11 @@ export interface NormalizedInternshipData {
  */
 export function normalizeStudentData(
   rawData: {
-    firstName?: string;
-    lastName?: string;
-    fullName?: string;
     major?: string;
     option?: string;
   },
   fromExcel: boolean = false,
 ): NormalizedStudentData {
-  let firstName = rawData.firstName || "";
-  let lastName = rawData.lastName || "";
-
-  // Si on a un nom complet, le séparer
-  if (rawData.fullName && (!firstName || !lastName)) {
-    const { firstName: parsedFirstName, lastName: parsedLastName } = splitLastNameFirstName(
-      rawData.fullName,
-    );
-    firstName = firstName || parsedFirstName;
-    lastName = lastName || parsedLastName;
-  }
-
   let major: string;
   let option: string;
 
@@ -77,8 +54,6 @@ export function normalizeStudentData(
   }
 
   return {
-    firstName: firstName.trim() || "??",
-    lastName: lastName.trim() || "??",
     major,
     option,
   };
@@ -130,7 +105,6 @@ export function normalizeOrganizationData(
  */
 export function normalizeInternshipData(rawData: {
   subject?: string;
-  confidential?: string | boolean;
   beginDate?: string;
   weeksCount?: number | string;
   academicYear?: string;
@@ -143,16 +117,8 @@ export function normalizeInternshipData(rawData: {
     weeksCount = Number.isNaN(parsed) ? 0 : parsed;
   }
 
-  let confidential = false;
-  if (typeof rawData.confidential === "boolean") {
-    confidential = rawData.confidential;
-  } else if (typeof rawData.confidential === "string") {
-    confidential = parseConfidential(rawData.confidential);
-  }
-
   return {
     subject: rawData.subject?.trim() || "??",
-    confidential,
     beginDate: parseDate(rawData.beginDate || ""),
     weeksCount,
     academicYear: (rawData.academicYear as "1A" | "2A" | "3A") || "2A",
@@ -165,9 +131,6 @@ export function normalizeInternshipData(rawData: {
 export function normalizeCompleteStageData(
   rawData: {
     // Données étudiant
-    studentFirstName?: string;
-    studentLastName?: string;
-    studentFullName?: string;
     studentMajor?: string;
     studentOption?: string;
 
@@ -179,7 +142,6 @@ export function normalizeCompleteStageData(
 
     // Données stage
     subject?: string;
-    confidential?: string | boolean;
     beginDate?: string;
     weeksCount?: number | string;
     academicYear?: string;
@@ -189,9 +151,6 @@ export function normalizeCompleteStageData(
   return {
     student: normalizeStudentData(
       {
-        firstName: rawData.studentFirstName,
-        lastName: rawData.studentLastName,
-        fullName: rawData.studentFullName,
         major: rawData.studentMajor,
         option: rawData.studentOption,
       },
@@ -208,7 +167,6 @@ export function normalizeCompleteStageData(
     ),
     internship: normalizeInternshipData({
       subject: rawData.subject,
-      confidential: rawData.confidential,
       beginDate: rawData.beginDate,
       weeksCount: rawData.weeksCount,
       academicYear: rawData.academicYear,
@@ -229,15 +187,11 @@ export function normalizeFormData(formData: {
   academicYear: string;
   beginDate: string;
   weeksCount: number;
-  studentFirstName: string;
-  studentLastName: string;
   studentMajor: string;
   studentOption?: string;
 }) {
   return normalizeCompleteStageData(
     {
-      studentFirstName: formData.studentFirstName,
-      studentLastName: formData.studentLastName,
       studentMajor: formData.studentMajor,
       studentOption: formData.studentOption,
       organizationName: formData.organizationName,
@@ -245,7 +199,6 @@ export function normalizeFormData(formData: {
       organizationCountry: formData.organizationCountry,
       organizationCity: formData.organizationCity,
       subject: formData.subject,
-      confidential: false,
       beginDate: formData.beginDate,
       weeksCount: formData.weeksCount,
       academicYear: formData.academicYear,

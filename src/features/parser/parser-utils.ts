@@ -88,17 +88,6 @@ export function extractNumberOfWeeks(weeksCell: string): number {
 // ===============================
 
 /**
- * Convertit une valeur confidentielle en booléen
- * Exemple: "oui" → true, "x" → true, "non" → false
- */
-export function parseConfidential(value: string): boolean {
-  if (!value || typeof value !== "string") return false;
-
-  const normalized = value.trim().toLowerCase();
-  return normalized === "oui" || normalized === "x";
-}
-
-/**
  * Convertit une date au format YYYY-MM-DD
  * Gère aussi les plages de dates (ex: "02/06/2025 - 22/08/2025") en prenant la première date
  * Exemple: "15/03/2025" → "2025-03-15"

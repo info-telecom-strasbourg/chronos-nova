@@ -4,7 +4,6 @@ import { useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { AutoComplete } from "@/components/ui/autocomplete";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { getMajorsForYear, getOptionsForMajor, hasOptionsForMajor } from "@/features/form/options";
 
 interface StudentSectionProps {
@@ -19,38 +18,6 @@ export function StudentSection({ control }: StudentSectionProps) {
     <div className="space-y-4">
       <h3 className="font-semibold text-lg">Étudiant</h3>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <FormField
-          control={control}
-          name="studentFirstName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                Prénom <span className="text-destructive">*</span>
-              </FormLabel>
-              <FormControl>
-                <Input placeholder="Jean" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={control}
-          name="studentLastName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                Nom <span className="text-destructive">*</span>
-              </FormLabel>
-              <FormControl>
-                <Input placeholder="Dupont" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
         <FormField
           control={control}
           name="studentMajor"

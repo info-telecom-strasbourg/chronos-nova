@@ -21,8 +21,6 @@ export default async function EditInternshipPage({ params }: PageParams<{ id: st
     academicYear: internship.academicYear || undefined,
     beginDate: internship.beginDate || "",
     weeksCount: internship.weeksCount || undefined,
-    studentFirstName: internship.student?.firstName || "",
-    studentLastName: internship.student?.lastName || "",
     studentMajor: internship.student?.major?.alias || "",
     studentOption: internship.student?.option?.alias || "",
   };

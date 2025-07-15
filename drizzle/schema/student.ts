@@ -5,8 +5,6 @@ export const degree = pgEnum("degree", ["gene", "ir", "ti"]);
 
 export const students = pgTable("student", {
   id: uuid("id").defaultRandom().primaryKey(),
-  firstName: text("firstName").notNull(),
-  lastName: text("lastName").notNull(),
   majorAlias: text("majorAlias")
     .notNull()
     .references(() => majors.alias, {

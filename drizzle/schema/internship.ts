@@ -1,4 +1,4 @@
-import { boolean, date, integer, pgEnum, pgTable, text, uuid } from "drizzle-orm/pg-core";
+import { date, integer, pgEnum, pgTable, text, uuid } from "drizzle-orm/pg-core";
 import { organizations } from "./organization";
 import { students } from "./student";
 
@@ -8,7 +8,6 @@ export const state = pgEnum("state", ["visible", "draft", "deleted"]);
 export const internships = pgTable("internship", {
   id: uuid("id").defaultRandom().primaryKey(),
   subject: text("subject").notNull(),
-  confidential: boolean("confidential").notNull().default(false),
   beginDate: date("beginDate").notNull(),
   weeksCount: integer("weeksCount").notNull(),
   academicYear: academicYear("academicYear").notNull(),

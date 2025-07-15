@@ -1,20 +1,18 @@
 import type { Row, Worksheet } from "exceljs";
 import type { Internship, Organization, Student } from "./type-definition";
 import {
+  parseCountry,
+  parseMajor,
+  parseOption,
+  parseOrganizationType,
+} from "@/features/parser/mappings";
+import {
   extractNumberOfWeeks,
   formatCityName,
   hasSignificantContent,
-  parseConfidential,
   parseDate,
   splitLastNameFirstName,
 } from "./parser-utils";
-
-import {
-  parseOrganizationType,
-  parseOption,
-  parseMajor,
-  parseCountry,
-} from "@/features/parser/mappings";
 
 export async function parseExcelInternship2A(
   filePath: string,
@@ -79,10 +77,6 @@ function parseInternships(worksheet: Worksheet, startRow: number): Internship[] 
     const subjectCell = row.getCell(13);
     const subject = subjectCell?.text?.trim() || "??";
 
-    const confidentialCell = row.getCell(12);
-    const confidentialRaw = confidentialCell?.text?.trim() || "";
-    const confidential = parseConfidential(confidentialRaw);
-
     const dateCell = row.getCell(16);
     const dateRaw = dateCell?.text?.trim() || "";
     const date = parseDate(dateRaw);
@@ -94,7 +88,6 @@ function parseInternships(worksheet: Worksheet, startRow: number): Internship[] 
     const year = "2A";
 
     return {
-      confidential,
       date,
       subject,
       weeksCount,
@@ -105,11 +98,6 @@ function parseInternships(worksheet: Worksheet, startRow: number): Internship[] 
 
 function parseStudents(worksheet: Worksheet, startRow: number): Student[] {
   return parseRowsWithContent(worksheet, startRow, 1, (row) => {
-    const fullNameCell = row.getCell(2);
-    const fullNameText = fullNameCell?.text?.trim() || "??";
-
-    const { lastName, firstName } = splitLastNameFirstName(fullNameText);
-
     const majorCell = row.getCell(3);
     const majorRaw = majorCell?.text?.trim() || "";
     const major = parseMajor(majorRaw);
@@ -119,8 +107,6 @@ function parseStudents(worksheet: Worksheet, startRow: number): Student[] {
     const option = parseOption(optionRaw);
 
     return {
-      firstName,
-      lastName,
       major,
       option,
     };
