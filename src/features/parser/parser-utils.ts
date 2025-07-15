@@ -1,21 +1,3 @@
-/**
- * Utilitaires pour le parsing et la transformation des données Excel
- * Centralise toutes les fonctions de normalisation, transformation et formatage
- */
-
-import {
-  parseCountry,
-  getCountryLabel,
-  getMajorFullLabel,
-  getMajorShortLabel,
-  getOptionFullLabel,
-  getOptionShortLabel,
-  getOrganizationTypeLabel,
-  parseMajor,
-  parseOption,
-  parseOrganizationType,
-} from "./mappings";
-
 // ===============================
 // FORMATAGE DE TEXTE ET NOMS
 // ===============================
