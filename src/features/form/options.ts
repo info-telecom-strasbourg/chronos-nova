@@ -48,6 +48,15 @@ export const academicStructure = {
         { value: "dtmi", label: "DTMI" },
       ],
     },
+    master: {
+      label: "Master",
+      options: [
+        { value: "asi", label: "ASI" },
+        { value: "ht", label: "HT" },
+        { value: "imed", label: "IMed" },
+        { value: "phynano", label: "PhyNano" },
+      ],
+    },
   },
   "3A": {
     gene: {
@@ -73,6 +82,17 @@ export const academicStructure = {
       options: [
         { value: "ti", label: "TI" },
         { value: "dtmi", label: "DTMI" },
+      ],
+    },
+    master: {
+      label: "Master",
+      options: [
+        { value: "id", label: "ID" },
+        { value: "ht", label: "HT" },
+        { value: "ar", label: "AR" },
+        { value: "irmc", label: "IRMC" },
+        { value: "mphot", label: "MPHOT" },
+        { value: "topo", label: "Topo" },
       ],
     },
   },

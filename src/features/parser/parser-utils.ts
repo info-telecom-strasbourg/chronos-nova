@@ -131,6 +131,8 @@ export function parseDiploma(value: string): string {
       return "ti-sante";
     case "ir":
       return "ir";
+    case "master":
+      return "master";
     default:
       console.warn(
         `Diplôme non reconnu: "${value}" (normalisé: "${normalized}"). Fallback vers "gene".`,
@@ -180,6 +182,24 @@ export function parseOption(value: string): string {
       return "isav";
     case "photo":
       return "photo";
+    case "asi":
+      return "asi";
+    case "ht":
+      return "ht";
+    case "imed":
+      return "imed";
+    case "phynano":
+      return "phynano";
+    case "ar":
+      return "ar";
+    case "id":
+      return "id";
+    case "irmc":
+      return "irmc";
+    case "mphot":
+      return "mphot";
+    case "topo":
+      return "topo";
     case "aucune":
     case "":
       return "aucune";
@@ -413,6 +433,8 @@ export function getMajorShortLabel(value: string): string {
       return "IR";
     case "ti-sante":
       return "TI Santé";
+    case "master":
+      return "Master";
     default:
       return value; // Fallback sur la value si pas de mapping
   }
@@ -448,6 +470,24 @@ export function getOptionShortLabel(value: string): string {
       return "Photonique";
     case "pm":
       return "PM";
+    case "asi":
+      return "ASI";
+    case "ht":
+      return "HT";
+    case "imed":
+      return "IMed";
+    case "phynano":
+      return "PhyNano";
+    case "ar":
+      return "AR";
+    case "id":
+      return "ID";
+    case "irmc":
+      return "IRMC";
+    case "mphot":
+      return "MPHOT";
+    case "topo":
+      return "Topo";
     default:
       return value.toUpperCase(); // Fallback en majuscules
   }
@@ -469,6 +509,8 @@ export function getMajorEnrichedLabel(value: string): string {
       return "IR (Informatique et Réseaux)";
     case "ti-sante":
       return "TI Santé (Technologie de l'Information pour la Santé)";
+    case "master":
+      return "Master";
     default:
       return value; // Fallback sur la value si pas de mapping
   }
@@ -504,6 +546,24 @@ export function getOptionEnrichedLabel(value: string): string {
       return "Photonique";
     case "pm":
       return "PM (Physique et Modélisation)";
+    case "asi":
+      return "ASI (Automatique, Signal, Informatique)";
+    case "ht":
+      return "HT (HealthTech)";
+    case "imed":
+      return "IMed (Imagerie Médicale)";
+    case "phynano":
+      return "PhyNano (Physique et Nanophotonique)";
+    case "ar":
+      return "AR (Automatique et Robotique)";
+    case "id":
+      return "ID (Images et Données)";
+    case "irmc":
+      return "IRMC (Imagerie, Robotique Médicale et Chirurgicale)";
+    case "mphot":
+      return "MPHOT (Photonique pour les nanosciences et le vivant)";
+    case "topo":
+      return "Topo (Topographie et photogrammétrie)";
     default:
       return value; // Fallback sur la value si pas de mapping
   }
