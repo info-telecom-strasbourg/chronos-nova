@@ -148,21 +148,31 @@ export const createInternship = async (data: CreateInternshipFormData): Promise<
 
   if (orgError) throw orgError;
 
-  // Ensure major exists
+  // Ensure major exists (with name)
+  const { studentMajors } = await import("@/features/form/options");
+  const majorLabel =
+    studentMajors.find((m) => m.value === normalized.student.major)?.label ||
+    normalized.student.major;
   const { error: majorError } = await supabase
     .from("major")
     .upsert({
       alias: normalized.student.major,
+      name: majorLabel,
     })
     .select("alias");
 
   if (majorError) throw majorError;
 
-  // Ensure option exists
+  // Ensure option exists (with name)
+  const { studentOptions } = await import("@/features/form/options");
+  const optionLabel =
+    studentOptions.find((o) => o.value === normalized.student.option)?.label ||
+    normalized.student.option;
   const { error: optionError } = await supabase
     .from("option")
     .upsert({
       alias: normalized.student.option,
+      name: optionLabel,
     })
     .select("alias");
 
@@ -240,21 +250,31 @@ export const updateInternship = async (
 
   if (orgError) throw orgError;
 
-  // Ensure major exists
+  // Ensure major exists (with name)
+  const { studentMajors } = await import("@/features/form/options");
+  const majorLabel =
+    studentMajors.find((m) => m.value === normalized.student.major)?.label ||
+    normalized.student.major;
   const { error: majorError } = await supabase
     .from("major")
     .upsert({
       alias: normalized.student.major,
+      name: majorLabel,
     })
     .select("alias");
 
   if (majorError) throw majorError;
 
-  // Ensure option exists
+  // Ensure option exists (with name)
+  const { studentOptions } = await import("@/features/form/options");
+  const optionLabel =
+    studentOptions.find((o) => o.value === normalized.student.option)?.label ||
+    normalized.student.option;
   const { error: optionError } = await supabase
     .from("option")
     .upsert({
       alias: normalized.student.option,
+      name: optionLabel,
     })
     .select("alias");
 
