@@ -1,6 +1,7 @@
 "use client";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
@@ -53,6 +54,17 @@ export const InternshipInfiniteScroll = ({
 
   if (isPending) {
     return <InternshipListSkeleton admin={admin} />;
+  }
+
+  if (totalItems === 0) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center">
+        <Search className="m-3 size-10 text-muted-foreground" />
+        <div className="text-center">
+          <h1 className="font-semibold text-lg">Aucun stage trouvé</h1>
+        </div>
+      </div>
+    );
   }
 
   return (
