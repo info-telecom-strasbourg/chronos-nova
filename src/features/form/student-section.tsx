@@ -22,7 +22,7 @@ export function StudentSection({ control }: StudentSectionProps) {
   return (
     <div className="space-y-4">
       <h3 className="font-semibold text-lg">Étudiant</h3>
-      <div className="gap-4 grid grid-cols-1 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <FormField
           control={control}
           name="studentMajor"
