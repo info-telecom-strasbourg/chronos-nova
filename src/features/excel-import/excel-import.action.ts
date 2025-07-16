@@ -150,7 +150,7 @@ export async function importExcelData(
     let totalImported = 0;
 
     for (const sheetConfig of sheetsConfig) {
-      const { name: sheetName, startRow, academicYear } = sheetConfig;
+      const { name: sheetName, academicYear } = sheetConfig;
 
       // Créer un fichier temporaire pour le parser
       const os = await import("os");
@@ -164,7 +164,12 @@ export async function importExcelData(
       // Utiliser le parser 2A avec startRow configurable
       if (sheetName === "2A - Récap. stage") {
         try {
-          const result = await parseExcelInternship2A(tempFilePath, sheetName, startRow);
+          const result = await parseExcelInternship2A(
+            tempFilePath,
+            sheetName,
+            typeof sheetConfig.startRow === "number" ? sheetConfig.startRow : 1,
+            academicYear || "",
+          );
 
           // Transformer les données pour correspondre au type ParsedData
           parsedData = {
@@ -172,7 +177,7 @@ export async function importExcelData(
               subject: i.subject || "??",
               date: i.date || "2025-01-01",
               weeksCount: typeof i.weeksCount === "number" ? i.weeksCount : 0,
-              year: academicYear || i.year || "2A",
+              year: i.year || academicYear || "",
             })),
             students: result.students.map((s) => ({
               major: s.major || "gene",

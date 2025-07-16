@@ -118,12 +118,13 @@ export const getMajorsForYear = (year: string) => {
 
 export const getOptionsForMajor = (year: string, majorKey: string) => {
   const yearData = academicStructure[year as keyof typeof academicStructure];
-  if (!yearData) return [];
+  if (!yearData) return [{ value: "aucune", label: "Aucune" }];
 
   const major = yearData[majorKey as keyof typeof yearData];
-  if (!major) return [];
+  if (!major) return [{ value: "aucune", label: "Aucune" }];
 
-  return major.options || [];
+  const options = major.options || [];
+  return options.length > 0 ? options : [{ value: "aucune", label: "Aucune" }];
 };
 
 export const hasOptionsForMajor = (year: string, majorKey: string) => {

@@ -47,7 +47,7 @@ export function InternshipEditDialog({
       beginDate: "",
       weeksCount: undefined,
       studentMajor: undefined,
-      studentOption: undefined,
+      studentOption: "aucune",
       ...defaultValues,
     },
   });
@@ -63,14 +63,14 @@ export function InternshipEditDialog({
   useEffect(() => {
     if (prevAcademicYear.current !== academicYear && prevAcademicYear.current !== undefined) {
       setValue("studentMajor", "");
-      setValue("studentOption", undefined);
+      setValue("studentOption", "");
     }
     prevAcademicYear.current = academicYear;
   }, [academicYear, setValue]);
 
   useEffect(() => {
     if (prevStudentMajor.current !== studentMajor && prevStudentMajor.current !== undefined) {
-      setValue("studentOption", undefined);
+      setValue("studentOption", "");
     }
     prevStudentMajor.current = studentMajor;
   }, [studentMajor, setValue]);
@@ -107,6 +107,10 @@ export function InternshipEditDialog({
     });
   };
 
+  const onError = () => {
+    toast.error("Des champs requis sont à remplir");
+  };
+
   const handleClose = () => {
     onOpenChange(false);
   };
@@ -123,7 +127,7 @@ export function InternshipEditDialog({
         <Separator />
         <div className="space-y-6">
           <Form {...form}>
-            <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+            <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit, onError)}>
               <OrganizationSection control={control} />
 
               <Separator />

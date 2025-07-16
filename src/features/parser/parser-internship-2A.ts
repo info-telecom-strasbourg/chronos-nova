@@ -18,6 +18,7 @@ export async function parseExcelInternship2A(
   filePath: string,
   sheetName: string,
   startRow: number,
+  year: string,
 ): Promise<{
   internships: Internship[];
   students: Student[];
@@ -33,7 +34,7 @@ export async function parseExcelInternship2A(
       throw new Error(`Sheet "${sheetName}" not found.`);
     }
 
-    const internships: Internship[] = parseInternships(worksheet, startRow);
+    const internships: Internship[] = parseInternships(worksheet, startRow, year);
     const students: Student[] = parseStudents(worksheet, startRow);
     const organizations: Organization[] = parseOrganizations(worksheet, startRow);
 
@@ -72,7 +73,7 @@ function parseRowsWithContent<T>(
   return results;
 }
 
-function parseInternships(worksheet: Worksheet, startRow: number): Internship[] {
+function parseInternships(worksheet: Worksheet, startRow: number, year: string): Internship[] {
   return parseRowsWithContent(worksheet, startRow, 5, (row) => {
     const subjectCell = row.getCell(13);
     const subject = subjectCell?.text?.trim() || "??";
@@ -84,8 +85,6 @@ function parseInternships(worksheet: Worksheet, startRow: number): Internship[] 
     const weeksCell = row.getCell(17);
     const weeksCellText = weeksCell?.text?.trim() || "";
     const weeksCount = extractNumberOfWeeks(weeksCellText);
-
-    const year = "2A";
 
     return {
       date,

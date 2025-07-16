@@ -60,14 +60,14 @@ export function InternshipCreateDialog({ open, onOpenChange }: InternshipCreateD
   useEffect(() => {
     if (prevAcademicYear.current !== academicYear && prevAcademicYear.current !== undefined) {
       setValue("studentMajor", "");
-      setValue("studentOption", undefined);
+      setValue("studentOption", "");
     }
     prevAcademicYear.current = academicYear;
   }, [academicYear, setValue]);
 
   useEffect(() => {
     if (prevStudentMajor.current !== studentMajor && prevStudentMajor.current !== undefined) {
-      setValue("studentOption", undefined);
+      setValue("studentOption", "");
     }
     prevStudentMajor.current = studentMajor;
   }, [studentMajor, setValue]);
@@ -112,6 +112,10 @@ export function InternshipCreateDialog({ open, onOpenChange }: InternshipCreateD
     });
   };
 
+  const onError = () => {
+    toast.error("Des champs requis sont à remplir");
+  };
+
   const handleClose = () => {
     reset();
     onOpenChange(false);
@@ -146,7 +150,7 @@ export function InternshipCreateDialog({ open, onOpenChange }: InternshipCreateD
           <Separator />
           <div className="space-y-6">
             <Form {...form}>
-              <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
+              <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit, onError)}>
                 <OrganizationSection control={control} />
                 <Separator />
                 <InternshipDetailsSection control={control} />

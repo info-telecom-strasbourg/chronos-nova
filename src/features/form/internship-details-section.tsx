@@ -1,6 +1,6 @@
 import type { Control } from "react-hook-form";
 import type { CreateInternshipFormData } from "@/features/form/internship.schema";
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -36,7 +36,6 @@ export function InternshipDetailsSection({ control }: InternshipDetailsSectionPr
                   {...field}
                 />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -63,7 +62,6 @@ export function InternshipDetailsSection({ control }: InternshipDetailsSectionPr
                   </SelectContent>
                 </Select>
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -79,7 +77,6 @@ export function InternshipDetailsSection({ control }: InternshipDetailsSectionPr
               <FormControl>
                 <Input type="date" {...field} />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -105,7 +102,6 @@ export function InternshipDetailsSection({ control }: InternshipDetailsSectionPr
                   }
                 />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />

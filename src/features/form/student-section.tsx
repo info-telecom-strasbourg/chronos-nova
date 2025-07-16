@@ -1,7 +1,7 @@
 import type { Control } from "react-hook-form";
 import type { CreateInternshipFormData } from "@/features/form/internship.schema";
 import { useWatch } from "react-hook-form";
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import {
   Select,
   SelectContent,
@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getMajorsForYear, getOptionsForMajor, hasOptionsForMajor } from "@/features/form/options";
+import { getMajorsForYear, getOptionsForMajor } from "@/features/form/options";
 
 interface StudentSectionProps {
   control: Control<CreateInternshipFormData>;
@@ -22,7 +22,7 @@ export function StudentSection({ control }: StudentSectionProps) {
   return (
     <div className="space-y-4">
       <h3 className="font-semibold text-lg">Étudiant</h3>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="gap-4 grid grid-cols-1 md:grid-cols-2">
         <FormField
           control={control}
           name="studentMajor"
@@ -31,7 +31,7 @@ export function StudentSection({ control }: StudentSectionProps) {
 
             return (
               <FormItem>
-                <FormLabel>
+                <FormLabel className={fieldState.invalid ? "text-destructive" : ""}>
                   Filière <span className="text-destructive">*</span>
                 </FormLabel>
                 <FormControl>
@@ -54,46 +54,34 @@ export function StudentSection({ control }: StudentSectionProps) {
                     </SelectContent>
                   </Select>
                 </FormControl>
-                <FormMessage />
               </FormItem>
             );
           }}
         />
-
         <FormField
           control={control}
           name="studentOption"
           render={({ field, fieldState }) => {
             const availableOptions =
               academicYear && studentMajor ? getOptionsForMajor(academicYear, studentMajor) : [];
-            const hasOptions =
-              academicYear && studentMajor ? hasOptionsForMajor(academicYear, studentMajor) : false;
+
+            let optionPlaceholder = "Sélectionnez une option";
+            if (!academicYear) optionPlaceholder = "Année manquante";
+            else if (!studentMajor) optionPlaceholder = "Filière manquante";
 
             return (
               <FormItem>
-                <FormLabel>
+                <FormLabel className={fieldState.invalid ? "text-destructive" : ""}>
                   Option <span className="text-destructive">*</span>
                 </FormLabel>
                 <FormControl>
                   <Select
-                    value={field.value || ""}
-                    onValueChange={(value) => field.onChange(value || undefined)}
-                    disabled={!academicYear || !studentMajor || !hasOptions}
+                    value={field.value || undefined}
+                    onValueChange={field.onChange}
+                    disabled={!academicYear || !studentMajor}
                   >
                     <SelectTrigger className={fieldState.invalid ? "border-destructive" : ""}>
-                      <SelectValue
-                        placeholder={(() => {
-                          if (!academicYear) {
-                            return "Année manquante";
-                          } else if (!studentMajor) {
-                            return "Filière manquante";
-                          } else if (!hasOptions) {
-                            return "Aucune option disponible";
-                          } else {
-                            return "Sélectionnez une option";
-                          }
-                        })()}
-                      />
+                      <SelectValue placeholder={optionPlaceholder} />
                     </SelectTrigger>
                     <SelectContent>
                       {availableOptions.map((option) => (
@@ -104,7 +92,6 @@ export function StudentSection({ control }: StudentSectionProps) {
                     </SelectContent>
                   </Select>
                 </FormControl>
-                <FormMessage />
               </FormItem>
             );
           }}

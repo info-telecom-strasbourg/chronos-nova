@@ -1,7 +1,7 @@
 import type { Control } from "react-hook-form";
 import type { CreateInternshipFormData } from "@/features/form/internship.schema";
 import { Combobox } from "@/components/ui/combobox";
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -32,7 +32,6 @@ export function OrganizationSection({ control }: OrganizationSectionProps) {
               <FormControl>
                 <Input placeholder="Nom de l'entreprise" {...field} />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -59,7 +58,6 @@ export function OrganizationSection({ control }: OrganizationSectionProps) {
                   </SelectContent>
                 </Select>
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -82,7 +80,6 @@ export function OrganizationSection({ control }: OrganizationSectionProps) {
                   error={fieldState.invalid}
                 />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -98,7 +95,6 @@ export function OrganizationSection({ control }: OrganizationSectionProps) {
               <FormControl>
                 <Input placeholder="Ville" {...field} />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
