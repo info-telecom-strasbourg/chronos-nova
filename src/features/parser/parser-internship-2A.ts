@@ -11,7 +11,6 @@ import {
   formatCityName,
   hasSignificantContent,
   parseDate,
-  splitLastNameFirstName,
 } from "./parser-utils";
 
 export async function parseExcelInternship2A(
@@ -74,9 +73,9 @@ function parseRowsWithContent<T>(
 }
 
 function parseInternships(worksheet: Worksheet, startRow: number, year: string): Internship[] {
-  return parseRowsWithContent(worksheet, startRow, 5, (row) => {
+  return parseRowsWithContent(worksheet, startRow, 1, (row) => {
     const subjectCell = row.getCell(13);
-    const subject = subjectCell?.text?.trim() || "??";
+    const subject = subjectCell?.text?.trim() || null;
 
     const dateCell = row.getCell(16);
     const dateRaw = dateCell?.text?.trim() || "";
@@ -98,11 +97,11 @@ function parseInternships(worksheet: Worksheet, startRow: number, year: string):
 function parseStudents(worksheet: Worksheet, startRow: number): Student[] {
   return parseRowsWithContent(worksheet, startRow, 1, (row) => {
     const majorCell = row.getCell(3);
-    const majorRaw = majorCell?.text?.trim() || "";
+    const majorRaw = majorCell?.text?.trim();
     const major = parseMajor(majorRaw);
 
     const optionCell = row.getCell(4);
-    const optionRaw = optionCell?.text?.trim() || "";
+    const optionRaw = optionCell?.text?.trim();
     const option = parseOption(optionRaw);
 
     return {
@@ -113,33 +112,26 @@ function parseStudents(worksheet: Worksheet, startRow: number): Student[] {
 }
 
 function parseOrganizations(worksheet: Worksheet, startRow: number): Organization[] {
-  return parseRowsWithContent(worksheet, startRow, 5, (row) => {
+  return parseRowsWithContent(worksheet, startRow, 1, (row) => {
     const orgNameCell = row.getCell(5);
-    const orgName = orgNameCell?.text?.trim() || "??";
-
-    const tutorFullNameCell = row.getCell(15);
-    const tutorFullNameText = tutorFullNameCell?.text?.trim() || "??";
-    const { lastName: tutorLastName, firstName: tutorFirstName } =
-      splitLastNameFirstName(tutorFullNameText);
+    const orgName = orgNameCell?.text?.trim();
 
     const orgTypeCell = row.getCell(6);
-    const orgTypeRaw = orgTypeCell?.text?.trim() || "??";
+    const orgTypeRaw = orgTypeCell?.text?.trim();
     const orgType = parseOrganizationType(orgTypeRaw);
 
     const countryCell = row.getCell(7);
-    const countryRaw = countryCell?.text?.trim() || "??";
+    const countryRaw = countryCell?.text?.trim();
     const country = parseCountry(countryRaw);
 
     const cityCell = row.getCell(8);
-    const cityRaw = cityCell?.text?.trim() || "??";
+    const cityRaw = cityCell?.text?.trim();
     const city = formatCityName(cityRaw);
 
     return {
       country,
       orgName,
       orgType,
-      tutorFirstName,
-      tutorLastName,
       city,
     };
   });

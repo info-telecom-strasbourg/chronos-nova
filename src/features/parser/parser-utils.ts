@@ -1,70 +1,12 @@
-// ===============================
-// FORMATAGE DE TEXTE ET NOMS
-// ===============================
-
-/**
- * Sépare un nom complet en nom de famille (majuscules) et prénom
- * Exemple: "DUPONT Jean-Marie" → { lastName: "DUPONT", firstName: "Jean-Marie" }
- */
-export function splitLastNameFirstName(fullName: string): {
-  lastName: string;
-  firstName: string;
-} {
-  try {
-    const trimmed = (fullName || "").trim();
-    if (!trimmed || trimmed === "x" || trimmed === "X" || trimmed === "?" || trimmed === "??") {
-      return { lastName: "??", firstName: "??" };
-    }
-
-    const words = trimmed.split(/\s+/);
-
-    // Séparer les mots en majuscules (nom de famille) et le reste (prénom)
-    const lastNameWords: string[] = [];
-    const firstNameWords: string[] = [];
-
-    for (const word of words) {
-      // Un mot est considéré comme nom de famille s'il est entièrement en majuscules
-      // et contient au moins 1 caractère alphabétique (pour gérer les noms courts et composés)
-      if (word === word.toUpperCase() && /[A-ZÀ-ÖØ-Ý]/.test(word)) {
-        lastNameWords.push(word);
-      } else {
-        firstNameWords.push(word);
-      }
-    }
-
-    // Si aucun mot en majuscule n'est trouvé, considérer le dernier mot comme nom de famille
-    if (lastNameWords.length === 0 && words.length > 1) {
-      const lastWord = words[words.length - 1];
-      lastNameWords.push(lastWord.toUpperCase());
-      firstNameWords.splice(-1, 1); // Retirer le dernier mot des prénoms
-    }
-
-    // Si un seul mot, le considérer comme nom de famille
-    if (words.length === 1) {
-      return {
-        lastName: words[0].toUpperCase(),
-        firstName: "??",
-      };
-    }
-
-    return {
-      lastName: lastNameWords.length > 0 ? lastNameWords.join(" ") : "??",
-      firstName: firstNameWords.length > 0 ? firstNameWords.join(" ") : "??",
-    };
-  } catch (error) {
-    console.error(`Erreur lors du parsing du nom "${fullName}":`, error);
-    return { lastName: "??", firstName: "??" };
-  }
-}
-
 /**
  * Extrait le nombre de semaines depuis une cellule Excel
  * Exemple: "8 semaines" → 8, "Stage de 12 sem" → 12
+ * Retourne null pour les valeurs vides, mal formatées ou invalides
  */
-export function extractNumberOfWeeks(weeksCell: string): number {
+export function extractNumberOfWeeks(weeksCell: string): number | null {
   try {
     if (!weeksCell || typeof weeksCell !== "string" || weeksCell.trim() === "") {
-      return 0;
+      return null;
     }
 
     const trimmed = weeksCell.trim();
@@ -73,13 +15,13 @@ export function extractNumberOfWeeks(weeksCell: string): number {
     const match = trimmed.match(/\d+/);
     if (match) {
       const weeks = parseInt(match[0], 10);
-      return weeks > 0 ? weeks : 0;
+      return weeks > 0 ? weeks : null;
     }
 
-    return 0;
+    return null;
   } catch (error) {
     console.error(`Erreur lors de l'extraction du nombre de semaines "${weeksCell}":`, error);
-    return 0;
+    return null;
   }
 }
 
@@ -91,9 +33,10 @@ export function extractNumberOfWeeks(weeksCell: string): number {
  * Convertit une date au format YYYY-MM-DD
  * Gère aussi les plages de dates (ex: "02/06/2025 - 22/08/2025") en prenant la première date
  * Exemple: "15/03/2025" → "2025-03-15"
+ * Retourne null pour les valeurs vides, mal formatées ou invalides
  */
-export function parseDate(value: string): string {
-  if (!value || typeof value !== "string") return "2025-01-01";
+export function parseDate(value: string | null): string | null {
+  if (!value || typeof value !== "string" || value.trim() === "") return null;
 
   try {
     let trimmed = value.trim();
@@ -120,7 +63,7 @@ export function parseDate(value: string): string {
 
       // Vérifier si la date est valide
       if (Number.isNaN(date.getTime())) {
-        return "2025-01-01";
+        return null;
       }
 
       // Convertir au format YYYY-MM-DD
@@ -134,7 +77,7 @@ export function parseDate(value: string): string {
     // Essayer de parser directement
     const date = new Date(trimmed);
     if (Number.isNaN(date.getTime())) {
-      return "2025-01-01";
+      return null;
     }
 
     const year = date.getFullYear();
@@ -143,7 +86,7 @@ export function parseDate(value: string): string {
 
     return `${year}-${month}-${day}`;
   } catch {
-    return "2025-01-01";
+    return null;
   }
 }
 
@@ -184,9 +127,10 @@ export function hasSignificantContent(row: import("exceljs").Row): boolean {
  * Formate un nom de ville avec majuscules appropriées
  * Met une majuscule à la première lettre de chaque mot,
  * sauf pour les déterminants et prépositions qui restent en minuscules
+ * Retourne null pour les valeurs vides ou invalides
  */
-export function formatCityName(city: string): string {
-  if (!city || typeof city !== "string") return "";
+export function formatCityName(city: string): string | null {
+  if (!city || typeof city !== "string" || city.trim() === "") return null;
 
   const lowercaseWords = new Set([
     "de",

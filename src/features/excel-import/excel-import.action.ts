@@ -10,22 +10,20 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 // Types pour les parsers adaptés
 interface ParsedData {
   internships: Array<{
-    subject: string;
-    date: string;
-    weeksCount: number;
-    year: string;
+    subject: string | null;
+    date: string | null;
+    weeksCount: number | null;
+    year: string | null;
   }>;
   students: Array<{
-    major: string;
-    option?: string;
+    major: string | null;
+    option: string | null;
   }>;
   organizations: Array<{
-    orgName: string;
-    orgType: string;
-    country: string;
-    city: string;
-    tutorFirstName: string;
-    tutorLastName: string;
+    orgName: string | null;
+    orgType: string | null;
+    country: string | null;
+    city: string | null;
   }>;
 }
 
@@ -47,27 +45,47 @@ async function insertParsedDataToDatabase(data: ParsedData): Promise<number> {
     const organization = data.organizations[i];
 
     try {
-      const normalized = normalizeCompleteStageData({
-        studentMajor: student?.major,
-        studentOption: student?.option,
-        organizationName: organization?.orgName,
-        organizationType: organization?.orgType,
-        organizationCountry: organization?.country,
-        organizationCity: organization?.city,
-        subject: internship?.subject,
-        beginDate: internship?.date,
-        weeksCount: internship?.weeksCount,
-        academicYear: internship?.year,
-      });
+      const normalized = normalizeCompleteStageData(
+        {
+          studentMajor: student?.major,
+          studentOption: student?.option,
+          organizationName: organization?.orgName,
+          organizationType: organization?.orgType,
+          organizationCountry: organization?.country,
+          organizationCity: organization?.city,
+          subject: internship?.subject,
+          beginDate: internship?.date,
+          weeksCount: internship?.weeksCount,
+          academicYear: internship?.year,
+        },
+        true, // fromExcel = true
+      );
+
+      const orgName = normalized.organization.name;
+      const orgType = normalized.organization.type;
+      const orgCountry = normalized.organization.country;
+      const orgCity = normalized.organization.city;
+
+      const studentMajor = normalized.student.major;
+      const studentOption = normalized.student.option;
+
+      const internshipSubject = normalized.internship.subject;
+      const internshipBeginDate = normalized.internship.beginDate;
+      const internshipWeeksCount = normalized.internship.weeksCount;
+      const internshipAcademicYear = normalized.internship.academicYear;
+
+      // Si major ou option est null, utiliser un placeholder spécial
+      const safeStudentMajor = studentMajor || "__inconnu__";
+      const safeStudentOption = studentOption || "__inconnu__";
 
       // 1. Créer ou récupérer l'organisation
       const { data: orgData, error: orgError } = await supabase
         .from("organization")
         .upsert({
-          name: normalized.organization.name,
-          type: normalized.organization.type,
-          country: normalized.organization.country,
-          city: normalized.organization.city,
+          name: orgName,
+          type: orgType,
+          country: orgCountry,
+          city: orgCity,
         })
         .select("id")
         .single();
@@ -79,8 +97,8 @@ async function insertParsedDataToDatabase(data: ParsedData): Promise<number> {
 
       // 2. Assurer que le diplôme existe
       const { error: majorError } = await supabase.from("major").upsert({
-        alias: normalized.student.major,
-        name: normalized.student.major === "??" ? "Non spécifié" : normalized.student.major,
+        alias: safeStudentMajor,
+        name: safeStudentMajor === "gene" ? "Généraliste" : safeStudentMajor,
       });
 
       if (majorError) {
@@ -90,8 +108,8 @@ async function insertParsedDataToDatabase(data: ParsedData): Promise<number> {
 
       // 3. Assurer que l'option existe
       const { error: optionError } = await supabase.from("option").upsert({
-        alias: normalized.student.option,
-        name: normalized.student.option === "AUCUNE" ? "Aucune" : normalized.student.option,
+        alias: safeStudentOption,
+        name: safeStudentOption === "aucune" ? "Aucune" : safeStudentOption,
       });
 
       if (optionError) {
@@ -103,8 +121,8 @@ async function insertParsedDataToDatabase(data: ParsedData): Promise<number> {
       const { data: studentData, error: studentError } = await supabase
         .from("student")
         .insert({
-          majorAlias: normalized.student.major,
-          optionAlias: normalized.student.option,
+          majorAlias: safeStudentMajor,
+          optionAlias: safeStudentOption,
         })
         .select("id")
         .single();
@@ -118,10 +136,10 @@ async function insertParsedDataToDatabase(data: ParsedData): Promise<number> {
       const { error: internshipError } = await supabase.from("internship").insert({
         organizationId: orgData.id,
         studentId: studentData.id,
-        subject: normalized.internship.subject,
-        academicYear: normalized.internship.academicYear,
-        beginDate: normalized.internship.beginDate,
-        weeksCount: normalized.internship.weeksCount,
+        subject: internshipSubject,
+        academicYear: internshipAcademicYear,
+        beginDate: internshipBeginDate,
+        weeksCount: internshipWeeksCount,
         state: "draft",
       });
 
@@ -174,22 +192,20 @@ export async function importExcelData(
           // Transformer les données pour correspondre au type ParsedData
           parsedData = {
             internships: result.internships.map((i) => ({
-              subject: i.subject || "??",
-              date: i.date || "2025-01-01",
-              weeksCount: typeof i.weeksCount === "number" ? i.weeksCount : 0,
-              year: i.year || academicYear || "",
+              subject: i.subject || null,
+              date: i.date || null,
+              weeksCount: typeof i.weeksCount === "number" ? i.weeksCount : null,
+              year: i.year || academicYear || null,
             })),
             students: result.students.map((s) => ({
-              major: s.major || "gene",
-              option: s.option || "aucune",
+              major: s.major || null,
+              option: s.option || null,
             })),
             organizations: result.organizations.map((o) => ({
-              orgName: o.orgName || "??",
-              orgType: o.orgType || "not_company",
-              country: o.country || "??",
-              city: o.city || "??",
-              tutorFirstName: o.tutorFirstName || "??",
-              tutorLastName: o.tutorLastName || "??",
+              orgName: o.orgName || null,
+              orgType: o.orgType || null,
+              country: o.country || null,
+              city: o.city || null,
             })),
           };
         } catch (error) {

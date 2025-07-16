@@ -24,12 +24,12 @@ export const createInternshipSchema = z.object({
   weeksCount: z.number().min(1),
   studentMajor: z
     .string()
-    .min(1)
-    .refine((major) => studentMajorValues.includes(major)),
+    .min(1, { message: "Le diplôme est requis" })
+    .refine((major) => studentMajorValues.includes(major) && major !== "__inconnu__"),
   studentOption: z
     .string()
-    .min(1)
-    .refine((option) => studentOptionValues.includes(option)),
+    .min(1, { message: "L'option est requise" })
+    .refine((option) => studentOptionValues.includes(option) && option !== "__inconnu__"),
 });
 
 export type CreateInternshipFormData = z.infer<typeof createInternshipSchema>;

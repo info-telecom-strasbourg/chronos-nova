@@ -6,8 +6,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { getCountryLabel, getMajorFullLabel, getOptionFullLabel } from "@/features/parser/mappings";
-import { formatDate } from "@/lib/scripts/date";
+import {
+  getCityLabel,
+  getCountryLabel,
+  getDateLabel,
+  getMajorFullLabel,
+  getOptionFullLabel,
+  getWeeksLabel,
+} from "@/features/parser/mappings";
 
 type InternshipDetailsDialogProps = {
   internship: InternshipData;
@@ -39,7 +45,7 @@ export function InternshipDetailsDialog({ internship }: InternshipDetailsDialogP
               <MapPin className="h-4 w-4 text-muted-foreground" />
             </span>
             <span>
-              <b>Ville :</b> {internship.organization.city}
+              <b>Ville :</b> {getCityLabel(internship.organization.city)}
             </span>
           </span>
           <span className="flex items-start gap-2">
@@ -73,7 +79,7 @@ export function InternshipDetailsDialog({ internship }: InternshipDetailsDialogP
               <Clock className="h-4 w-4 text-muted-foreground" />
             </span>
             <span>
-              <b>Durée :</b> {internship.weeksCount} semaines
+              <b>Durée :</b> {getWeeksLabel(internship.weeksCount)}
             </span>
           </span>
           <span className="flex items-start gap-2">
@@ -81,7 +87,7 @@ export function InternshipDetailsDialog({ internship }: InternshipDetailsDialogP
               <Calendar1 className="h-4 w-4 text-muted-foreground" />
             </span>
             <span>
-              <b>Date de début :</b> {formatDate(internship.beginDate || "")}
+              <b>Date de début :</b> {getDateLabel(internship.beginDate)}
             </span>
           </span>
         </div>

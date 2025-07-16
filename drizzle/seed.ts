@@ -4,7 +4,7 @@ import { reset, seed } from "drizzle-seed";
 import { serverEnv } from "@/lib/env/server";
 import * as schema from "./schema";
 
-const majorValues = ["gene", "ir", "ti-sante"];
+const majorValues = ["gene", "ir", "ti-sante", "__inconnu__"];
 const optionValues = [
   "aucune",
   "sdia",
@@ -16,7 +16,8 @@ const optionValues = [
   "issd",
   "isav",
   "photo",
-  "pm"
+  "pm",
+  "__inconnu__",
 ];
 
 async function main() {

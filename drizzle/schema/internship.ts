@@ -7,10 +7,10 @@ export const state = pgEnum("state", ["visible", "draft", "deleted"]);
 
 export const internships = pgTable("internship", {
   id: uuid("id").defaultRandom().primaryKey(),
-  subject: text("subject").notNull(),
-  beginDate: date("beginDate").notNull(),
-  weeksCount: integer("weeksCount").notNull(),
-  academicYear: academicYear("academicYear").notNull(),
+  subject: text("subject"),
+  beginDate: date("beginDate"),
+  weeksCount: integer("weeksCount"),
+  academicYear: academicYear("academicYear"),
   state: state("state").notNull(),
   studentId: uuid("studentId")
     .notNull()

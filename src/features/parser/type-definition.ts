@@ -3,23 +3,23 @@
 // ========================================
 
 export interface Internship {
-  subject?: string; // Subject of the internship
-  date?: string; // Date of the internship
-  weeksCount?: number | string; // Duration in weeks
-  year?: string; // Year of study for the internship (1A, 2A, 3A)
+  subject?: string | null; // Subject of the internship
+  date?: string | null; // Date of the internship
+  weeksCount?: number | null; // Duration in weeks
+  year?: string | null; // Year of study for the internship (1A, 2A, 3A)
 }
 
 export interface Student {
-  major?: string; // Major field of study
-  option?: string; // Course specialization
+  major?: string | null; // Major field of study
+  option?: string | null; // Course specialization
 }
 
 export interface Organization {
-  orgName?: string; // Name of the organization
-  city?: string; // City where the organization is located
+  orgName?: string | null; // Name of the organization
+  city?: string | null; // City where the organization is located
   // Tutor's information
-  tutorLastName?: string;
-  tutorFirstName?: string;
-  orgType?: string; // Type of organization
-  country?: string; // Country of the organization
+  tutorLastName?: string | null;
+  tutorFirstName?: string | null;
+  orgType?: string | null; // Type of organization
+  country?: string | null; // Country of the organization
 }

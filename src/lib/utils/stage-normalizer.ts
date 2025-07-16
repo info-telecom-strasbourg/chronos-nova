@@ -7,22 +7,22 @@ import {
 import { formatCityName, parseDate } from "@/features/parser/parser-utils";
 
 export interface NormalizedStudentData {
-  major: string; // "gene", "ir", "ti-sante"
-  option: string; // "stq", "sdia", "rio", "aucune", etc.
+  major: string | null | "__inconnu__"; // "gene", "ir", "ti-sante", "__inconnu__" ou null
+  option: string | null | "__inconnu__"; // "stq", "sdia", "rio", "aucune", "__inconnu__" ou null
 }
 
 export interface NormalizedOrganizationData {
-  name: string;
-  type: "company" | "not_company";
-  country: string;
-  city: string;
+  name: string | null;
+  type: string | null; // "company", "not_company" ou null
+  country: string | null;
+  city: string | null;
 }
 
 export interface NormalizedInternshipData {
-  subject: string;
-  beginDate: string;
-  weeksCount: number;
-  academicYear: "1A" | "2A" | "3A";
+  subject: string | null;
+  beginDate: string | null;
+  weeksCount: number | null;
+  academicYear: string | null; // "1A", "2A", "3A" ou null
 }
 
 /**
@@ -30,13 +30,13 @@ export interface NormalizedInternshipData {
  */
 export function normalizeStudentData(
   rawData: {
-    major?: string;
-    option?: string;
+    major?: string | null;
+    option?: string | null;
   },
   fromExcel: boolean = false,
 ): NormalizedStudentData {
-  let major: string;
-  let option: string;
+  let major: string | null;
+  let option: string | null;
 
   if (fromExcel) {
     major = parseMajor(rawData.major || "");
@@ -46,11 +46,11 @@ export function normalizeStudentData(
     const optionKey = rawData.option?.trim() || "";
 
     if (!majorKey) {
-      throw new Error("Major requise pour les données de formulaire");
+      major = "__inconnu__";
+    } else {
+      major = majorKey;
     }
-
-    major = majorKey;
-    option = optionKey || "aucune";
+    option = optionKey || "__inconnu__";
   }
 
   return {
@@ -64,15 +64,15 @@ export function normalizeStudentData(
  */
 export function normalizeOrganizationData(
   rawData: {
-    name?: string;
-    type?: string;
-    country?: string;
-    city?: string;
+    name?: string | null;
+    type?: string | null;
+    country?: string | null;
+    city?: string | null;
   },
   fromExcel: boolean = false,
 ): NormalizedOrganizationData {
-  let country: string;
-  let type: string;
+  let country: string | null;
+  let type: string | null;
 
   if (fromExcel) {
     country = parseCountry(rawData.country || "");
@@ -87,16 +87,18 @@ export function normalizeOrganizationData(
     if (!typeKey) {
       throw new Error("Type d'organisation requis pour les données de formulaire");
     }
-
-    country = countryKey;
     type = typeKey;
+    country = countryKey;
   }
 
+  const name = rawData.name?.trim() || null;
+  const city = rawData.city?.trim() ? formatCityName(rawData.city.trim()) : null;
+
   return {
-    name: rawData.name?.trim() || "??",
-    type: type as "company" | "not_company",
+    name,
+    type,
     country,
-    city: formatCityName(rawData.city || ""),
+    city,
   };
 }
 
@@ -104,24 +106,30 @@ export function normalizeOrganizationData(
  * Normalise les données d'un stage pour la base de données
  */
 export function normalizeInternshipData(rawData: {
-  subject?: string;
-  beginDate?: string;
-  weeksCount?: number | string;
-  academicYear?: string;
+  subject?: string | null;
+  beginDate?: string | null;
+  weeksCount?: number | string | null;
+  academicYear?: string | null;
 }): NormalizedInternshipData {
-  let weeksCount = 0;
+  let weeksCount: number | null = null;
   if (typeof rawData.weeksCount === "number") {
-    weeksCount = rawData.weeksCount;
+    weeksCount = rawData.weeksCount > 0 ? rawData.weeksCount : null;
   } else if (typeof rawData.weeksCount === "string") {
     const parsed = parseInt(rawData.weeksCount, 10);
-    weeksCount = Number.isNaN(parsed) ? 0 : parsed;
+    weeksCount = !Number.isNaN(parsed) && parsed > 0 ? parsed : null;
   }
 
+  const subject = rawData.subject?.trim() || null;
+  const beginDate = parseDate(rawData.beginDate || "") || null;
+  const academicYear = rawData.academicYear?.trim();
+  const validAcademicYear =
+    academicYear && ["1A", "2A", "3A"].includes(academicYear) ? academicYear : null;
+
   return {
-    subject: rawData.subject?.trim() || "??",
-    beginDate: parseDate(rawData.beginDate || ""),
+    subject,
+    beginDate,
     weeksCount,
-    academicYear: (rawData.academicYear as "1A" | "2A" | "3A") || "2A",
+    academicYear: validAcademicYear,
   };
 }
 
@@ -131,20 +139,20 @@ export function normalizeInternshipData(rawData: {
 export function normalizeCompleteStageData(
   rawData: {
     // Données étudiant
-    studentMajor?: string;
-    studentOption?: string;
+    studentMajor?: string | null;
+    studentOption?: string | null;
 
     // Données organisation
-    organizationName?: string;
-    organizationType?: string;
-    organizationCountry?: string;
-    organizationCity?: string;
+    organizationName?: string | null;
+    organizationType?: string | null;
+    organizationCountry?: string | null;
+    organizationCity?: string | null;
 
     // Données stage
-    subject?: string;
-    beginDate?: string;
-    weeksCount?: number | string;
-    academicYear?: string;
+    subject?: string | null;
+    beginDate?: string | null;
+    weeksCount?: number | null;
+    academicYear?: string | null;
   },
   fromExcel: boolean = false,
 ) {

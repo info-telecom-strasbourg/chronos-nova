@@ -36,12 +36,16 @@ import {
   softDeleteInternship,
 } from "@/features/infinite-scroll/internship.query";
 import {
+  getCityLabel,
   getCountryLabel,
+  getDateLabel,
   getMajorShortLabel,
   getOptionShortLabel,
   getOrganizationTypeLabel,
+  getSubjectLabel,
+  getTitleLabel,
+  getWeeksLabel,
 } from "@/features/parser/mappings";
-import { formatDate } from "@/lib/scripts/date";
 import { InternshipDetailsDialog } from "./internship-details-dialog";
 
 type InternshipCardProps = {
@@ -208,7 +212,7 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
     <Card className="w-full">
       <CardHeader className="border-b-2 pb-4">
         <div className="flex w-full items-start justify-between">
-          <CardTitle className="text-2xl">{internship.organization.name}</CardTitle>
+          <CardTitle className="text-2xl">{getTitleLabel(internship.organization.name)}</CardTitle>
           {admin && getStateBadge()}
         </div>
         <CardDescription>
@@ -219,12 +223,13 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
         </CardDescription>
       </CardHeader>
       <CardContent className="mb-4 px-6 text-justify font-thin">
-        <p className="mb-7">{internship.subject}</p>
+        <p className="mb-7">{getSubjectLabel(internship.subject)}</p>
         <div className="mt-4 grid grid-cols-1 gap-x-4 gap-y-2 text-sm sm:grid-cols-2">
           <div className="flex items-center gap-2">
             <MapPin className="h-4 w-4" />
             <span>
-              {getCountryLabel(internship.organization.country)}, {internship.organization.city}
+              {getCountryLabel(internship.organization.country)},{" "}
+              {getCityLabel(internship.organization.city)}
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -238,14 +243,11 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
           </div>
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4" />
-            <span>
-              {internship.weeksCount && internship.weeksCount > 0 ? internship.weeksCount : "??"}{" "}
-              semaines
-            </span>
+            <span>{getWeeksLabel(internship.weeksCount)}</span>
           </div>
           <div className="flex items-center gap-2">
             <Calendar1 className="h-4 w-4" />
-            <span>{formatDate(internship.beginDate)}</span>
+            <span>{getDateLabel(internship.beginDate)}</span>
           </div>
         </div>
       </CardContent>

@@ -225,9 +225,10 @@ function normalizeForMatching(value: string): string {
 /**
  * Parse et normalise un diplôme/filière vers sa valeur courte
  * Exemple: "G" → "gene", "TIS" → "ti-sante"
+ * Retourne null pour les valeurs vides, mal formatées ou non reconnues
  */
-export function parseMajor(value: string): string {
-  if (!value || typeof value !== "string") return "gene";
+export function parseMajor(value: string): string | null {
+  if (!value || typeof value !== "string" || value.trim() === "") return "__inconnu__";
 
   const normalized = normalizeForMatching(value);
   const mapping = MAJOR_MAPPINGS[normalized];
@@ -236,19 +237,18 @@ export function parseMajor(value: string): string {
     return mapping.value;
   }
 
-  console.warn(
-    `Diplôme non reconnu: "${value}" (normalisé: "${normalized}"). Fallback vers "gene".`,
-  );
-  return "gene";
+  console.warn(`Diplôme non reconnu: "${value}" (normalisé: "${normalized}"). Retour '__inconnu__'.`);
+  return "__inconnu__";
 }
 
 /**
  * Parse et normalise une option/spécialité vers sa valeur courte
  * Exemple: "SDIA" → "sdia", "RIO" → "rio"
+ * Retourne null pour les valeurs vides, mal formatées ou non reconnues
  */
-export function parseOption(value: string): string {
+export function parseOption(value: string): string | null {
   if (!value || typeof value !== "string" || value.trim() === "") {
-    return "aucune";
+    return "__inconnu__";
   }
 
   const normalized = normalizeForMatching(value);
@@ -258,15 +258,16 @@ export function parseOption(value: string): string {
     return mapping.value;
   }
 
-  return "aucune";
+  return "__inconnu__";
 }
 
 /**
  * Parse et normalise un pays vers sa valeur courte
  * Exemple: "FRANCE" → "france"
+ * Retourne null pour les valeurs vides, mal formatées ou non reconnues
  */
-export function parseCountry(value: string): string {
-  if (!value || typeof value !== "string") return "france";
+export function parseCountry(value: string): string | null {
+  if (!value || typeof value !== "string" || value.trim() === "") return null;
 
   const normalized = normalizeForMatching(value);
   const mapping = COUNTRY_MAPPINGS[normalized];
@@ -275,15 +276,16 @@ export function parseCountry(value: string): string {
     return mapping.value;
   }
 
-  return "france";
+  return null;
 }
 
 /**
  * Parse et normalise un type d'organisation vers sa valeur courte
  * Exemple: "E" → "company", "Hors entreprise" → "not_company"
+ * Retourne null pour les valeurs vides, mal formatées ou non reconnues
  */
-export function parseOrganizationType(value: string): string {
-  if (!value || typeof value !== "string") return "not_company";
+export function parseOrganizationType(value: string): string | null {
+  if (!value || typeof value !== "string" || value.trim() === "") return null;
   const normalized = normalizeForMatching(value);
   if (ORGANIZATION_TYPE_ALIASES[normalized]) {
     return ORGANIZATION_TYPE_ALIASES[normalized].value;
@@ -291,7 +293,63 @@ export function parseOrganizationType(value: string): string {
   if (ORGANIZATION_TYPE_MAPPINGS[normalized]) {
     return ORGANIZATION_TYPE_MAPPINGS[normalized].value;
   }
-  return "not_company";
+  return null;
+}
+// =====================
+// FONCTIONS D'AFFICHAGE
+// =====================
+
+/**
+ * Formate une date au format "DD/MM/YYYY" pour l'affichage
+ * Exemple: "2025-03-15" → "15/03/2025"
+ */
+
+export function getCityLabel(city: string | null): string {
+  if (!city) return "??";
+  return city;
+}
+/**
+ * Obtient le label d'un nombre de semaines pour l'affichage
+ * Exemple: 4 → "4 semaines", null → "??"
+ */
+export function getWeeksLabel(weeksCount: number | null): string {
+  if (!weeksCount) return "??";
+  return `${weeksCount} semaines`;
+}
+
+/**
+ * Obtient le label d'un titre pour l'affichage
+ * Exemple: "Titre" → "Titre", null → "??"
+ */
+export function getTitleLabel(title: string | null): string {
+  if (!title) return "??";
+  return title;
+}
+
+/**
+ * Obtient le label d'un sujet pour l'affichage
+ * Exemple: "Sujet" → "Sujet", null → "??"
+ */
+export function getSubjectLabel(subject: string | null): string {
+  if (!subject) return "??";
+  return subject;
+}
+
+/**
+  * Formate une date au format "DD/MM/YYYY" pour l'affichage
+  * Exemple: "2025-03-15" → "15/03/2025"
+  * Retourne "??" si la date est nulle
+  */
+export function getDateLabel(dateStr: string | null): string {
+  if (!dateStr) {
+    return "??";
+  }
+  const date = new Date(dateStr);
+  return date.toLocaleDateString("fr-FR", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 }
 
 // ===================================
@@ -300,10 +358,10 @@ export function parseOrganizationType(value: string): string {
 
 /**
  * Obtient le nom court d'un diplôme pour l'affichage sur les cartes
- * Exemple: "ti-sante" → "TI Santé", "gene" → "Généraliste"
+ * Exemple: "ti-sante" → "TI Santé", "gene" → "Généraliste", null → "??"
  */
-export function getMajorShortLabel(value: string): string {
-  if (!value || typeof value !== "string") return "Généraliste";
+export function getMajorShortLabel(value: string | null): string {
+  if (!value || typeof value !== "string" || value === "__inconnu__") return "??";
 
   // Recherche directe par valeur
   const directMapping = Object.values(MAJOR_MAPPINGS).find((mapping) => mapping.value === value);
@@ -311,15 +369,15 @@ export function getMajorShortLabel(value: string): string {
     return directMapping.shortLabel;
   }
 
-  return value; // Fallback sur la valeur si pas de mapping
+  return "??";
 }
 
 /**
  * Obtient le nom court d'une option pour l'affichage sur les cartes
- * Exemple: "sdia" → "SDIA", "rio" → "RIO"
+ * Exemple: "sdia" → "SDIA", "rio" → "RIO", null → "??"
  */
-export function getOptionShortLabel(value: string): string {
-  if (!value || typeof value !== "string" || value.trim() === "aucune") return "";
+export function getOptionShortLabel(value: string | null): string {
+  if (!value || typeof value !== "string" || value === "__inconnu__") return "??";
 
   // Recherche directe par valeur
   const directMapping = Object.values(OPTION_MAPPINGS).find((mapping) => mapping.value === value);
@@ -327,14 +385,14 @@ export function getOptionShortLabel(value: string): string {
     return directMapping.shortLabel;
   }
 
-  return value.toUpperCase(); // Fallback en majuscules
+  return "??";
 }
 
 /**
  * Obtient le label d'un pays pour l'affichage
- * Exemple: "france" → "FRANCE"
+ * Exemple: "france" → "FRANCE", null → "??"
  */
-export function getCountryLabel(value: string): string {
+export function getCountryLabel(value: string | null): string {
   if (!value || typeof value !== "string") return "??";
 
   const mapping = COUNTRY_MAPPINGS[value];
@@ -342,22 +400,22 @@ export function getCountryLabel(value: string): string {
     return mapping.label;
   }
 
-  return value.toUpperCase();
+  return "??";
 }
 
 /**
  * Obtient le label d'un type d'organisation pour l'affichage
- * Exemple: "company" → "Entreprise"
+ * Exemple: "company" → "Entreprise", null → "??"
  */
-export function getOrganizationTypeLabel(value: string): string {
-  if (!value || typeof value !== "string") return "Non spécifié";
+export function getOrganizationTypeLabel(value: string | null): string {
+  if (!value || typeof value !== "string") return "??";
 
   const mapping = ORGANIZATION_TYPE_MAPPINGS[value];
   if (mapping) {
     return mapping.label;
   }
 
-  return value;
+  return "??";
 }
 
 // =====================================
@@ -367,10 +425,10 @@ export function getOrganizationTypeLabel(value: string): string {
 /**
  * Obtient le nom complet enrichi d'un diplôme pour l'affichage détaillé
  * Si pas de nom complet, retourne le nom court
- * Exemple: "ti-sante" → "TI Santé (Technologie de l'Information pour la Santé)"
+ * Exemple: "ti-sante" → "TI Santé (Technologie de l'Information pour la Santé)", null → "??"
  */
-export function getMajorFullLabel(value: string): string {
-  if (!value || typeof value !== "string") return "Généraliste";
+export function getMajorFullLabel(value: string | null): string {
+  if (!value || typeof value !== "string" || value === "__inconnu__") return "??";
 
   // Recherche directe par valeur
   const directMapping = Object.values(MAJOR_MAPPINGS).find((mapping) => mapping.value === value);
@@ -378,16 +436,16 @@ export function getMajorFullLabel(value: string): string {
     return directMapping.fullLabel || directMapping.shortLabel;
   }
 
-  return value; // Fallback sur la valeur si pas de mapping
+  return "??";
 }
 
 /**
  * Obtient le nom complet enrichi d'une option pour l'affichage détaillé
  * Si pas de nom complet, retourne le nom court
- * Exemple: "sdia" → "SDIA (Science des Données et Intelligence Artificielle)"
+ * Exemple: "sdia" → "SDIA (Science des Données et Intelligence Artificielle)", null → "??"
  */
-export function getOptionFullLabel(value: string): string {
-  if (!value || typeof value !== "string" || value.trim() === "aucune") return "Aucune";
+export function getOptionFullLabel(value: string | null): string {
+  if (!value || typeof value !== "string" || value === "__inconnu__") return "??";
 
   // Recherche directe par valeur
   const directMapping = Object.values(OPTION_MAPPINGS).find((mapping) => mapping.value === value);
@@ -395,5 +453,5 @@ export function getOptionFullLabel(value: string): string {
     return directMapping.fullLabel || directMapping.shortLabel;
   }
 
-  return value; // Fallback sur la valeur si pas de mapping
+  return "??";
 }
