@@ -103,12 +103,12 @@ export function hasSignificantContent(row: import("exceljs").Row): boolean {
     if (!row || row.cellCount === 0) return false;
 
     // Vérifier les cellules importantes pour les stages 2A
-    const importantCells = [2, 5, 13, 15]; // Nom étudiant, organisation, sujet, tuteur
+    const importantCells = [5, 16]; // Titre stage et Dates stages
 
     for (const cellIndex of importantCells) {
       const cell = row.getCell(cellIndex);
       const text = cell?.text?.trim();
-      if (text && text !== "" && text !== "??") {
+      if (text && text !== "") {
         return true;
       }
     }
