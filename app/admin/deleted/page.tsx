@@ -13,7 +13,7 @@ export default async function AdminDeletedPage() {
       <AdminTabs pendingCount={pendingCount} />
       <div className="space-y-8">
         <InternshipHeader />
-        <Suspense fallback={<InternshipListSkeleton admin actions={2} />}>
+        <Suspense fallback={<InternshipListSkeleton admin />}>
           <InternshipInfiniteScroll admin state="deleted" />
         </Suspense>
       </div>

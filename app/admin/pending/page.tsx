@@ -13,7 +13,7 @@ export default async function AdminPendingPage() {
       <AdminTabs pendingCount={pendingCount} />
       <div className="space-y-8">
         <InternshipHeader />
-        <Suspense fallback={<InternshipListSkeleton admin actions={3} />}>
+        <Suspense fallback={<InternshipListSkeleton admin />}>
           <InternshipInfiniteScroll admin state="draft" />
         </Suspense>
       </div>

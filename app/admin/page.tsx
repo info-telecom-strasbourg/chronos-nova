@@ -14,7 +14,7 @@ export default async function AdminPage() {
 
       <div className="space-y-8">
         <InternshipHeader />
-        <Suspense fallback={<InternshipListSkeleton admin actions={2} />}>
+        <Suspense fallback={<InternshipListSkeleton admin />}>
           <InternshipInfiniteScroll admin state="visible" />
         </Suspense>
       </div>
