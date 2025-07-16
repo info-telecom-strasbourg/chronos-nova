@@ -3,8 +3,10 @@
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { InternshipCreateDialog } from "@/features/form/internship-create-dialog";
 
 interface AdminTabsProps {
   pendingCount?: number;
@@ -12,6 +14,7 @@ interface AdminTabsProps {
 
 export function AdminTabs({ pendingCount = 0 }: AdminTabsProps) {
   const pathname = usePathname();
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   const getActiveTab = () => {
     if (pathname === "/admin") return "visible";
@@ -22,16 +25,14 @@ export function AdminTabs({ pendingCount = 0 }: AdminTabsProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex items-center justify-between">
         <div>
           <h1 className="font-bold text-3xl">Administration des stages</h1>
           <p className="text-muted-foreground">Gérez tous les stages de l'application</p>
         </div>
-        <Button asChild>
-          <Link href="/admin/create" className="flex items-center gap-2">
-            <Plus className="size-4" />
-            Ajouter un stage
-          </Link>
+        <Button onClick={() => setIsCreateDialogOpen(true)} className="flex items-center gap-2">
+          <Plus className="size-4" />
+          Ajouter un stage
         </Button>
       </div>
 
@@ -65,6 +66,8 @@ export function AdminTabs({ pendingCount = 0 }: AdminTabsProps) {
           <Link href="/admin/deleted">Supprimés</Link>
         </Button>
       </div>
+
+      <InternshipCreateDialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen} />
     </div>
   );
 }

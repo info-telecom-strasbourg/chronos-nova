@@ -1,9 +1,9 @@
 import { Suspense } from "react";
+import { AdminInternshipHeader } from "@/features/admin/admin-internship-header";
 import { AdminTabs } from "@/features/admin/admin-tabs";
 import { getInternshipsCount } from "@/features/infinite-scroll/internship.query";
 import { InternshipInfiniteScroll } from "@/features/infinite-scroll/internship-infinite-scroll";
 import { InternshipListSkeleton } from "@/features/infinite-scroll/internship-skeleton";
-import { InternshipHeader } from "@/features/search/internship-header";
 
 export default async function AdminPage() {
   const pendingCount = await getInternshipsCount("draft");
@@ -13,7 +13,7 @@ export default async function AdminPage() {
       <AdminTabs pendingCount={pendingCount} />
 
       <div className="space-y-8">
-        <InternshipHeader />
+        <AdminInternshipHeader />
         <Suspense fallback={<InternshipListSkeleton admin />}>
           <InternshipInfiniteScroll admin state="visible" />
         </Suspense>

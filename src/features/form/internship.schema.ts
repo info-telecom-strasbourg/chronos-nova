@@ -17,24 +17,19 @@ const academicYearValues = academicYears.map((year) => year.value) as [string, .
 export const createInternshipSchema = z
   .object({
     organizationName: z.string().min(1, { message: "Le nom de l'organisation est requis" }),
-    organizationType: z.enum(organizationTypeValues, {
-      required_error: "Le type d'organisation est requis",
-      invalid_type_error: "Type d'organisation invalide",
-    }),
-    organizationCountry: z.enum(countryValues, {
-      required_error: "Le pays est requis",
-      invalid_type_error: "Pays invalide",
-    }),
+    organizationType: z
+      .enum(organizationTypeValues)
+      .refine((val) => val !== undefined, { message: "Le type d'organisation est requis" }),
+    organizationCountry: z
+      .enum(countryValues)
+      .refine((val) => val !== undefined, { message: "Le pays est requis" }),
     organizationCity: z.string().min(1, { message: "La ville est requise" }),
     subject: z.string().min(1, { message: "Le sujet du stage est requis" }),
-    academicYear: z.enum(academicYearValues, {
-      required_error: "L'année académique est requise",
-      invalid_type_error: "Année académique invalide",
-    }),
+    academicYear: z
+      .enum(academicYearValues)
+      .refine((val) => val !== undefined, { message: "L'année académique est requise" }),
     beginDate: z.string().min(1, { message: "La date de début est requise" }),
-    weeksCount: z
-      .number({ invalid_type_error: "La durée est requise" })
-      .min(1, { message: "La durée doit être d'au moins 1 semaine" }),
+    weeksCount: z.number().min(1, { message: "La durée doit être d'au moins 1 semaine" }),
     studentMajor: z
       .string()
       .min(1, { message: "La filière est requise" })

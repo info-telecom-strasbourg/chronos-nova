@@ -13,9 +13,8 @@ import {
   RefreshCw,
   Trash2,
 } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -29,6 +28,7 @@ import {
 } from "@/components/ui/card";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { InternshipEditDialog } from "@/features/form/internship-edit-dialog";
 import {
   approveInternship,
   hardDeleteInternship,
@@ -53,6 +53,7 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [isPending, startTransition] = useTransition();
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const handleAction = async (action: () => Promise<void>, successMessage: string) => {
     startTransition(async () => {
@@ -87,6 +88,19 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
     handleAction(() => restoreInternship(internship.id), "Stage restauré avec succès");
   };
 
+  const getEditDefaultValues = () => ({
+    organizationName: internship.organization?.name || "",
+    organizationType: internship.organization?.type || undefined,
+    organizationCountry: internship.organization?.country || "",
+    organizationCity: internship.organization?.city || "",
+    subject: internship.subject || "",
+    academicYear: internship.academicYear || undefined,
+    beginDate: internship.beginDate || "",
+    weeksCount: internship.weeksCount || undefined,
+    studentMajor: internship.student?.major?.alias || "",
+    studentOption: internship.student?.option?.alias || "",
+  });
+
   const getStateBadge = () => {
     const stateLabels = {
       visible: { label: "Actif", variant: "default" as "default" },
@@ -110,11 +124,9 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
                 <Check className="mr-1 h-4 w-4" />
                 Approuver
               </Button>
-              <Button variant="outline" size="sm" asChild>
-                <Link href={`/admin/${internship.id}/edit`}>
-                  <Edit className="mr-1 h-4 w-4" />
-                  Modifier
-                </Link>
+              <Button variant="outline" size="sm" onClick={() => setIsEditDialogOpen(true)}>
+                <Edit className="mr-1 h-4 w-4" />
+                Modifier
               </Button>
               <ConfirmDialog
                 title="Supprimer le stage"
@@ -134,11 +146,9 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
 
           {internship.state === "visible" && (
             <>
-              <Button variant="outline" size="sm" asChild>
-                <Link href={`/admin/${internship.id}/edit`}>
-                  <Edit className="mr-1 h-4 w-4" />
-                  Modifier
-                </Link>
+              <Button variant="outline" size="sm" onClick={() => setIsEditDialogOpen(true)}>
+                <Edit className="mr-1 h-4 w-4" />
+                Modifier
               </Button>
               <ConfirmDialog
                 title="Supprimer le stage"
@@ -256,6 +266,15 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
           </div>
         )}
       </CardFooter>
+
+      {admin && (
+        <InternshipEditDialog
+          open={isEditDialogOpen}
+          onOpenChange={setIsEditDialogOpen}
+          internshipId={internship.id}
+          defaultValues={getEditDefaultValues()}
+        />
+      )}
     </Card>
   );
 }
