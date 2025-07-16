@@ -1,9 +1,14 @@
 import type { Control } from "react-hook-form";
 import type { CreateInternshipFormData } from "@/features/form/internship.schema";
 import { useWatch } from "react-hook-form";
-import { toast } from "sonner";
-import { AutoComplete } from "@/components/ui/autocomplete";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { getMajorsForYear, getOptionsForMajor, hasOptionsForMajor } from "@/features/form/options";
 
 interface StudentSectionProps {
@@ -30,24 +35,24 @@ export function StudentSection({ control }: StudentSectionProps) {
                   Filière <span className="text-destructive">*</span>
                 </FormLabel>
                 <FormControl>
-                  <AutoComplete
-                    options={availableMajors}
-                    value={
-                      field.value === undefined || field.value === ""
-                        ? undefined
-                        : availableMajors.find((major) => major.value === field.value)
-                    }
-                    onValueChange={(option) => field.onChange(option?.value || "")}
-                    placeholder={
-                      !academicYear ? "Sélectionnez une année" : "Sélectionnez une filière"
-                    }
-                    emptyMessage="Aucun résultat"
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
                     disabled={!academicYear}
-                    onDisabledClick={() => {
-                      toast.error("Veuillez d'abord sélectionner une année académique");
-                    }}
-                    error={fieldState.invalid}
-                  />
+                  >
+                    <SelectTrigger className={fieldState.invalid ? "border-destructive" : ""}>
+                      <SelectValue
+                        placeholder={!academicYear ? "Année manquante" : "Sélectionnez une filière"}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableMajors.map((major) => (
+                        <SelectItem key={major.value} value={major.value}>
+                          {major.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -70,38 +75,34 @@ export function StudentSection({ control }: StudentSectionProps) {
                   Option <span className="text-destructive">*</span>
                 </FormLabel>
                 <FormControl>
-                  <AutoComplete
-                    options={availableOptions}
-                    value={
-                      field.value === undefined || field.value === ""
-                        ? undefined
-                        : availableOptions.find((option) => option.value === field.value)
-                    }
-                    onValueChange={(option) => field.onChange(option?.value || undefined)}
-                    placeholder={(() => {
-                      if (!academicYear) {
-                        return "Sélectionnez une année";
-                      } else if (!studentMajor) {
-                        return "Sélectionnez une filière";
-                      } else if (!hasOptions) {
-                        return "Aucune option disponible";
-                      } else {
-                        return "Sélectionnez une option";
-                      }
-                    })()}
-                    emptyMessage="Aucun résultat"
+                  <Select
+                    value={field.value || ""}
+                    onValueChange={(value) => field.onChange(value || undefined)}
                     disabled={!academicYear || !studentMajor || !hasOptions}
-                    onDisabledClick={() => {
-                      if (!academicYear) {
-                        toast.error("Veuillez d'abord sélectionner une année académique");
-                      } else if (!studentMajor) {
-                        toast.error("Veuillez d'abord sélectionner une filière");
-                      } else if (!hasOptions) {
-                        toast.error("Cette filière n'a pas d'options disponibles");
-                      }
-                    }}
-                    error={fieldState.invalid}
-                  />
+                  >
+                    <SelectTrigger className={fieldState.invalid ? "border-destructive" : ""}>
+                      <SelectValue
+                        placeholder={(() => {
+                          if (!academicYear) {
+                            return "Année manquante";
+                          } else if (!studentMajor) {
+                            return "Filière manquante";
+                          } else if (!hasOptions) {
+                            return "Aucune option disponible";
+                          } else {
+                            return "Sélectionnez une option";
+                          }
+                        })()}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availableOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </FormControl>
                 <FormMessage />
               </FormItem>

@@ -1,8 +1,14 @@
 import type { Control } from "react-hook-form";
 import type { CreateInternshipFormData } from "@/features/form/internship.schema";
-import { AutoComplete } from "@/components/ui/autocomplete";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { academicYears } from "@/features/form/options";
 
@@ -44,14 +50,18 @@ export function InternshipDetailsSection({ control }: InternshipDetailsSectionPr
                 Année académique <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
-                <AutoComplete
-                  options={academicYears}
-                  value={academicYears.find((year) => year.value === field.value) || undefined}
-                  onValueChange={(option) => field.onChange(option?.value || "")}
-                  placeholder="Sélectionnez une année"
-                  emptyMessage="Aucun résultat"
-                  error={fieldState.invalid}
-                />
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger className={fieldState.invalid ? "border-destructive" : ""}>
+                    <SelectValue placeholder="Sélectionnez une année" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {academicYears.map((year) => (
+                      <SelectItem key={year.value} value={year.value}>
+                        {year.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -1,8 +1,15 @@
 import type { Control } from "react-hook-form";
 import type { CreateInternshipFormData } from "@/features/form/internship.schema";
-import { AutoComplete } from "@/components/ui/autocomplete";
+import { Combobox } from "@/components/ui/combobox";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { countries, organizationTypes } from "@/features/form/options";
 
 interface OrganizationSectionProps {
@@ -39,14 +46,18 @@ export function OrganizationSection({ control }: OrganizationSectionProps) {
                 Type d'organisme <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
-                <AutoComplete
-                  options={organizationTypes}
-                  value={organizationTypes.find((type) => type.value === field.value) || undefined}
-                  onValueChange={(option) => field.onChange(option?.value || "")}
-                  placeholder="Sélectionnez un type"
-                  emptyMessage="Aucun résultat"
-                  error={fieldState.invalid}
-                />
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger className={fieldState.invalid ? "border-destructive" : ""}>
+                    <SelectValue placeholder="Sélectionnez un type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {organizationTypes.map((type) => (
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -62,7 +73,7 @@ export function OrganizationSection({ control }: OrganizationSectionProps) {
                 Pays <span className="text-destructive">*</span>
               </FormLabel>
               <FormControl>
-                <AutoComplete
+                <Combobox
                   options={countries}
                   value={countries.find((country) => country.value === field.value) || undefined}
                   onValueChange={(option) => field.onChange(option?.value || "")}

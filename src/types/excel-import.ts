@@ -1,6 +1,6 @@
 export interface SheetConfig {
   name: string;
-  startRow: number;
+  academicYear?: string;
 }
 
 export interface ExcelImportResult {

@@ -17,9 +17,18 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { academicYears } from "@/features/form/options";
 import { pluralize } from "@/lib/scripts/string";
 
 interface SheetItem extends SheetConfig {
+  startRow: number | null;
   selected: boolean;
 }
 
@@ -33,11 +42,15 @@ export function ExcelImportDialog({ open, onOpenChange, onImport }: ExcelImportD
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [sheets, setSheets] = useState<SheetItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [academicYearErrors, setAcademicYearErrors] = useState<number[]>([]);
+  const [startRowErrors, setStartRowErrors] = useState<number[]>([]);
 
   const resetDialog = useCallback(() => {
     setSelectedFile(null);
     setSheets([]);
     setIsLoading(false);
+    setAcademicYearErrors([]);
+    setStartRowErrors([]);
   }, []);
 
   const handleFileChange = useCallback(async (event: ChangeEvent<HTMLInputElement>) => {
@@ -66,8 +79,9 @@ export function ExcelImportDialog({ open, onOpenChange, onImport }: ExcelImportD
 
       const allSheets: SheetItem[] = worksheetNames.map((name) => ({
         name,
-        startRow: 1,
+        startRow: null,
         selected: false,
+        academicYear: undefined,
       }));
 
       setSheets(allSheets);
@@ -92,14 +106,44 @@ export function ExcelImportDialog({ open, onOpenChange, onImport }: ExcelImportD
     );
   }, []);
 
-  const handleStartRowChange = useCallback((sheetIndex: number, value: string) => {
-    const numValue = Number.parseInt(value, 10);
-    if (Number.isNaN(numValue) || numValue < 1) return;
+  const handleStartRowChange = useCallback(
+    (sheetIndex: number, value: string) => {
+      if (value === "") {
+        setSheets((prev) =>
+          prev.map((sheet, index) => (index === sheetIndex ? { ...sheet, startRow: null } : sheet)),
+        );
+        if (startRowErrors.includes(sheetIndex)) {
+          setStartRowErrors((prev) => prev.filter((i) => i !== sheetIndex));
+        }
+        return;
+      }
+      const numValue = Number.parseInt(value, 10);
+      if (Number.isNaN(numValue) || numValue < 1) return;
+      setSheets((prev) =>
+        prev.map((sheet, index) =>
+          index === sheetIndex ? { ...sheet, startRow: numValue } : sheet,
+        ),
+      );
+      if (startRowErrors.includes(sheetIndex)) {
+        setStartRowErrors((prev) => prev.filter((i) => i !== sheetIndex));
+      }
+    },
+    [startRowErrors],
+  );
 
-    setSheets((prev) =>
-      prev.map((sheet, index) => (index === sheetIndex ? { ...sheet, startRow: numValue } : sheet)),
-    );
-  }, []);
+  const handleAcademicYearChange = useCallback(
+    (sheetIndex: number, value: string) => {
+      setSheets((prev) =>
+        prev.map((sheet, index) =>
+          index === sheetIndex ? { ...sheet, academicYear: value } : sheet,
+        ),
+      );
+      if (academicYearErrors.includes(sheetIndex)) {
+        setAcademicYearErrors((prev) => prev.filter((i) => i !== sheetIndex));
+      }
+    },
+    [academicYearErrors],
+  );
 
   const handleCancel = useCallback(() => {
     resetDialog();
@@ -126,7 +170,50 @@ export function ExcelImportDialog({ open, onOpenChange, onImport }: ExcelImportD
         return;
       }
 
-      onImport?.(selectedFile, selectedSheets);
+      // Vérifier que toutes les feuilles "2A - Récap. stage" ont une année académique sélectionnée
+      const sheetsWithoutYear = selectedSheets.filter(
+        (sheet) => sheet.name === "2A - Récap. stage" && !sheet.academicYear,
+      );
+
+      // Vérifier que toutes les feuilles "2A - Récap. stage" ont une première ligne à analyser
+      const sheetsWithoutStartRow = selectedSheets.filter(
+        (sheet) =>
+          sheet.name === "2A - Récap. stage" && (sheet.startRow === null || sheet.startRow < 1),
+      );
+
+      // Si des champs sont manquants, mettre à jour les erreurs visuelles
+      if (sheetsWithoutYear.length > 0 || sheetsWithoutStartRow.length > 0) {
+        // Identifier les indices des feuilles avec erreurs
+        const academicYearErrorIndices: number[] = [];
+        const startRowErrorIndices: number[] = [];
+
+        sheets.forEach((sheet, index) => {
+          if (sheet.selected && sheet.name === "2A - Récap. stage") {
+            if (!sheet.academicYear) {
+              academicYearErrorIndices.push(index);
+            }
+            if (sheet.startRow === null || sheet.startRow < 1) {
+              startRowErrorIndices.push(index);
+            }
+          }
+        });
+
+        setAcademicYearErrors(academicYearErrorIndices);
+        setStartRowErrors(startRowErrorIndices);
+
+        // Afficher un seul toast d'erreur générique
+        toast.error("Veuillez remplir les champs manquants dans les feuilles sélectionnées.");
+        return;
+      }
+
+      setAcademicYearErrors([]);
+      setStartRowErrors([]);
+      // On s'assure que startRow est bien un number avant d'appeler onImport
+      const cleanedSheets = selectedSheets.map((sheet) => ({
+        ...sheet,
+        startRow: typeof sheet.startRow === "number" ? sheet.startRow : 1,
+      }));
+      onImport?.(selectedFile, cleanedSheets);
       resetDialog();
       onOpenChange(false);
     }
@@ -192,27 +279,59 @@ export function ExcelImportDialog({ open, onOpenChange, onImport }: ExcelImportD
                     </div>
 
                     {sheet.selected && (
-                      <div className="ml-7 space-y-1">
+                      <div className="ml-7 space-y-3">
                         {sheet.name === "2A - Récap. stage" && (
                           <>
-                            <Label htmlFor={`start-row-${sheetIndex}`} className="text-xs">
-                              Première ligne à analyser
-                            </Label>
-                            <Input
-                              id={`start-row-${sheetIndex}`}
-                              type="number"
-                              min="1"
-                              value={sheet.startRow}
-                              onChange={(e) => handleStartRowChange(sheetIndex, e.target.value)}
-                              className="h-8"
-                              placeholder="1"
-                            />
+                            <div>
+                              <Label
+                                htmlFor={`start-row-${sheetIndex}`}
+                                className={`text-xs ${startRowErrors.includes(sheetIndex) ? "text-destructive" : ""}`}
+                              >
+                                Première ligne à analyser
+                              </Label>
+                              <Input
+                                id={`start-row-${sheetIndex}`}
+                                type="number"
+                                min="1"
+                                value={sheet.startRow === null ? "" : sheet.startRow}
+                                onChange={(e) => handleStartRowChange(sheetIndex, e.target.value)}
+                                className={`h-8 ${startRowErrors.includes(sheetIndex) ? "border-destructive ring-2 ring-destructive/40" : ""}`}
+                                placeholder="4"
+                              />
+                            </div>
+                            <div>
+                              <Label
+                                htmlFor={`academic-year-${sheetIndex}`}
+                                className={`text-xs ${academicYearErrors.includes(sheetIndex) ? "text-destructive" : ""}`}
+                              >
+                                Année académique
+                              </Label>
+                              <Select
+                                value={sheet.academicYear || ""}
+                                onValueChange={(value) =>
+                                  handleAcademicYearChange(sheetIndex, value)
+                                }
+                              >
+                                <SelectTrigger
+                                  className={`h-8 ${academicYearErrors.includes(sheetIndex) ? "border-destructive ring-2 ring-destructive/40" : ""}`}
+                                >
+                                  <SelectValue placeholder="Sélectionnez une année" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {academicYears.map((year) => (
+                                    <SelectItem key={year.value} value={year.value}>
+                                      {year.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
                           </>
                         )}
                         {sheet.name !== "2A - Récap. stage" && (
                           <p className="text-destructive text-xs">
-                            Cette feuille ne peut pas être parsée. Seule la feuille "2A -
-                            Récap. stage" est supportée.
+                            Cette feuille ne peut pas être parsée. Seule la feuille "2A - Récap.
+                            stage" est supportée.
                           </p>
                         )}
                       </div>
