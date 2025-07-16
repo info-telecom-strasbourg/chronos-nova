@@ -124,9 +124,46 @@ export const softDeleteInternship = async (id: string): Promise<void> => {
 };
 
 // Action: Approve a draft internship by setting state to 'visible'
-export const approveInternship = async (id: string): Promise<void> => {
+export const approveInternship = async (
+  id: string,
+): Promise<{ success: boolean; message?: string }> => {
   const supabase = await createSupabaseServerClient();
 
+  // D'abord, récupérer les données complètes du stage pour validation
+  const { data: internshipData, error: fetchError } = await supabase
+    .from("internship")
+    .select("*, organization(*), student(*, major(*), option(*))")
+    .eq("id", id)
+    .single();
+
+  if (fetchError) throw fetchError;
+
+  // Valider les données avant approbation
+  const { validateStageForApproval } = await import("@/features/stage-validation");
+
+  const stageData = {
+    organizationName: internshipData.organization?.name || null,
+    organizationType: internshipData.organization?.type || null,
+    organizationCountry: internshipData.organization?.country || null,
+    organizationCity: internshipData.organization?.city || null,
+    subject: internshipData.subject || null,
+    academicYear: internshipData.academicYear || null,
+    beginDate: internshipData.beginDate || null,
+    weeksCount: internshipData.weeksCount || null,
+    studentMajor: internshipData.student?.major?.alias || null,
+    studentOption: internshipData.student?.option?.alias || null,
+  };
+
+  const validation = validateStageForApproval(stageData);
+
+  if (!validation.isValid) {
+    return {
+      success: false,
+      message: `Impossible d'approuver ce stage : des données sont manquantes ou invalides.`,
+    };
+  }
+
+  // Si la validation passe, approuver le stage
   const { error } = await supabase.from("internship").update({ state: "visible" }).eq("id", id);
 
   if (error) throw error;
@@ -134,6 +171,8 @@ export const approveInternship = async (id: string): Promise<void> => {
   // Revalidate admin pages
   const { revalidateAdmin } = await import("@/lib/revalidation");
   await revalidateAdmin();
+
+  return { success: true };
 };
 
 // Action: Restore a deleted internship by setting state to 'visible'

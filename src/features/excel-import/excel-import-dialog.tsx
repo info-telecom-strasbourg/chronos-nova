@@ -28,7 +28,7 @@ import { academicYears } from "@/features/form/options";
 import { pluralize } from "@/lib/scripts/string";
 
 interface SheetItem extends SheetConfig {
-  startRow: number | null;
+  startRow?: number;
   selected: boolean;
 }
 
@@ -79,7 +79,7 @@ export function ExcelImportDialog({ open, onOpenChange, onImport }: ExcelImportD
 
       const allSheets: SheetItem[] = worksheetNames.map((name) => ({
         name,
-        startRow: null,
+        startRow: undefined,
         selected: false,
         academicYear: undefined,
       }));
@@ -110,7 +110,9 @@ export function ExcelImportDialog({ open, onOpenChange, onImport }: ExcelImportD
     (sheetIndex: number, value: string) => {
       if (value === "") {
         setSheets((prev) =>
-          prev.map((sheet, index) => (index === sheetIndex ? { ...sheet, startRow: null } : sheet)),
+          prev.map((sheet, index) =>
+            index === sheetIndex ? { ...sheet, startRow: undefined } : sheet,
+          ),
         );
         if (startRowErrors.includes(sheetIndex)) {
           setStartRowErrors((prev) => prev.filter((i) => i !== sheetIndex));
@@ -178,7 +180,7 @@ export function ExcelImportDialog({ open, onOpenChange, onImport }: ExcelImportD
       // Vérifier que toutes les feuilles "2A - Récap. stage" ont une première ligne à analyser
       const sheetsWithoutStartRow = selectedSheets.filter(
         (sheet) =>
-          sheet.name === "2A - Récap. stage" && (sheet.startRow === null || sheet.startRow < 1),
+          sheet.name === "2A - Récap. stage" && (typeof sheet.startRow !== "number" || sheet.startRow < 1),
       );
 
       // Si des champs sont manquants, mettre à jour les erreurs visuelles
@@ -192,7 +194,7 @@ export function ExcelImportDialog({ open, onOpenChange, onImport }: ExcelImportD
             if (!sheet.academicYear) {
               academicYearErrorIndices.push(index);
             }
-            if (sheet.startRow === null || sheet.startRow < 1) {
+            if (typeof sheet.startRow !== "number" || sheet.startRow < 1) {
               startRowErrorIndices.push(index);
             }
           }
@@ -245,11 +247,11 @@ export function ExcelImportDialog({ open, onOpenChange, onImport }: ExcelImportD
                 accept=".xlsx"
                 onChange={handleFileChange}
                 disabled={isLoading}
-                className="file:mr-3 file:rounded-sm file:border-0 file:bg-primary file:text-primary-foreground file:text-xs hover:file:bg-primary/90"
+                className="hover:file:bg-primary/90 file:bg-primary file:mr-3 file:border-0 file:rounded-sm file:text-primary-foreground file:text-xs"
               />
               {isLoading && (
-                <div className="-translate-y-1/2 absolute top-1/2 right-3">
-                  <div className="size-4 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
+                <div className="top-1/2 right-3 absolute -translate-y-1/2">
+                  <div className="border-2 border-muted-foreground border-t-transparent rounded-full size-4 animate-spin" />
                 </div>
               )}
             </div>
@@ -259,9 +261,9 @@ export function ExcelImportDialog({ open, onOpenChange, onImport }: ExcelImportD
             <div className="space-y-4">
               <h4 className="font-medium text-sm">Feuilles disponibles</h4>
 
-              <div className="max-h-60 space-y-3 overflow-y-auto">
+              <div className="space-y-3 max-h-60 overflow-y-auto">
                 {sheets.map((sheet, sheetIndex) => (
-                  <div key={sheet.name} className="space-y-2 rounded-lg border p-3">
+                  <div key={sheet.name} className="space-y-2 p-3 border rounded-lg">
                     <div className="flex items-center gap-3">
                       <Checkbox
                         id={`sheet-${sheetIndex}`}
@@ -271,7 +273,7 @@ export function ExcelImportDialog({ open, onOpenChange, onImport }: ExcelImportD
                       />
                       <label
                         htmlFor={`sheet-${sheetIndex}`}
-                        className="flex cursor-pointer items-center gap-2 font-medium text-sm"
+                        className="flex items-center gap-2 font-medium text-sm cursor-pointer"
                       >
                         <FileSpreadsheetIcon className="size-4 text-muted-foreground" />
                         {sheet.name}
@@ -279,7 +281,7 @@ export function ExcelImportDialog({ open, onOpenChange, onImport }: ExcelImportD
                     </div>
 
                     {sheet.selected && (
-                      <div className="ml-7 space-y-3">
+                      <div className="space-y-3 ml-7">
                         {sheet.name === "2A - Récap. stage" && (
                           <>
                             <div>
@@ -293,7 +295,7 @@ export function ExcelImportDialog({ open, onOpenChange, onImport }: ExcelImportD
                                 id={`start-row-${sheetIndex}`}
                                 type="number"
                                 min="1"
-                                value={sheet.startRow === null ? "" : sheet.startRow}
+                                value={typeof sheet.startRow === "number" ? sheet.startRow : ""}
                                 onChange={(e) => handleStartRowChange(sheetIndex, e.target.value)}
                                 className={`h-8 ${startRowErrors.includes(sheetIndex) ? "border-destructive ring-2 ring-destructive/40" : ""}`}
                                 placeholder="4"
@@ -349,7 +351,7 @@ export function ExcelImportDialog({ open, onOpenChange, onImport }: ExcelImportD
           )}
         </div>
 
-        <DialogFooter className="gap-2 sm:justify-center">
+        <DialogFooter className="sm:justify-center gap-2">
           <Button onClick={handleValidate} disabled={isValidateDisabled} className="gap-2">
             <UploadIcon className="size-4" />
             Valider

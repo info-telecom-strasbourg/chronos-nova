@@ -31,13 +31,18 @@ export interface ExcelImportResult {
   success: boolean;
   message: string;
   importedCount?: number;
+  badlyImportedCount?: number;
 }
 
-async function insertParsedDataToDatabase(data: ParsedData): Promise<number> {
+async function insertParsedDataToDatabase(
+  data: ParsedData,
+): Promise<{ insertedCount: number; badlyImportedCount: number }> {
   const supabase = await createSupabaseServerClient();
   const { normalizeCompleteStageData } = await import("@/lib/utils/stage-normalizer");
+  const { isBadlyImportedStage } = await import("@/features/stage-validation");
 
   let insertedCount = 0;
+  let badlyImportedCount = 0;
 
   for (let i = 0; i < data.internships.length; i++) {
     const internship = data.internships[i];
@@ -60,6 +65,24 @@ async function insertParsedDataToDatabase(data: ParsedData): Promise<number> {
         },
         true, // fromExcel = true
       );
+
+      // Vérifier si le stage est mal importé
+      const stageData = {
+        organizationName: normalized.organization.name,
+        organizationType: normalized.organization.type,
+        organizationCountry: normalized.organization.country,
+        organizationCity: normalized.organization.city,
+        subject: normalized.internship.subject,
+        academicYear: normalized.internship.academicYear,
+        beginDate: normalized.internship.beginDate,
+        weeksCount: normalized.internship.weeksCount,
+        studentMajor: normalized.student.major,
+        studentOption: normalized.student.option,
+      };
+
+      if (isBadlyImportedStage(stageData)) {
+        badlyImportedCount++;
+      }
 
       const orgName = normalized.organization.name;
       const orgType = normalized.organization.type;
@@ -154,7 +177,7 @@ async function insertParsedDataToDatabase(data: ParsedData): Promise<number> {
     }
   }
 
-  return insertedCount;
+  return { insertedCount, badlyImportedCount };
 }
 
 /**
@@ -166,6 +189,7 @@ export async function importExcelData(
 ): Promise<ExcelImportResult> {
   try {
     let totalImported = 0;
+    let totalBadlyImported = 0;
 
     for (const sheetConfig of sheetsConfig) {
       const { name: sheetName, academicYear } = sheetConfig;
@@ -226,8 +250,9 @@ export async function importExcelData(
       }
 
       // Insérer les données en base
-      const importedCount = await insertParsedDataToDatabase(parsedData);
-      totalImported += importedCount;
+      const result = await insertParsedDataToDatabase(parsedData);
+      totalImported += result.insertedCount;
+      totalBadlyImported += result.badlyImportedCount;
 
       // Nettoyer le fichier temporaire
       fs.unlinkSync(tempFilePath);
@@ -237,10 +262,17 @@ export async function importExcelData(
     revalidatePath("/admin");
     revalidatePath("/admin/pending");
 
+    // Construire le message d'import
+    let message = pluralize(totalImported, "stage importé", "stages importés");
+    if (totalBadlyImported > 0) {
+      message += ` - ${pluralize(totalBadlyImported, "stage mal importé", "stages mal importés")} (données incomplètes)`;
+    }
+
     return {
       success: true,
-      message: pluralize(totalImported, "stage importé", "stages importés"),
+      message,
       importedCount: totalImported,
+      badlyImportedCount: totalBadlyImported,
     };
   } catch (error) {
     console.error("Error during Excel import:", error);

@@ -85,7 +85,25 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
   };
 
   const handleApprove = () => {
-    handleAction(() => approveInternship(internship.id), "Stage approuvé avec succès");
+    startTransition(async () => {
+      try {
+        const result = await approveInternship(internship.id);
+        if (!result.success) {
+          toast.error(result.message || "Impossible d'approuver ce stage");
+          return;
+        }
+        await queryClient.invalidateQueries({ queryKey: ["internships"] });
+        router.refresh();
+        toast.success("Stage approuvé avec succès");
+      } catch (error) {
+        console.error(error);
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : "Une erreur s'est produite lors de l'approbation";
+        toast.error(errorMessage);
+      }
+    });
   };
 
   const handleRestore = () => {
@@ -101,8 +119,15 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
     academicYear: internship.academicYear || undefined,
     beginDate: internship.beginDate || "",
     weeksCount: internship.weeksCount || undefined,
-    studentMajor: internship.student?.major?.alias || "",
-    studentOption: internship.student?.option?.alias || "",
+    // Traiter "__inconnu__" comme undefined pour le formulaire d'édition
+    studentMajor:
+      internship.student?.major?.alias === "__inconnu__"
+        ? undefined
+        : internship.student?.major?.alias || undefined,
+    studentOption:
+      internship.student?.option?.alias === "__inconnu__"
+        ? undefined
+        : internship.student?.option?.alias || undefined,
   });
 
   const getStateBadge = () => {
@@ -235,10 +260,26 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
           <div className="flex items-center gap-2">
             <GraduationCap className="h-4 w-4" />
             <span>
-              {internship.academicYear} - {getMajorShortLabel(internship.student.major.alias || "")}
-              {internship.student.option && internship.student.option.alias !== "aucune"
-                ? ` - ${getOptionShortLabel(internship.student.option.alias)}`
-                : ""}
+              {internship.academicYear}
+              {/* Diplôme : toujours afficher, "??" si inconnu */}
+              {(() => {
+                const major = internship.student?.major?.alias;
+                const option = internship.student?.option?.alias;
+                if (!major || major === "__inconnu__") {
+                  // Diplôme inconnu : afficher ?? et la filière (?? si inconnue)
+                  return ` - ??${option ? ` - ${option === "__inconnu__" ? "??" : getOptionShortLabel(option)}` : ""}`;
+                } else {
+                  // Diplôme connu : afficher le label, puis la filière si pertinente
+                  return (
+                    <>
+                      {` - ${getMajorShortLabel(major)}`}
+                      {option && option !== "aucune" && option !== "__inconnu__"
+                        ? ` - ${getOptionShortLabel(option)}`
+                        : ""}
+                    </>
+                  );
+                }
+              })()}
             </span>
           </div>
           <div className="flex items-center gap-2">

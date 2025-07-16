@@ -29,6 +29,9 @@ export function StudentSection({ control }: StudentSectionProps) {
           render={({ field, fieldState }) => {
             const availableMajors = academicYear ? getMajorsForYear(academicYear) : [];
 
+            // Traiter "__inconnu__" comme undefined pour le formulaire
+            const fieldValue = field.value === "__inconnu__" ? undefined : field.value;
+
             return (
               <FormItem>
                 <FormLabel className={fieldState.invalid ? "text-destructive" : ""}>
@@ -36,7 +39,7 @@ export function StudentSection({ control }: StudentSectionProps) {
                 </FormLabel>
                 <FormControl>
                   <Select
-                    value={field.value}
+                    value={fieldValue}
                     onValueChange={field.onChange}
                     disabled={!academicYear}
                   >
@@ -69,6 +72,9 @@ export function StudentSection({ control }: StudentSectionProps) {
             if (!academicYear) optionPlaceholder = "Année manquante";
             else if (!studentMajor) optionPlaceholder = "Filière manquante";
 
+            // Traiter "__inconnu__" comme undefined pour le formulaire
+            const fieldValue = field.value === "__inconnu__" ? undefined : field.value;
+
             return (
               <FormItem>
                 <FormLabel className={fieldState.invalid ? "text-destructive" : ""}>
@@ -76,7 +82,7 @@ export function StudentSection({ control }: StudentSectionProps) {
                 </FormLabel>
                 <FormControl>
                   <Select
-                    value={field.value || undefined}
+                    value={fieldValue || undefined}
                     onValueChange={field.onChange}
                     disabled={!academicYear || !studentMajor}
                   >
