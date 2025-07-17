@@ -187,6 +187,7 @@ async function insertParsedDataToDatabase(
         weeksCount: internshipWeeksCount,
         state: "draft",
         internshipHash: internshipHash,
+        isInvalid: isBadlyImportedStage(stageData),
       });
 
       if (internshipError) {

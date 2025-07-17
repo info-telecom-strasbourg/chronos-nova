@@ -4,8 +4,10 @@ import type { CreateInternshipFormData } from "@/features/form/internship.schema
 import type { InternshipData } from "@/types/drizzle";
 import { z } from "zod";
 import { studentMajors, studentOptions } from "@/features/form/options";
+import { isBadlyImportedStage } from "@/features/stage-validation";
 import { revalidateAdmin } from "@/lib/revalidation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { enrichInternshipsWithDuplicateServer } from "@/lib/utils/duplicate-detection-server";
 import { createInternshipHashFromNormalized } from "@/lib/utils/internship-hash-utils";
 import { validateInternshipForApproval } from "@/lib/utils/internship-validation";
 import { normalizeFormData } from "@/lib/utils/stage-normalizer";
@@ -52,8 +54,13 @@ export const getInternshipsQuery = async ({
     const { data, error, count } = await query;
     if (error) throw error;
 
+    let enrichedData = data || [];
+    if (targetState === "draft") {
+      enrichedData = await enrichInternshipsWithDuplicateServer(enrichedData);
+    }
+
     return {
-      data: data || [],
+      data: enrichedData,
       nextPage: data && data.length === limit ? page + 1 : undefined,
       hasMore: data && data.length === limit,
       total: count || 0,
@@ -173,6 +180,7 @@ export const approveInternship = async (
     .update({
       state: "visible",
       internshipHash: internshipHash,
+      isInvalid: false, // Un stage approuvé ne peut pas être invalide
     })
     .eq("id", id);
 
@@ -272,6 +280,20 @@ export const createInternship = async (data: CreateInternshipFormData): Promise<
   // Générer le hash du stage
   const internshipHash = createInternshipHashFromNormalized(normalized);
 
+  // Calculer si le stage est invalide
+  const isInvalid = isBadlyImportedStage({
+    organizationName: normalized.organization.name,
+    organizationType: normalized.organization.type,
+    organizationCountry: normalized.organization.country,
+    organizationCity: normalized.organization.city,
+    subject: normalized.internship.subject,
+    academicYear: normalized.internship.academicYear,
+    beginDate: normalized.internship.beginDate,
+    weeksCount: normalized.internship.weeksCount,
+    studentMajor: normalized.student.major,
+    studentOption: normalized.student.option,
+  });
+
   // Finally create internship
   const { data: internshipData, error: internshipError } = await supabase
     .from("internship")
@@ -284,6 +306,7 @@ export const createInternship = async (data: CreateInternshipFormData): Promise<
       weeksCount: normalized.internship.weeksCount,
       state: "draft", // New internships start as draft
       internshipHash: internshipHash,
+      isInvalid: isInvalid,
     })
     .select("id")
     .single();
@@ -370,6 +393,20 @@ export const updateInternship = async (
   // Générer le nouveau hash du stage
   const internshipHash = createInternshipHashFromNormalized(normalized);
 
+  // Calculer si le stage est invalide
+  const isInvalid = isBadlyImportedStage({
+    organizationName: normalized.organization.name,
+    organizationType: normalized.organization.type,
+    organizationCountry: normalized.organization.country,
+    organizationCity: normalized.organization.city,
+    subject: normalized.internship.subject,
+    academicYear: normalized.internship.academicYear,
+    beginDate: normalized.internship.beginDate,
+    weeksCount: normalized.internship.weeksCount,
+    studentMajor: normalized.student.major,
+    studentOption: normalized.student.option,
+  });
+
   // Update internship
   const { error: internshipError } = await supabase
     .from("internship")
@@ -379,6 +416,7 @@ export const updateInternship = async (
       beginDate: normalized.internship.beginDate,
       weeksCount: normalized.internship.weeksCount,
       internshipHash: internshipHash,
+      isInvalid: isInvalid,
     })
     .eq("id", id);
 

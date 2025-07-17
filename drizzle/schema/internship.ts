@@ -1,4 +1,4 @@
-import { date, integer, pgEnum, pgTable, text, uuid } from "drizzle-orm/pg-core";
+import { boolean, date, integer, pgEnum, pgTable, text, uuid } from "drizzle-orm/pg-core";
 import { organizations } from "./organization";
 import { students } from "./student";
 
@@ -13,6 +13,7 @@ export const internships = pgTable("internship", {
   academicYear: academicYear("academicYear"),
   state: state("state").notNull(),
   internshipHash: text("internshipHash"),
+  isInvalid: boolean("isInvalid").default(false).notNull(),
   studentId: uuid("studentId")
     .notNull()
     .references(() => students.id, {

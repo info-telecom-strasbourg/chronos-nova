@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/card";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { StageBadges } from "@/components/ui/stage-badges";
 import { InternshipEditDialog } from "@/features/form/internship-edit-dialog";
 import {
   approveInternship,
@@ -48,8 +49,9 @@ import {
 } from "@/features/parser/mappings";
 import { InternshipDetailsDialog } from "./internship-details-dialog";
 
+type InternshipWithDuplicate = InternshipData & { isDuplicate?: boolean };
 type InternshipCardProps = {
-  internship: InternshipData;
+  internship: InternshipWithDuplicate;
   admin?: boolean;
 };
 
@@ -238,7 +240,17 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
       <CardHeader className="border-b-2 pb-4">
         <div className="flex w-full items-start justify-between">
           <CardTitle className="text-2xl">{getTitleLabel(internship.organization.name)}</CardTitle>
-          {admin && getStateBadge()}
+          {admin && (
+            <div className="flex flex-wrap gap-2">
+              {getStateBadge()}
+              {internship.state === "draft" && (
+                <StageBadges
+                  isInvalid={internship.isInvalid}
+                  isDuplicate={internship.isDuplicate}
+                />
+              )}
+            </div>
+          )}
         </div>
         <CardDescription>
           <span className="inline-flex items-center gap-1">
