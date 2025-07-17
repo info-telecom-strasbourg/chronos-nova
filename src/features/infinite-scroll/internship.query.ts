@@ -99,8 +99,13 @@ export const getInternshipsQuery = async ({
   const total = uniqueResults.length;
   const paginatedResults = uniqueResults.slice(from, to + 1);
 
+  let enrichedData = paginatedResults;
+  if (targetState === "draft") {
+    enrichedData = await enrichWithDuplicateStatus(paginatedResults);
+  }
+
   return {
-    data: paginatedResults,
+    data: enrichedData,
     nextPage: paginatedResults.length === limit ? page + 1 : undefined,
     hasMore: paginatedResults.length === limit,
     total,
