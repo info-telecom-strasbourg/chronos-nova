@@ -82,7 +82,18 @@ export function Combobox({
             placeholder={searchPlaceholder}
             className="placeholder:!opacity-100 placeholder:!text-muted-foreground/80 h-9 bg-popover text-popover-foreground"
           />
-          <CommandList>
+          <CommandList
+            className="max-h-40 overflow-y-auto"
+            onWheel={(e) => {
+              const target = e.currentTarget;
+              const { scrollTop, scrollHeight, clientHeight } = target;
+              const isAtTop = scrollTop === 0 && e.deltaY < 0;
+              const isAtBottom = scrollTop + clientHeight >= scrollHeight && e.deltaY > 0;
+              if (!isAtTop && !isAtBottom) {
+                e.stopPropagation();
+              }
+            }}
+          >
             <CommandEmpty>{emptyMessage}</CommandEmpty>
             <CommandGroup>
               {options.map((option) => (
