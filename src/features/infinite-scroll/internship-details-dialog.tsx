@@ -69,23 +69,20 @@ export function InternshipDetailsDialog({ internship }: InternshipDetailsDialogP
                 : getMajorFullLabel(internship.student.major.alias)}
             </span>
           </span>
-          {/* Filière : afficher si diplôme inconnu, sinon comme avant */}
-          {internship.student?.option?.alias &&
-            (internship.student?.major?.alias === "__inconnu__" ||
-              (internship.student.option.alias !== "aucune" &&
-                internship.student.option.alias !== "__inconnu__")) && (
-              <span className="flex items-start gap-2">
-                <span>
-                  <School className="h-4 w-4 text-muted-foreground" />
-                </span>
-                <span>
-                  <b>Filière :</b>{" "}
-                  {internship.student.option.alias === "__inconnu__"
-                    ? "??"
-                    : getOptionFullLabel(internship.student.option.alias)}
-                </span>
+          {/* Filière : afficher seulement si l'option existe et n'est pas 'aucune' */}
+          {internship.student?.option?.alias && internship.student.option.alias !== "aucune" && (
+            <span className="flex items-start gap-2">
+              <span>
+                <School className="h-4 w-4 text-muted-foreground" />
               </span>
-            )}
+              <span>
+                <b>Filière :</b>{" "}
+                {internship.student.option.alias === "__inconnu__"
+                  ? "??"
+                  : getOptionFullLabel(internship.student.option.alias)}
+              </span>
+            </span>
+          )}
           <span className="flex items-start gap-2">
             <span>
               <Clock className="h-4 w-4 text-muted-foreground" />

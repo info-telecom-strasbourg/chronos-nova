@@ -261,24 +261,18 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
             <GraduationCap className="h-4 w-4" />
             <span>
               {internship.academicYear}
-              {/* Diplôme : toujours afficher, "??" si inconnu */}
               {(() => {
                 const major = internship.student?.major?.alias;
                 const option = internship.student?.option?.alias;
-                if (!major || major === "__inconnu__") {
-                  // Diplôme inconnu : afficher ?? et la filière (?? si inconnue)
-                  return ` - ??${option ? ` - ${option === "__inconnu__" ? "??" : getOptionShortLabel(option)}` : ""}`;
-                } else {
-                  // Diplôme connu : afficher le label, puis la filière si pertinente
-                  return (
-                    <>
-                      {` - ${getMajorShortLabel(major)}`}
-                      {option && option !== "aucune" && option !== "__inconnu__"
-                        ? ` - ${getOptionShortLabel(option)}`
-                        : ""}
-                    </>
-                  );
+                // Diplôme
+                const majorLabel =
+                  !major || major === "__inconnu__" ? "??" : getMajorShortLabel(major);
+                // Option
+                let optionLabel = "";
+                if (option && option !== "aucune") {
+                  optionLabel = option === "__inconnu__" ? "??" : getOptionShortLabel(option);
                 }
+                return ` - ${majorLabel}${optionLabel ? ` - ${optionLabel}` : ""}`;
               })()}
             </span>
           </div>
