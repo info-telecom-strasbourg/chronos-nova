@@ -4,10 +4,10 @@ import type { SheetConfig } from "@/types/excel-import";
 import { revalidatePath } from "next/cache";
 import path from "path";
 import { parseExcelInternship2A } from "@/features/parser/parser-internship-2A";
+import { isBadlyImportedStage } from "@/features/stage-validation";
 import { pluralize } from "@/lib/scripts/string";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { normalizeCompleteStageData } from "@/lib/utils/stage-normalizer";
-import { isBadlyImportedStage } from "@/features/stage-validation";
 
 // Types pour les parsers adaptés
 interface ParsedData {
@@ -193,7 +193,6 @@ export async function importExcelData(
 
     for (const sheetConfig of sheetsConfig) {
       const { name: sheetName, academicYear } = sheetConfig;
-
       // Créer un fichier temporaire pour le parser
       const os = await import("os");
       const tempDir = os.tmpdir();
@@ -202,50 +201,39 @@ export async function importExcelData(
       fs.writeFileSync(tempFilePath, Buffer.from(fileBuffer));
 
       let parsedData: ParsedData;
+      try {
+        const result = await parseExcelInternship2A(
+          tempFilePath,
+          sheetName,
+          typeof sheetConfig.startRow === "number" ? sheetConfig.startRow : 1,
+          academicYear || "",
+        );
 
-      // Utiliser le parser 2A avec startRow configurable
-      if (sheetName === "2A - Récap. stage") {
-        try {
-          const result = await parseExcelInternship2A(
-            tempFilePath,
-            sheetName,
-            typeof sheetConfig.startRow === "number" ? sheetConfig.startRow : 1,
-            academicYear || "",
-          );
-
-          // Transformer les données pour correspondre au type ParsedData
-          parsedData = {
-            internships: result.internships.map((i) => ({
-              subject: i.subject || null,
-              date: i.date || null,
-              weeksCount: typeof i.weeksCount === "number" ? i.weeksCount : null,
-              year: i.year || academicYear || null,
-            })),
-            students: result.students.map((s) => ({
-              major: s.major || null,
-              option: s.option || null,
-            })),
-            organizations: result.organizations.map((o) => ({
-              orgName: o.orgName || null,
-              orgType: o.orgType || null,
-              country: o.country || null,
-              city: o.city || null,
-            })),
-          };
-        } catch (error) {
-          console.error(`Error parsing sheet "${sheetName}":`, error);
-          parsedData = {
-            internships: [],
-            students: [],
-            organizations: [],
-          };
-        }
-      } else {
-        // Nettoyer le fichier temporaire
-        fs.unlinkSync(tempFilePath);
-        return {
-          success: false,
-          message: `La feuille "${sheetName}" ne peut pas être parsée. Seule la feuille "2A - Récap. stage" est supportée.`,
+        // Transformer les données pour correspondre au type ParsedData
+        parsedData = {
+          internships: result.internships.map((i) => ({
+            subject: i.subject || null,
+            date: i.date || null,
+            weeksCount: typeof i.weeksCount === "number" ? i.weeksCount : null,
+            year: i.year || academicYear || null,
+          })),
+          students: result.students.map((s) => ({
+            major: s.major || null,
+            option: s.option || null,
+          })),
+          organizations: result.organizations.map((o) => ({
+            orgName: o.orgName || null,
+            orgType: o.orgType || null,
+            country: o.country || null,
+            city: o.city || null,
+          })),
+        };
+      } catch (error) {
+        console.error(`Error parsing sheet "${sheetName}":`, error);
+        parsedData = {
+          internships: [],
+          students: [],
+          organizations: [],
         };
       }
 
