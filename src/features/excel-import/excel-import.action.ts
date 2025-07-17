@@ -251,7 +251,10 @@ export async function importExcelData(
     revalidatePath("/admin/pending");
 
     // Construire le message d'import
-    let message = pluralize(totalImported, "stage importé", "stages importés");
+    let message =
+      totalImported === 0
+        ? "Aucun stage trouvé. Veuillez vérifier les données renseignées."
+        : pluralize(totalImported, "stage importé", "stages importés");
     if (totalBadlyImported > 0) {
       message += ` - ${pluralize(totalBadlyImported, "stage mal importé", "stages mal importés")} (données incomplètes)`;
     }
