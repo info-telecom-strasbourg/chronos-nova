@@ -63,6 +63,7 @@ export const academicStructure = {
         { value: "ispv", label: getOptionShortLabel("ispv") },
         { value: "issd", label: getOptionShortLabel("issd") },
         { value: "isav", label: getOptionShortLabel("isav") },
+        { value: "ese", label: getOptionShortLabel("ese") },
       ],
     },
     ir: {

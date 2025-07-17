@@ -98,6 +98,11 @@ export const OPTION_MAPPINGS: Record<string, OptionMapping> = {
     shortLabel: "PM",
     fullLabel: "PM (Physique et Modélisation)",
   },
+  ese: {
+    value: "ese",
+    shortLabel: "ESE",
+    fullLabel: "ESE (Électronique et Systèmes Embarqués)",
+  },
 
   // Options Master
   asi: {
