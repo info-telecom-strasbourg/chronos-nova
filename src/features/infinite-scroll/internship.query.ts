@@ -7,7 +7,7 @@ import { studentMajors, studentOptions } from "@/features/form/options";
 import { isBadlyImportedStage } from "@/features/stage-validation";
 import { revalidateAdmin } from "@/lib/revalidation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { enrichInternshipsWithDuplicateServer } from "@/lib/utils/duplicate-detection-server";
+import { enrichWithDuplicateStatus } from "@/lib/utils/duplicate-detection-server";
 import { createInternshipHashFromNormalized } from "@/lib/utils/internship-hash-utils";
 import { validateInternshipForApproval } from "@/lib/utils/internship-validation";
 import { normalizeFormData } from "@/lib/utils/stage-normalizer";
@@ -56,7 +56,7 @@ export const getInternshipsQuery = async ({
 
     let enrichedData = data || [];
     if (targetState === "draft") {
-      enrichedData = await enrichInternshipsWithDuplicateServer(enrichedData);
+      enrichedData = await enrichWithDuplicateStatus(enrichedData);
     }
 
     return {

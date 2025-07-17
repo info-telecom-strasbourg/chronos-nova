@@ -16,7 +16,6 @@ import {
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -28,7 +27,7 @@ import {
 } from "@/components/ui/card";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { StageBadges } from "@/components/ui/stage-badges";
+import { InternshipBadges } from "@/components/ui/internship-badges";
 import { InternshipEditDialog } from "@/features/form/internship-edit-dialog";
 import {
   approveInternship,
@@ -132,17 +131,6 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
         : internship.student?.option?.alias || undefined,
   });
 
-  const getStateBadge = () => {
-    const stateLabels = {
-      visible: { label: "Actif", variant: "default" as "default" },
-      draft: { label: "En attente", variant: "outline" as "outline" },
-      deleted: { label: "Supprimé", variant: "destructive" as "destructive" },
-    };
-
-    const stateInfo = stateLabels[internship.state as keyof typeof stateLabels];
-    return stateInfo ? <Badge variant={stateInfo.variant}>{stateInfo.label}</Badge> : null;
-  };
-
   const getActionButtons = () => {
     if (!admin) return null;
 
@@ -242,13 +230,12 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
           <CardTitle className="text-2xl">{getTitleLabel(internship.organization.name)}</CardTitle>
           {admin && (
             <div className="flex flex-wrap gap-2">
-              {getStateBadge()}
-              {internship.state === "draft" && (
-                <StageBadges
-                  isInvalid={internship.isInvalid}
-                  isDuplicate={internship.isDuplicate}
-                />
-              )}
+              <InternshipBadges
+                state={internship.state as "visible" | "draft" | "deleted"}
+                isInvalid={internship.isInvalid}
+                isDuplicate={internship.isDuplicate}
+                showState={true}
+              />
             </div>
           )}
         </div>

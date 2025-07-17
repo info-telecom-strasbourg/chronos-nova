@@ -3,7 +3,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 /**
  * Vérifie si un stage en attente est un doublon d'un stage déjà approuvé
  */
-export async function isDuplicateInternshipServer(
+export async function isDuplicate(
   internshipId: string,
   internshipHash: string | null,
 ): Promise<boolean> {
@@ -27,13 +27,13 @@ export async function isDuplicateInternshipServer(
   return data.length > 0;
 }
 
-export async function enrichInternshipsWithDuplicateServer<
+export async function enrichWithDuplicateStatus<
   T extends { id: string; internshipHash: string | null },
 >(internships: T[]): Promise<(T & { isDuplicate: boolean })[]> {
   return Promise.all(
     internships.map(async (internship) => ({
       ...internship,
-      isDuplicate: await isDuplicateInternshipServer(internship.id, internship.internshipHash),
+      isDuplicate: await isDuplicate(internship.id, internship.internshipHash),
     })),
   );
 }
