@@ -39,7 +39,7 @@ export const InternshipInfiniteScroll = ({
     getNextPageParam: (lastPage) => lastPage.nextPage,
   });
 
-  const { ref, inView } = useInView();
+  const { ref, inView } = useInView({ rootMargin: "200px" });
 
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) fetchNextPage();
