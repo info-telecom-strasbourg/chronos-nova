@@ -108,7 +108,7 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
   };
 
   const handleRestore = () => {
-    handleAction(() => restoreInternship(internship.id), "Stage restauré avec succès");
+    handleAction(() => restoreInternship(internship.id), "Stage restauré et placé en attente de validation");
   };
 
   const getEditDefaultValues = () => ({

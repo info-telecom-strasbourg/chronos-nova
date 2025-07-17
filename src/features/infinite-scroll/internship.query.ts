@@ -201,7 +201,7 @@ export const approveInternship = async (
 export const restoreInternship = async (id: string): Promise<void> => {
   const supabase = await createSupabaseServerClient();
 
-  const { error } = await supabase.from("internship").update({ state: "visible" }).eq("id", id);
+  const { error } = await supabase.from("internship").update({ state: "draft" }).eq("id", id);
 
   if (error) throw error;
 
