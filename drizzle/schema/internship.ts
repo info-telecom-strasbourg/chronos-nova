@@ -12,6 +12,7 @@ export const internships = pgTable("internship", {
   weeksCount: integer("weeksCount"),
   academicYear: academicYear("academicYear"),
   state: state("state").notNull(),
+  internshipHash: text("internshipHash"),
   studentId: uuid("studentId")
     .notNull()
     .references(() => students.id, {

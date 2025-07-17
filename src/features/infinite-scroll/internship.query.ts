@@ -3,11 +3,12 @@
 import type { CreateInternshipFormData } from "@/features/form/internship.schema";
 import type { InternshipData } from "@/types/drizzle";
 import { z } from "zod";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { revalidateAdmin } from "@/lib/revalidation";
-import { validateStageForApproval } from "@/features/stage-validation";
-import { normalizeFormData } from "@/lib/utils/stage-normalizer";
 import { studentMajors, studentOptions } from "@/features/form/options";
+import { revalidateAdmin } from "@/lib/revalidation";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createInternshipHashFromNormalized } from "@/lib/utils/internship-hash-utils";
+import { validateInternshipForApproval } from "@/lib/utils/internship-validation";
+import { normalizeFormData } from "@/lib/utils/stage-normalizer";
 
 const getInternshipsQuerySchema = z.object({
   q: z.string().optional(),
@@ -141,32 +142,39 @@ export const approveInternship = async (
 
   if (fetchError) throw fetchError;
 
-  // Valider les données avant approbation
+  const validation = await validateInternshipForApproval(internshipData);
 
-  const stageData = {
-    organizationName: internshipData.organization?.name || null,
-    organizationType: internshipData.organization?.type || null,
-    organizationCountry: internshipData.organization?.country || null,
-    organizationCity: internshipData.organization?.city || null,
-    subject: internshipData.subject || null,
-    academicYear: internshipData.academicYear || null,
-    beginDate: internshipData.beginDate || null,
-    weeksCount: internshipData.weeksCount || null,
-    studentMajor: internshipData.student?.major?.alias || null,
-    studentOption: internshipData.student?.option?.alias || null,
-  };
-
-  const validation = validateStageForApproval(stageData);
-
-  if (!validation.isValid) {
+  if (!validation.canApprove) {
     return {
       success: false,
-      message: `Impossible d'approuver ce stage : des données sont manquantes ou invalides.`,
+      message: validation.errors.join(", "),
     };
   }
 
+  // Générer le hash du stage
+  const internshipHash = createInternshipHashFromNormalized({
+    internship: {
+      subject: internshipData.subject,
+      beginDate: internshipData.beginDate,
+      weeksCount: internshipData.weeksCount,
+      academicYear: internshipData.academicYear,
+    },
+    organization: {
+      name: internshipData.organization?.name || null,
+      type: internshipData.organization?.type || null,
+      country: internshipData.organization?.country || null,
+      city: internshipData.organization?.city || null,
+    },
+  });
+
   // Si la validation passe, approuver le stage
-  const { error } = await supabase.from("internship").update({ state: "visible" }).eq("id", id);
+  const { error } = await supabase
+    .from("internship")
+    .update({
+      state: "visible",
+      internshipHash: internshipHash,
+    })
+    .eq("id", id);
 
   if (error) throw error;
 
@@ -205,7 +213,7 @@ export const createInternship = async (data: CreateInternshipFormData): Promise<
   const supabase = await createSupabaseServerClient();
 
   // Normaliser les données avec validation Zod puis normalisation
-    const normalized = normalizeFormData(data);
+  const normalized = normalizeFormData(data);
 
   // First, create or get organization
   const { data: orgData, error: orgError } = await supabase
@@ -222,7 +230,7 @@ export const createInternship = async (data: CreateInternshipFormData): Promise<
   if (orgError) throw orgError;
 
   // Ensure major exists (with name)
-    const majorLabel =
+  const majorLabel =
     studentMajors.find((m) => m.value === normalized.student.major)?.label ||
     normalized.student.major;
   const { error: majorError } = await supabase
@@ -236,7 +244,7 @@ export const createInternship = async (data: CreateInternshipFormData): Promise<
   if (majorError) throw majorError;
 
   // Ensure option exists (with name)
-    const optionLabel =
+  const optionLabel =
     studentOptions.find((o) => o.value === normalized.student.option)?.label ||
     normalized.student.option;
   const { error: optionError } = await supabase
@@ -261,6 +269,9 @@ export const createInternship = async (data: CreateInternshipFormData): Promise<
 
   if (studentError) throw studentError;
 
+  // Générer le hash du stage
+  const internshipHash = createInternshipHashFromNormalized(normalized);
+
   // Finally create internship
   const { data: internshipData, error: internshipError } = await supabase
     .from("internship")
@@ -272,6 +283,7 @@ export const createInternship = async (data: CreateInternshipFormData): Promise<
       beginDate: normalized.internship.beginDate,
       weeksCount: normalized.internship.weeksCount,
       state: "draft", // New internships start as draft
+      internshipHash: internshipHash,
     })
     .select("id")
     .single();
@@ -292,7 +304,7 @@ export const updateInternship = async (
   const supabase = await createSupabaseServerClient();
 
   // Normaliser les données avec validation Zod puis normalisation
-    const normalized = normalizeFormData(data);
+  const normalized = normalizeFormData(data);
 
   // Get current internship to access related IDs
   const { data: currentInternship, error: fetchError } = await supabase
@@ -317,7 +329,7 @@ export const updateInternship = async (
   if (orgError) throw orgError;
 
   // Ensure major exists (with name)
-    const majorLabel =
+  const majorLabel =
     studentMajors.find((m) => m.value === normalized.student.major)?.label ||
     normalized.student.major;
   const { error: majorError } = await supabase
@@ -331,7 +343,7 @@ export const updateInternship = async (
   if (majorError) throw majorError;
 
   // Ensure option exists (with name)
-    const optionLabel =
+  const optionLabel =
     studentOptions.find((o) => o.value === normalized.student.option)?.label ||
     normalized.student.option;
   const { error: optionError } = await supabase
@@ -355,6 +367,9 @@ export const updateInternship = async (
 
   if (studentError) throw studentError;
 
+  // Générer le nouveau hash du stage
+  const internshipHash = createInternshipHashFromNormalized(normalized);
+
   // Update internship
   const { error: internshipError } = await supabase
     .from("internship")
@@ -363,6 +378,7 @@ export const updateInternship = async (
       academicYear: normalized.internship.academicYear,
       beginDate: normalized.internship.beginDate,
       weeksCount: normalized.internship.weeksCount,
+      internshipHash: internshipHash,
     })
     .eq("id", id);
 

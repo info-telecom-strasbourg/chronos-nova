@@ -7,6 +7,7 @@ import { parseExcelInternship2A } from "@/features/parser/parser-internship-2A";
 import { isBadlyImportedStage } from "@/features/stage-validation";
 import { pluralize } from "@/lib/scripts/string";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createInternshipHashFromNormalized } from "@/lib/utils/internship-hash-utils";
 import { normalizeCompleteStageData } from "@/lib/utils/stage-normalizer";
 
 // Types pour les parsers adaptés
@@ -38,11 +39,12 @@ export interface ExcelImportResult {
 
 async function insertParsedDataToDatabase(
   data: ParsedData,
-): Promise<{ insertedCount: number; badlyImportedCount: number }> {
+): Promise<{ insertedCount: number; badlyImportedCount: number; duplicateCount: number }> {
   const supabase = await createSupabaseServerClient();
 
   let insertedCount = 0;
   let badlyImportedCount = 0;
+  let duplicateCount = 0;
 
   for (let i = 0; i < data.internships.length; i++) {
     const internship = data.internships[i];
@@ -155,7 +157,27 @@ async function insertParsedDataToDatabase(
         continue;
       }
 
-      // 5. Créer le stage avec statut "draft"
+      // 5. Générer le hash du stage
+      const internshipHash = createInternshipHashFromNormalized(normalized);
+
+      // 6. Vérifier s'il existe déjà un stage approuvé avec le même hash
+      const { data: existingApprovedInternship } = await supabase
+        .from("internship")
+        .select("id")
+        .eq("internshipHash", internshipHash)
+        .eq("state", "visible")
+        .single();
+
+      // Si un stage approuvé identique existe déjà, on peut quand même créer en draft
+      // L'utilisateur devra gérer le doublon lors de l'approbation
+      if (existingApprovedInternship) {
+        console.warn(
+          `Stage potentiellement en doublon détecté pour la ligne ${i + 1} (stage approuvé existant: ${existingApprovedInternship.id})`,
+        );
+        duplicateCount++;
+      }
+
+      // 7. Créer le stage avec statut "draft"
       const { error: internshipError } = await supabase.from("internship").insert({
         organizationId: orgData.id,
         studentId: studentData.id,
@@ -164,6 +186,7 @@ async function insertParsedDataToDatabase(
         beginDate: internshipBeginDate,
         weeksCount: internshipWeeksCount,
         state: "draft",
+        internshipHash: internshipHash,
       });
 
       if (internshipError) {
@@ -177,7 +200,7 @@ async function insertParsedDataToDatabase(
     }
   }
 
-  return { insertedCount, badlyImportedCount };
+  return { insertedCount, badlyImportedCount, duplicateCount };
 }
 
 /**
@@ -190,6 +213,7 @@ export async function importExcelData(
   try {
     let totalImported = 0;
     let totalBadlyImported = 0;
+    let totalDuplicates = 0;
 
     for (const sheetConfig of sheetsConfig) {
       const { name: sheetName, academicYear } = sheetConfig;
@@ -241,6 +265,7 @@ export async function importExcelData(
       const result = await insertParsedDataToDatabase(parsedData);
       totalImported += result.insertedCount;
       totalBadlyImported += result.badlyImportedCount;
+      totalDuplicates += result.duplicateCount;
 
       // Nettoyer le fichier temporaire
       fs.unlinkSync(tempFilePath);
@@ -257,6 +282,9 @@ export async function importExcelData(
         : pluralize(totalImported, "stage importé", "stages importés");
     if (totalBadlyImported > 0) {
       message += ` - ${pluralize(totalBadlyImported, "stage mal importé", "stages mal importés")} (données incomplètes)`;
+    }
+    if (totalDuplicates > 0) {
+      message += ` - ${pluralize(totalDuplicates, "doublon suspecté", "doublons suspectés")}`;
     }
 
     return {

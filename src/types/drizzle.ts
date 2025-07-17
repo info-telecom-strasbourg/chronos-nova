@@ -13,3 +13,26 @@ export type InternshipData = Internship & {
     option: Option;
   };
 };
+
+// Types pour la gestion des doublons
+export type InternshipHashData = {
+  subject: string | null;
+  beginDate: string | null;
+  weeksCount: number | null;
+  academicYear: string | null;
+  organizationName: string | null;
+  organizationType: string | null;
+  organizationCountry: string | null;
+  organizationCity: string | null;
+};
+
+export type DuplicateCheckResult = {
+  isDuplicate: boolean;
+  duplicateId?: string;
+};
+
+export type InternshipValidationResult = {
+  canApprove: boolean;
+  errors: string[];
+  isDuplicate: boolean;
+};
