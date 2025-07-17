@@ -6,6 +6,8 @@ import path from "path";
 import { parseExcelInternship2A } from "@/features/parser/parser-internship-2A";
 import { pluralize } from "@/lib/scripts/string";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { normalizeCompleteStageData } from "@/lib/utils/stage-normalizer";
+import { isBadlyImportedStage } from "@/features/stage-validation";
 
 // Types pour les parsers adaptés
 interface ParsedData {
@@ -38,8 +40,6 @@ async function insertParsedDataToDatabase(
   data: ParsedData,
 ): Promise<{ insertedCount: number; badlyImportedCount: number }> {
   const supabase = await createSupabaseServerClient();
-  const { normalizeCompleteStageData } = await import("@/lib/utils/stage-normalizer");
-  const { isBadlyImportedStage } = await import("@/features/stage-validation");
 
   let insertedCount = 0;
   let badlyImportedCount = 0;

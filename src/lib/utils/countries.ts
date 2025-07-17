@@ -1,5 +1,6 @@
 import countries from "i18n-iso-countries";
 import fr from "i18n-iso-countries/langs/fr.json";
+import { normalizeCountryName } from "./string-normalizer";
 
 // Enregistrer la langue française
 countries.registerLocale(fr);
@@ -28,19 +29,6 @@ export function generateCountriesList(): Country[] {
 }
 
 export const COUNTRIES_LIST = generateCountriesList();
-
-/**
- * Normalise un nom de pays pour la comparaison
- * Supprime les accents, espaces et met en minuscules
- */
-function normalizeCountryName(name: string): string {
-  return name
-    .toLowerCase()
-    .trim()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // Supprime les accents
-    .replace(/[^a-z0-9]/g, ""); // Garde seulement lettres et chiffres
-}
 
 /**
  * Trouve un pays par son nom (insensible à la casse et aux accents)

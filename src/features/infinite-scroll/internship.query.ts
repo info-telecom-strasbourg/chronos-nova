@@ -4,6 +4,10 @@ import type { CreateInternshipFormData } from "@/features/form/internship.schema
 import type { InternshipData } from "@/types/drizzle";
 import { z } from "zod";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { revalidateAdmin } from "@/lib/revalidation";
+import { validateStageForApproval } from "@/features/stage-validation";
+import { normalizeFormData } from "@/lib/utils/stage-normalizer";
+import { studentMajors, studentOptions } from "@/features/form/options";
 
 const getInternshipsQuerySchema = z.object({
   q: z.string().optional(),
@@ -119,7 +123,6 @@ export const softDeleteInternship = async (id: string): Promise<void> => {
   if (error) throw error;
 
   // Revalidate admin pages
-  const { revalidateAdmin } = await import("@/lib/revalidation");
   await revalidateAdmin();
 };
 
@@ -139,7 +142,6 @@ export const approveInternship = async (
   if (fetchError) throw fetchError;
 
   // Valider les données avant approbation
-  const { validateStageForApproval } = await import("@/features/stage-validation");
 
   const stageData = {
     organizationName: internshipData.organization?.name || null,
@@ -169,7 +171,6 @@ export const approveInternship = async (
   if (error) throw error;
 
   // Revalidate admin pages
-  const { revalidateAdmin } = await import("@/lib/revalidation");
   await revalidateAdmin();
 
   return { success: true };
@@ -184,7 +185,6 @@ export const restoreInternship = async (id: string): Promise<void> => {
   if (error) throw error;
 
   // Revalidate admin pages
-  const { revalidateAdmin } = await import("@/lib/revalidation");
   await revalidateAdmin();
 };
 
@@ -197,7 +197,6 @@ export const hardDeleteInternship = async (id: string): Promise<void> => {
   if (error) throw error;
 
   // Revalidate admin pages
-  const { revalidateAdmin } = await import("@/lib/revalidation");
   await revalidateAdmin();
 };
 
@@ -206,8 +205,7 @@ export const createInternship = async (data: CreateInternshipFormData): Promise<
   const supabase = await createSupabaseServerClient();
 
   // Normaliser les données avec validation Zod puis normalisation
-  const { normalizeFormData } = await import("@/lib/utils/stage-normalizer");
-  const normalized = normalizeFormData(data);
+    const normalized = normalizeFormData(data);
 
   // First, create or get organization
   const { data: orgData, error: orgError } = await supabase
@@ -224,8 +222,7 @@ export const createInternship = async (data: CreateInternshipFormData): Promise<
   if (orgError) throw orgError;
 
   // Ensure major exists (with name)
-  const { studentMajors } = await import("@/features/form/options");
-  const majorLabel =
+    const majorLabel =
     studentMajors.find((m) => m.value === normalized.student.major)?.label ||
     normalized.student.major;
   const { error: majorError } = await supabase
@@ -239,8 +236,7 @@ export const createInternship = async (data: CreateInternshipFormData): Promise<
   if (majorError) throw majorError;
 
   // Ensure option exists (with name)
-  const { studentOptions } = await import("@/features/form/options");
-  const optionLabel =
+    const optionLabel =
     studentOptions.find((o) => o.value === normalized.student.option)?.label ||
     normalized.student.option;
   const { error: optionError } = await supabase
@@ -283,7 +279,6 @@ export const createInternship = async (data: CreateInternshipFormData): Promise<
   if (internshipError) throw internshipError;
 
   // Revalidate admin pages after creating new internship
-  const { revalidateAdmin } = await import("@/lib/revalidation");
   await revalidateAdmin();
 
   return { id: internshipData.id };
@@ -297,8 +292,7 @@ export const updateInternship = async (
   const supabase = await createSupabaseServerClient();
 
   // Normaliser les données avec validation Zod puis normalisation
-  const { normalizeFormData } = await import("@/lib/utils/stage-normalizer");
-  const normalized = normalizeFormData(data);
+    const normalized = normalizeFormData(data);
 
   // Get current internship to access related IDs
   const { data: currentInternship, error: fetchError } = await supabase
@@ -323,8 +317,7 @@ export const updateInternship = async (
   if (orgError) throw orgError;
 
   // Ensure major exists (with name)
-  const { studentMajors } = await import("@/features/form/options");
-  const majorLabel =
+    const majorLabel =
     studentMajors.find((m) => m.value === normalized.student.major)?.label ||
     normalized.student.major;
   const { error: majorError } = await supabase
@@ -338,8 +331,7 @@ export const updateInternship = async (
   if (majorError) throw majorError;
 
   // Ensure option exists (with name)
-  const { studentOptions } = await import("@/features/form/options");
-  const optionLabel =
+    const optionLabel =
     studentOptions.find((o) => o.value === normalized.student.option)?.label ||
     normalized.student.option;
   const { error: optionError } = await supabase
@@ -377,7 +369,6 @@ export const updateInternship = async (
   if (internshipError) throw internshipError;
 
   // Revalidate admin pages after update
-  const { revalidateAdmin } = await import("@/lib/revalidation");
   await revalidateAdmin();
 };
 

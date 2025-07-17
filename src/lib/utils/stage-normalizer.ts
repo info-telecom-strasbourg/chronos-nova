@@ -3,7 +3,7 @@ import {
   parseMajor,
   parseOption,
   parseOrganizationType,
-} from "@/features/parser/mappings";
+} from "@/lib/utils/parsers";
 import { formatCityName, parseDate } from "@/features/parser/parser-utils";
 
 export interface NormalizedStudentData {

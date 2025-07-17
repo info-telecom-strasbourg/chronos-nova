@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Form } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { ExcelImportDialog } from "@/features/excel-import/excel-import-dialog";
+import { importExcelData } from "@/features/excel-import/excel-import.action";
 import {
   type CreateInternshipFormData,
   createInternshipSchema,
@@ -76,7 +77,6 @@ export function InternshipCreateDialog({ open, onOpenChange }: InternshipCreateD
     try {
       const arrayBuffer = await file.arrayBuffer();
 
-      const { importExcelData } = await import("@/features/excel-import/excel-import.action");
       const result = await importExcelData(arrayBuffer, sheetsConfig);
 
       if (result.success) {
