@@ -25,7 +25,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { InternshipConfirmDialogs } from "@/features/admin/internship-confirm-dialogs";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { InternshipBadges } from "@/components/ui/internship-badges";
 import { InternshipEditDialog } from "@/features/form/internship-edit-dialog";
@@ -147,11 +147,8 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
                 <Edit className="mr-1 w-4 h-4" />
                 Modifier
               </Button>
-              <ConfirmDialog
-                title="Supprimer le stage"
-                description="Êtes-vous sûr de vouloir supprimer ce stage ? Il sera déplacé vers la section supprimés."
-                confirmText="Supprimer"
-                variant="destructive"
+              <InternshipConfirmDialogs
+                type="single-draft"
                 onConfirm={handleSoftDelete}
                 disabled={isPending}
               >
@@ -159,7 +156,7 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
                   <Trash2 className="mr-1 w-4 h-4" />
                   Supprimer
                 </Button>
-              </ConfirmDialog>
+              </InternshipConfirmDialogs>
             </>
           )}
 
@@ -169,11 +166,8 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
                 <Edit className="mr-1 w-4 h-4" />
                 Modifier
               </Button>
-              <ConfirmDialog
-                title="Supprimer le stage"
-                description="Êtes-vous sûr de vouloir supprimer ce stage ? Il sera déplacé vers la section supprimés."
-                confirmText="Supprimer"
-                variant="destructive"
+              <InternshipConfirmDialogs
+                type="single-visible"
                 onConfirm={handleSoftDelete}
                 disabled={isPending}
               >
@@ -181,7 +175,7 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
                   <Trash2 className="mr-1 w-4 h-4" />
                   Supprimer
                 </Button>
-              </ConfirmDialog>
+              </InternshipConfirmDialogs>
             </>
           )}
 
@@ -191,11 +185,8 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
                 <RefreshCw className="mr-1 w-4 h-4" />
                 Restaurer
               </Button>
-              <ConfirmDialog
-                title="Suppression définitive"
-                description="ATTENTION : Cette action est irréversible ! Le stage sera définitivement supprimé de la base de données et ne pourra pas être récupéré."
-                confirmText="Supprimer définitivement"
-                variant="destructive"
+              <InternshipConfirmDialogs
+                type="single-deleted"
                 onConfirm={handleHardDelete}
                 disabled={isPending}
               >
@@ -203,7 +194,7 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
                   <AlertTriangle className="mr-1 w-4 h-4" />
                   Supprimer définitivement
                 </Button>
-              </ConfirmDialog>
+              </InternshipConfirmDialogs>
             </>
           )}
         </div>

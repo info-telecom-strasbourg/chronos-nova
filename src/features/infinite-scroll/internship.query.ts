@@ -496,3 +496,47 @@ export async function getInternshipsWithDetails({
     hasMore,
   };
 }
+
+// Action: Soft delete all draft internships
+export const deleteAllDrafts = async (): Promise<{ deletedCount: number }> => {
+  const supabase = await createSupabaseServerClient();
+
+  // Get count before deletion
+  const { count: initialCount } = await supabase
+    .from("internship")
+    .select("*", { count: "exact", head: true })
+    .eq("state", "draft");
+
+  // Update all draft internships to deleted
+  const { error } = await supabase
+    .from("internship")
+    .update({ state: "deleted" })
+    .eq("state", "draft");
+
+  if (error) throw error;
+
+  await revalidateAdmin();
+  return { deletedCount: initialCount || 0 };
+};
+
+// Action: Hard delete all deleted internships
+export const deleteAllDeleted = async (): Promise<{ deletedCount: number }> => {
+  const supabase = await createSupabaseServerClient();
+
+  // Get count before deletion
+  const { count: initialCount } = await supabase
+    .from("internship")
+    .select("*", { count: "exact", head: true })
+    .eq("state", "deleted");
+
+  // Permanently delete all deleted internships
+  const { error } = await supabase
+    .from("internship")
+    .delete()
+    .eq("state", "deleted");
+
+  if (error) throw error;
+
+  await revalidateAdmin();
+  return { deletedCount: initialCount || 0 };
+};
