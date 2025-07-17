@@ -42,7 +42,6 @@ export function Combobox({
   error = false,
   disabled = false,
   className,
-  width = "w-full",
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false);
 
@@ -57,8 +56,7 @@ export function Combobox({
           aria-invalid={error}
           disabled={disabled}
           className={cn(
-            "w-full justify-between",
-            width,
+            "w-full justify-between md:w-54",
             error &&
               "!border-destructive focus-visible:border-destructive focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
             className,
@@ -66,14 +64,19 @@ export function Combobox({
         >
           <span
             data-slot="select-value"
-            className={cn(!value && "line-clamp-1 flex items-center gap-2 text-muted-foreground")}
+            className="block max-w-full truncate text-left md:max-w-[13rem]"
+            title={value?.label || placeholder}
           >
             {value?.label || placeholder}
           </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className={cn("p-0", width)}>
+      <PopoverContent
+        align="start"
+        className={cn("w-full min-w-0 max-w-full p-0 md:w-54 md:max-w-[13.5rem]")}
+        sideOffset={4}
+      >
         <Command className="bg-popover text-popover-foreground">
           <CommandInput
             placeholder={searchPlaceholder}
@@ -93,7 +96,9 @@ export function Combobox({
                   }}
                   className="text-foreground hover:bg-transparent hover:text-foreground aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50"
                 >
-                  {option.label}
+                  <span className="block max-w-full truncate md:max-w-[13rem]" title={option.label}>
+                    {option.label}
+                  </span>
                   <Check
                     className={cn(
                       "ml-auto h-4 w-4",

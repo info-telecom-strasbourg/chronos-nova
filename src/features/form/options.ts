@@ -1,5 +1,5 @@
+import { COUNTRIES_LIST } from "@/lib/utils/countries";
 import {
-  COUNTRY_MAPPINGS,
   getMajorShortLabel,
   getOptionShortLabel,
   ORGANIZATION_TYPE_MAPPINGS,
@@ -10,10 +10,7 @@ export const organizationTypes = Object.values(ORGANIZATION_TYPE_MAPPINGS)
   .filter((mapping) => mapping.value === "company" || mapping.value === "not_company")
   .map((mapping) => ({ value: mapping.value, label: mapping.label }));
 
-export const countries = Object.values(COUNTRY_MAPPINGS).map((mapping) => ({
-  value: mapping.value,
-  label: mapping.label,
-}));
+export const countries = COUNTRIES_LIST;
 
 export const academicStructure = {
   "1A": {

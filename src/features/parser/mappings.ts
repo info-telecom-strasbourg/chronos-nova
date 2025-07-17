@@ -14,11 +14,6 @@ export interface MajorMapping {
   fullLabel?: string;
 }
 
-export interface CountryMapping {
-  value: string;
-  label: string;
-}
-
 export interface OrganizationTypeMapping {
   value: string;
   label: string;
@@ -161,22 +156,6 @@ export const OPTION_MAPPINGS: Record<string, OptionMapping> = {
   },
 } as const;
 
-// ========================================
-// MAPPINGS DES PAYS (Parsing et Affichage)
-// ========================================
-
-export const COUNTRY_MAPPINGS: Record<string, CountryMapping> = {
-  france: { value: "france", label: "FRANCE" },
-  allemagne: { value: "allemagne", label: "ALLEMAGNE" },
-  luxembourg: { value: "luxembourg", label: "LUXEMBOURG" },
-  belgique: { value: "belgique", label: "BELGIQUE" },
-  bresil: { value: "bresil", label: "BRÉSIL" },
-  espagne: { value: "espagne", label: "ESPAGNE" },
-  italie: { value: "italie", label: "ITALIE" },
-  portugal: { value: "portugal", label: "PORTUGAL" },
-  suisse: { value: "suisse", label: "SUISSE" },
-} as const;
-
 // ========================================================
 // MAPPINGS DES TYPES D'ORGANISATION (Affichage et Parsing)
 // ========================================================
@@ -275,20 +254,15 @@ export function parseOption(value: string): string | null {
 
 /**
  * Parse et normalise un pays vers sa valeur courte
- * Exemple: "FRANCE" → "france"
+ * Exemple: "france" → "FRANCE", "allemagne" → "ALLEMAGNE"
  * Retourne null pour les valeurs vides, mal formatées ou non reconnues
  */
 export function parseCountry(value: string): string | null {
   if (!value || typeof value !== "string" || value.trim() === "") return null;
 
-  const normalized = normalizeForMatching(value);
-  const mapping = COUNTRY_MAPPINGS[normalized];
-
-  if (mapping) {
-    return mapping.value;
-  }
-
-  return null;
+  // Import dynamique pour éviter les problèmes de circularité
+  const { findCountryByName } = require("@/lib/utils/countries");
+  return findCountryByName(value);
 }
 
 /**
@@ -424,14 +398,15 @@ export function getOptionShortLabel(value: string | null): string {
 
 /**
  * Obtient le label d'un pays pour l'affichage
- * Exemple: "france" → "FRANCE", null → "??"
+ * Exemple: "FRANCE" → "FRANCE", null → "??"
  */
 export function getCountryLabel(value: string | null): string {
   if (!value || typeof value !== "string") return "??";
 
-  const mapping = COUNTRY_MAPPINGS[value];
-  if (mapping) {
-    return mapping.label;
+  // Pour les pays, la valeur et le label sont identiques (tous en MAJUSCULES)
+  const { isValidCountry } = require("@/lib/utils/countries");
+  if (isValidCountry(value)) {
+    return value;
   }
 
   return "??";
