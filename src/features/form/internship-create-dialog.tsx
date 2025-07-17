@@ -1,5 +1,6 @@
 "use client";
 
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import type { SheetConfig } from "@/types/excel-import";
 import type { ExcelImportSummary } from "@/types/excel-import";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
+import { Spinner } from "@/components/ui/spinner";
 import { ExcelImportDialog } from "@/features/excel-import/excel-import-dialog";
 import { ExcelImportSummaryDialog } from "@/features/excel-import/excel-import-summary-dialog";
 import { importExcelData } from "@/features/excel-import/excel-import.action";
@@ -37,6 +39,7 @@ export function InternshipCreateDialog({ open, onOpenChange }: InternshipCreateD
   const [isExcelDialogOpen, setIsExcelDialogOpen] = useState(false);
   const [isSummaryDialogOpen, setIsSummaryDialogOpen] = useState(false);
   const [importSummary, setImportSummary] = useState<ExcelImportSummary | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
 
   const form = useForm<CreateInternshipFormData>({
     resolver: zodResolver(createInternshipSchema),
@@ -79,6 +82,7 @@ export function InternshipCreateDialog({ open, onOpenChange }: InternshipCreateD
 
   const handleExcelImport = async (file: File, sheetsConfig: SheetConfig[]) => {
     try {
+      setIsImporting(true);
       const arrayBuffer = await file.arrayBuffer();
 
       const result = await importExcelData(arrayBuffer, sheetsConfig);
@@ -108,6 +112,8 @@ export function InternshipCreateDialog({ open, onOpenChange }: InternshipCreateD
     } catch (error) {
       console.error("Erreur lors de l'import Excel:", error);
       toast.error("Une erreur s'est produite lors de l'import des données Excel");
+    } finally {
+      setIsImporting(false);
     }
   };
 
@@ -138,7 +144,22 @@ export function InternshipCreateDialog({ open, onOpenChange }: InternshipCreateD
 
   return (
     <>
-      <Dialog open={open} onOpenChange={handleClose}>
+      <Dialog open={isImporting} onOpenChange={() => {}}>
+        <DialogContent showCloseButton={false} className="flex flex-col justify-center items-center bg-background/90 max-w-xs">
+          <DialogTitle asChild>
+            <VisuallyHidden>Importation en cours</VisuallyHidden>
+          </DialogTitle>
+          <Spinner className="mb-2 size-8" />
+          <div className="text-center">
+            <h3 className="font-semibold text-lg">Import en cours…</h3>
+            <p className="mt-1 text-muted-foreground text-sm">
+              Veuillez patienter pendant l'importation des stages. Cette opération peut prendre quelques secondes. Si au bout de quelques minutes l'import n'est pas terminé, veuillez réessayer ou contacter le support.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={open} onOpenChange={isImporting ? undefined : handleClose}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <div className="flex flex-row items-stretch gap-4">
