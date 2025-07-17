@@ -132,7 +132,6 @@ export function validateStageForApproval(data: StageImportData): {
  * Un stage "mal importé" contient au moins une valeur null ou "__inconnu__".
  */
 export function isBadlyImportedStage(stage: Partial<StageImportData>): boolean {
-  // On ne compte PAS studentOption dans la détection des stages mal importés
   const values = [
     stage.organizationName,
     stage.organizationType,
@@ -143,8 +142,12 @@ export function isBadlyImportedStage(stage: Partial<StageImportData>): boolean {
     stage.beginDate,
     stage.weeksCount,
     stage.studentMajor,
-    // studentOption ignoré volontairement
   ];
 
-  return values.some((value) => value === null || value === "__inconnu__" || value === undefined);
+  // Vérifier les valeurs principales
+  const hasInvalidMainValues = values.some((value) => value === null || value === "__inconnu__" || value === undefined);
+  
+  const hasInvalidOption = stage.studentOption === "__inconnu__";
+  
+  return hasInvalidMainValues || hasInvalidOption;
 }

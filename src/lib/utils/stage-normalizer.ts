@@ -5,6 +5,7 @@ import {
   parseOrganizationType,
 } from "@/lib/utils/parsers";
 import { formatCityName, parseDate } from "@/features/parser/parser-utils";
+import { validateAndFixAcademicData } from "@/lib/utils/academic-validation";
 
 export interface NormalizedStudentData {
   major: string | null | "__inconnu__"; // "gene", "ir", "ti-sante", "__inconnu__" ou null
@@ -156,14 +157,38 @@ export function normalizeCompleteStageData(
   },
   fromExcel: boolean = false,
 ) {
+  // Normaliser les données de base
+  const student = normalizeStudentData(
+    {
+      major: rawData.studentMajor,
+      option: rawData.studentOption,
+    },
+    fromExcel,
+  );
+  
+  const internship = normalizeInternshipData({
+    subject: rawData.subject,
+    beginDate: rawData.beginDate,
+    weeksCount: rawData.weeksCount,
+    academicYear: rawData.academicYear,
+  });
+
+  // Valider et corriger la cohérence académique si on est en import Excel
+  let validatedStudent = student;
+  if (fromExcel) {
+    const correctedData = validateAndFixAcademicData(
+      internship.academicYear,
+      student.major,
+      student.option,
+    );
+    validatedStudent = {
+      major: correctedData.major,
+      option: correctedData.option,
+    };
+  }
+
   return {
-    student: normalizeStudentData(
-      {
-        major: rawData.studentMajor,
-        option: rawData.studentOption,
-      },
-      fromExcel,
-    ),
+    student: validatedStudent,
     organization: normalizeOrganizationData(
       {
         name: rawData.organizationName,
@@ -173,12 +198,7 @@ export function normalizeCompleteStageData(
       },
       fromExcel,
     ),
-    internship: normalizeInternshipData({
-      subject: rawData.subject,
-      beginDate: rawData.beginDate,
-      weeksCount: rawData.weeksCount,
-      academicYear: rawData.academicYear,
-    }),
+    internship,
   };
 }
 
