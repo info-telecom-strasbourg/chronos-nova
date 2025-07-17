@@ -22,6 +22,7 @@ export async function parseExcelInternship2A(
   internships: Internship[];
   students: Student[];
   organizations: Organization[];
+  rowsRead: number;
 }> {
   try {
     const ExcelJS = await import("exceljs");
@@ -33,14 +34,19 @@ export async function parseExcelInternship2A(
       throw new Error(`Sheet "${sheetName}" not found.`);
     }
 
-    const internships: Internship[] = parseInternships(worksheet, startRow, year);
+    const parseResult = parseInternships(worksheet, startRow, year);
     const students: Student[] = parseStudents(worksheet, startRow);
     const organizations: Organization[] = parseOrganizations(worksheet, startRow);
 
-    return { internships, organizations, students };
+    return { 
+      internships: parseResult.internships, 
+      organizations, 
+      students,
+      rowsRead: parseResult.rowsRead 
+    };
   } catch (error) {
     console.error(`Error parsing Excel file "${filePath}", sheet "${sheetName}":`, error);
-    return { internships: [], students: [], organizations: [] };
+    return { internships: [], students: [], organizations: [], rowsRead: 0 };
   }
 }
 
@@ -49,11 +55,14 @@ function parseRowsWithContent<T>(
   startRow: number,
   maxEmptyRows: number,
   parseRow: (row: Row, rowNumber: number) => T | null,
-): T[] {
+): { results: T[]; rowsRead: number } {
   const results: T[] = [];
   let emptyRowCount = 0;
+  let rowsRead = 0;
+  
   worksheet.eachRow({ includeEmpty: true }, (row, rowNumber) => {
     if (rowNumber < startRow) return;
+    
     if (!hasSignificantContent(row)) {
       emptyRowCount++;
       if (emptyRowCount >= maxEmptyRows) {
@@ -61,7 +70,10 @@ function parseRowsWithContent<T>(
       }
       return;
     }
+    
+    rowsRead++;
     emptyRowCount = 0;
+    
     try {
       const parsed = parseRow(row, rowNumber);
       if (parsed) results.push(parsed);
@@ -69,11 +81,12 @@ function parseRowsWithContent<T>(
       console.error(`Error parsing row ${rowNumber}:`, error);
     }
   });
-  return results;
+  
+  return { results, rowsRead };
 }
 
-function parseInternships(worksheet: Worksheet, startRow: number, year: string): Internship[] {
-  return parseRowsWithContent(worksheet, startRow, 1, (row) => {
+function parseInternships(worksheet: Worksheet, startRow: number, year: string): { internships: Internship[]; rowsRead: number } {
+  const result = parseRowsWithContent(worksheet, startRow, 1, (row) => {
     const subjectCell = row.getCell(13);
     const subject = subjectCell?.text?.trim() || null;
 
@@ -92,10 +105,12 @@ function parseInternships(worksheet: Worksheet, startRow: number, year: string):
       year,
     };
   });
+  
+  return { internships: result.results, rowsRead: result.rowsRead };
 }
 
 function parseStudents(worksheet: Worksheet, startRow: number): Student[] {
-  return parseRowsWithContent(worksheet, startRow, 1, (row) => {
+  const result = parseRowsWithContent(worksheet, startRow, 1, (row) => {
     const majorCell = row.getCell(3);
     const majorRaw = majorCell?.text?.trim();
     const major = parseMajor(majorRaw);
@@ -109,10 +124,12 @@ function parseStudents(worksheet: Worksheet, startRow: number): Student[] {
       option,
     };
   });
+  
+  return result.results;
 }
 
 function parseOrganizations(worksheet: Worksheet, startRow: number): Organization[] {
-  return parseRowsWithContent(worksheet, startRow, 1, (row) => {
+  const result = parseRowsWithContent(worksheet, startRow, 1, (row) => {
     const orgNameCell = row.getCell(5);
     const orgName = orgNameCell?.text?.trim();
 
@@ -135,4 +152,6 @@ function parseOrganizations(worksheet: Worksheet, startRow: number): Organizatio
       city,
     };
   });
+  
+  return result.results;
 }

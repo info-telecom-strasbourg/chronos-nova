@@ -35,6 +35,8 @@ export interface ExcelImportResult {
   message: string;
   importedCount?: number;
   badlyImportedCount?: number;
+  duplicateCount?: number;
+  rowsReadCount?: number;
 }
 
 async function insertParsedDataToDatabase(
@@ -215,6 +217,7 @@ export async function importExcelData(
     let totalImported = 0;
     let totalBadlyImported = 0;
     let totalDuplicates = 0;
+    let totalRowsRead = 0;
 
     for (const sheetConfig of sheetsConfig) {
       const { name: sheetName, academicYear } = sheetConfig;
@@ -226,6 +229,8 @@ export async function importExcelData(
       fs.writeFileSync(tempFilePath, Buffer.from(fileBuffer));
 
       let parsedData: ParsedData;
+      let sheetRowsRead = 0;
+      
       try {
         const result = await parseExcelInternship2A(
           tempFilePath,
@@ -233,6 +238,9 @@ export async function importExcelData(
           typeof sheetConfig.startRow === "number" ? sheetConfig.startRow : 1,
           academicYear || "",
         );
+
+        sheetRowsRead = result.rowsRead;
+        totalRowsRead += sheetRowsRead;
 
         // Transformer les données pour correspondre au type ParsedData
         parsedData = {
@@ -293,6 +301,8 @@ export async function importExcelData(
       message,
       importedCount: totalImported,
       badlyImportedCount: totalBadlyImported,
+      duplicateCount: totalDuplicates,
+      rowsReadCount: totalRowsRead,
     };
   } catch (error) {
     console.error("Error during Excel import:", error);
