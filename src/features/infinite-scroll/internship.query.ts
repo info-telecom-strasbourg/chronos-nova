@@ -12,7 +12,7 @@ import { createInternshipHashFromNormalized } from "@/lib/utils/internship-hash-
 import { validateInternshipForApproval } from "@/lib/utils/internship-validation";
 import { normalizeFormData } from "@/lib/utils/stage-normalizer";
 import { buildSortedQuery } from "@/features/sorting";
-import { getInternshipsWithSearch } from "./sorting/search-sorting";
+import { getInternshipsWithSearch } from "@/features/sorting/search-sorting";
 
 const getInternshipsQuerySchema = z.object({
   q: z.string().optional(),
