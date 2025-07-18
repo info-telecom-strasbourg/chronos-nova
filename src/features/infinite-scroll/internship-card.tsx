@@ -25,9 +25,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { InternshipConfirmDialogs } from "@/features/admin/internship-confirm-dialogs";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { InternshipBadges } from "@/components/ui/internship-badges";
+import { InternshipConfirmDialogs } from "@/features/admin/internship-confirm-dialogs";
 import { InternshipEditDialog } from "@/features/form/internship-edit-dialog";
 import {
   approveInternship,
@@ -90,7 +90,9 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
       try {
         const result = await approveInternship(internship.id);
         if (!result.success) {
-          toast.error("Impossible d'approuver ce stage. Merci de vérifier que toutes les informations sont complètes et valides.");
+          toast.error(
+            "Impossible d'approuver ce stage. Merci de vérifier que toutes les informations sont complètes et valides.",
+          );
           return;
         }
         await queryClient.invalidateQueries({ queryKey: ["internships"] });
@@ -108,7 +110,10 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
   };
 
   const handleRestore = () => {
-    handleAction(() => restoreInternship(internship.id), "Stage restauré et placé en attente de validation");
+    handleAction(
+      () => restoreInternship(internship.id),
+      "Stage restauré et placé en attente de validation",
+    );
   };
 
   const getEditDefaultValues = () => ({
@@ -135,16 +140,16 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
     if (!admin) return null;
 
     return (
-      <div className="flex sm:flex-row flex-col sm:justify-between sm:items-center gap-2 sm:gap-0 w-full">
-        <div className="flex justify-center sm:justify-start gap-2 w-full sm:w-auto">
+      <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
+        <div className="flex w-full justify-center gap-2 sm:w-auto sm:justify-start">
           {internship.state === "draft" && (
             <>
               <Button variant="default" size="sm" onClick={handleApprove} disabled={isPending}>
-                <Check className="mr-1 w-4 h-4" />
+                <Check className="mr-1 h-4 w-4" />
                 Approuver
               </Button>
               <Button variant="outline" size="sm" onClick={() => setIsEditDialogOpen(true)}>
-                <Edit className="mr-1 w-4 h-4" />
+                <Edit className="mr-1 h-4 w-4" />
                 Modifier
               </Button>
               <InternshipConfirmDialogs
@@ -153,7 +158,7 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
                 disabled={isPending}
               >
                 <Button variant="destructive" size="sm" disabled={isPending}>
-                  <Trash2 className="mr-1 w-4 h-4" />
+                  <Trash2 className="mr-1 h-4 w-4" />
                   Supprimer
                 </Button>
               </InternshipConfirmDialogs>
@@ -163,7 +168,7 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
           {internship.state === "visible" && (
             <>
               <Button variant="outline" size="sm" onClick={() => setIsEditDialogOpen(true)}>
-                <Edit className="mr-1 w-4 h-4" />
+                <Edit className="mr-1 h-4 w-4" />
                 Modifier
               </Button>
               <InternshipConfirmDialogs
@@ -172,7 +177,7 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
                 disabled={isPending}
               >
                 <Button variant="destructive" size="sm" disabled={isPending}>
-                  <Trash2 className="mr-1 w-4 h-4" />
+                  <Trash2 className="mr-1 h-4 w-4" />
                   Supprimer
                 </Button>
               </InternshipConfirmDialogs>
@@ -182,7 +187,7 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
           {internship.state === "deleted" && (
             <>
               <Button variant="default" size="sm" onClick={handleRestore} disabled={isPending}>
-                <RefreshCw className="mr-1 w-4 h-4" />
+                <RefreshCw className="mr-1 h-4 w-4" />
                 Restaurer
               </Button>
               <InternshipConfirmDialogs
@@ -191,7 +196,7 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
                 disabled={isPending}
               >
                 <Button variant="destructive" size="sm" disabled={isPending}>
-                  <AlertTriangle className="mr-1 w-4 h-4" />
+                  <AlertTriangle className="mr-1 h-4 w-4" />
                   Supprimer définitivement
                 </Button>
               </InternshipConfirmDialogs>
@@ -199,11 +204,11 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
           )}
         </div>
 
-        <div className="flex justify-center sm:justify-end w-full sm:w-auto">
+        <div className="flex w-full justify-center sm:w-auto sm:justify-end">
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="outline" size="sm">
-                <Eye className="mr-1 w-4 h-4" />
+                <Eye className="mr-1 h-4 w-4" />
                 Voir plus
               </Button>
             </DialogTrigger>
@@ -216,8 +221,8 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
 
   return (
     <Card className="w-full">
-      <CardHeader className="pb-4 border-b-2">
-        <div className="flex justify-between items-start w-full">
+      <CardHeader className="border-b-2 pb-4">
+        <div className="flex w-full items-start justify-between">
           <CardTitle className="text-2xl">{getTitleLabel(internship.organization.name)}</CardTitle>
           {admin && (
             <div className="flex flex-wrap gap-2">
@@ -232,23 +237,23 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
         </div>
         <CardDescription>
           <span className="inline-flex items-center gap-1">
-            <Building className="inline w-4 h-4 align-text-bottom" />
+            <Building className="inline h-4 w-4 align-text-bottom" />
             {getOrganizationTypeLabel(internship.organization.type)}
           </span>
         </CardDescription>
       </CardHeader>
-      <CardContent className="mb-4 px-6 font-thin text-justify">
+      <CardContent className="mb-4 px-6 text-justify font-thin">
         <p className="mb-7">{getSubjectLabel(internship.subject)}</p>
-        <div className="gap-x-4 gap-y-2 grid grid-cols-1 sm:grid-cols-2 mt-4 text-sm">
+        <div className="mt-4 grid grid-cols-1 gap-x-4 gap-y-2 text-sm sm:grid-cols-2">
           <div className="flex items-center gap-2">
-            <MapPin className="w-4 h-4" />
+            <MapPin className="h-4 w-4" />
             <span>
               {getCountryLabel(internship.organization.country)},{" "}
               {getCityLabel(internship.organization.city)}
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <GraduationCap className="w-4 h-4" />
+            <GraduationCap className="h-4 w-4" />
             <span>
               {internship.academicYear}
               {(() => {
@@ -267,24 +272,24 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4" />
+            <Clock className="h-4 w-4" />
             <span>{getWeeksLabel(internship.weeksCount)}</span>
           </div>
           <div className="flex items-center gap-2">
-            <Calendar1 className="w-4 h-4" />
+            <Calendar1 className="h-4 w-4" />
             <span>{getDateLabel(internship.beginDate)}</span>
           </div>
         </div>
       </CardContent>
-      <CardFooter className="flex justify-center sm:justify-between gap-2">
+      <CardFooter className="flex justify-center gap-2 sm:justify-between">
         {admin ? (
           getActionButtons()
         ) : (
-          <div className="flex justify-center sm:justify-end w-full">
+          <div className="flex w-full justify-center sm:justify-end">
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="outline" size="sm">
-                  <Eye className="mr-1 w-4 h-4" />
+                  <Eye className="mr-1 h-4 w-4" />
                   Voir plus
                 </Button>
               </DialogTrigger>
