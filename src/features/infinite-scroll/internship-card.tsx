@@ -90,9 +90,15 @@ export function InternshipCard({ internship, admin }: InternshipCardProps) {
       try {
         const result = await approveInternship(internship.id);
         if (!result.success) {
-          toast.error(
-            "Impossible d'approuver ce stage. Merci de vérifier que toutes les informations sont complètes et valides.",
-          );
+          if (internship.isInvalid) {
+            toast.error(
+              "Impossible d'approuver ce stage. Merci de vérifier que toutes les informations sont complètes et valides.",
+            );
+          } else {
+            toast.error(
+              "Impossible d'approuver ce stage. Ce stage est un doublon d'un stage déjà approuvé.",
+            );
+          }
           return;
         }
         await queryClient.invalidateQueries({ queryKey: ["internships"] });
