@@ -4,13 +4,13 @@ import type { ExcelImportSummary } from "@/types/excel-import";
 import { CheckCircle, FileSpreadsheet, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { pluralize } from "@/lib/scripts/string";
 
 interface ExcelImportSummaryDialogProps {
@@ -29,17 +29,17 @@ export function ExcelImportSummaryDialog({
   const hasIssues = summary.totalBadlyImported > 0 || summary.totalDuplicates > 0;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent className="sm:max-w-md">
+        <AlertDialogHeader>
+          <AlertDialogTitle className="flex items-center gap-2">
             <CheckCircle className="size-5 text-green-600" />
             Résumé de l'import
-          </DialogTitle>
-          <DialogDescription>
+          </AlertDialogTitle>
+          <AlertDialogDescription>
             Voici un récapitulatif de l'import Excel qui vient d'être effectué.
-          </DialogDescription>
-        </DialogHeader>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
 
         <div className="space-y-4">
           <div className="p-4 border rounded-lg">
@@ -96,13 +96,13 @@ export function ExcelImportSummaryDialog({
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="destructive" onClick={() => onOpenChange(false)}  className="w-full">
+        <AlertDialogFooter>
+          <Button variant="destructive" onClick={() => onOpenChange(false)} className="w-full">
             <X className="mr-2 size-4" />
             Fermer
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
