@@ -25,15 +25,29 @@ export const InternshipInfiniteScroll = ({
 }: InternshipInfiniteScrollProps) => {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("q") || "";
+  const sortParam = searchParams.get("sort") || "";
+  const orderParam = searchParams.get("order") || "";
 
+  // Validation des paramètres de tri pour éviter les erreurs de type
+  // Seuls les critères supportés sont acceptés
+  const validSort = ["most-recent", "organization", "duration", "location"].includes(sortParam)
+    ? (sortParam as "most-recent" | "organization" | "duration" | "location")
+    : undefined;
+  const validOrder = ["asc", "desc"].includes(orderParam)
+    ? (orderParam as "asc" | "desc")
+    : undefined;
+
+  // Configuration de React Query avec invalidation basée sur les paramètres de tri
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteQuery({
-    queryKey: ["internships", { state, q: searchQuery }],
+    queryKey: ["internships", { state, q: searchQuery, sort: validSort, order: validOrder }],
     queryFn: ({ pageParam }) =>
       getInternshipsQuery({
         page: pageParam,
         limit,
         state,
         q: searchQuery || undefined,
+        sort: validSort,
+        order: validOrder,
       }),
     initialPageParam: initialPage,
     getNextPageParam: (lastPage) => lastPage.nextPage,

@@ -11,11 +11,13 @@ import { enrichWithDuplicateStatus } from "@/lib/utils/duplicate-detection-serve
 import { createInternshipHashFromNormalized } from "@/lib/utils/internship-hash-utils";
 import { validateInternshipForApproval } from "@/lib/utils/internship-validation";
 import { normalizeFormData } from "@/lib/utils/stage-normalizer";
+import { buildSortedQuery } from "@/features/sorting";
+import { getInternshipsWithSearch } from "./sorting/search-sorting";
 
 const getInternshipsQuerySchema = z.object({
   q: z.string().optional(),
   filter: z.string().optional(),
-  sort: z.enum(["created_at", "updated_at"]).optional(),
+  sort: z.enum(["most-recent", "organization", "duration", "location"]).optional(),
   order: z.enum(["asc", "desc"]).optional(),
   page: z.coerce.number().optional(),
   limit: z.number().optional().default(10),
@@ -29,86 +31,73 @@ export type GetInternshipsResponse = {
   total: number;
 };
 
+/**
+ * Récupère les stages sans recherche avec tri côté serveur
+ */
+async function getInternshipsWithoutSearch(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  targetState: string,
+  sort?: string,
+  order?: string,
+  from: number = 0,
+  to: number = 9,
+): Promise<{ data: InternshipData[] | null; count: number | null; error: unknown }> {
+  // Utiliser la nouvelle fonction avec tri côté serveur
+  return await buildSortedQuery(supabase, targetState, sort, order, from, to);
+}
+
+/**
+ * Récupère la liste des stages avec tri et pagination
+ *
+ * @param q - Terme de recherche (optionnel, minimum 2 caractères)
+ * @param page - Numéro de page (commence à 0)
+ * @param limit - Nombre d'éléments par page
+ * @param state - État des stages ("visible", "draft", "deleted")
+ * @param sort - Critère de tri ("most-recent", "organization", "duration", "location")
+ * @param order - Ordre de tri ("asc", "desc")
+ * @returns Liste paginée des stages avec métadonnées
+ */
 export const getInternshipsQuery = async ({
   q,
   page = 0,
   limit,
   state,
+  sort,
+  order,
 }: Pick<
   z.infer<typeof getInternshipsQuerySchema>,
-  "q" | "page" | "limit" | "state"
+  "q" | "page" | "limit" | "state" | "sort" | "order"
 >): Promise<GetInternshipsResponse> => {
   const supabase = await createSupabaseServerClient();
   const from = page * limit;
   const to = from + limit - 1;
   const targetState = state || "visible";
 
-  // Si pas de recherche, requête simple (ne commence qu'à partir de 2 caractères)
+  let result: { data: InternshipData[] | null; count: number | null; error: unknown };
+
+  // Choisir la stratégie selon la présence de recherche
   if (!q || q.length < 2) {
-    const query = supabase
-      .from("internship")
-      .select("*, organization(*), student(*, major(*), option(*))", { count: "exact" })
-      .eq("state", targetState)
-      .range(from, to);
-
-    const { data, error, count } = await query;
-    if (error) throw error;
-
-    let enrichedData = data || [];
-    if (targetState === "draft") {
-      enrichedData = await enrichWithDuplicateStatus(enrichedData);
-    }
-
-    return {
-      data: enrichedData,
-      nextPage: data && data.length === limit ? page + 1 : undefined,
-      hasMore: data && data.length === limit,
-      total: count || 0,
-    };
+    // Pas de recherche : tri côté serveur complet
+    result = await getInternshipsWithoutSearch(supabase, targetState, sort, order, from, to);
+  } else {
+    // Avec recherche : tri côté serveur avec déduplication côté client
+    result = await getInternshipsWithSearch(supabase, q, targetState, sort, order, from, to);
   }
 
-  const escapedQuery = q.replace(/[%_\\]/g, "\\$&");
+  if (result.error) throw result.error;
 
-  // Recherche dans le nom d'organisation
-  const orgQuery = supabase
-    .from("internship")
-    .select("*, organization!inner(*), student(*, major(*), option(*))")
-    .eq("state", targetState)
-    .ilike("organization.name", `%${escapedQuery}%`);
+  let enrichedData = (result.data as InternshipData[]) || [];
 
-  // Recherche dans le sujet
-  const subjectQuery = supabase
-    .from("internship")
-    .select("*, organization(*), student(*, major(*), option(*))")
-    .eq("state", targetState)
-    .ilike("subject", `%${escapedQuery}%`);
-
-  const [orgResults, subjectResults] = await Promise.all([orgQuery, subjectQuery]);
-
-  if (orgResults.error && subjectResults.error) {
-    throw orgResults.error;
-  }
-
-  // Combiner et dédupliquer les résultats
-  const allResults = [...(orgResults.data || []), ...(subjectResults.data || [])];
-
-  const uniqueResults = allResults.filter(
-    (item, index, arr) => arr.findIndex((t) => t.id === item.id) === index,
-  );
-
-  const total = uniqueResults.length;
-  const paginatedResults = uniqueResults.slice(from, to + 1);
-
-  let enrichedData = paginatedResults;
+  // Enrichir avec le statut de doublon si nécessaire
   if (targetState === "draft") {
-    enrichedData = await enrichWithDuplicateStatus(paginatedResults);
+    enrichedData = await enrichWithDuplicateStatus(enrichedData);
   }
 
   return {
     data: enrichedData,
-    nextPage: paginatedResults.length === limit ? page + 1 : undefined,
-    hasMore: paginatedResults.length === limit,
-    total,
+    nextPage: enrichedData.length === limit ? page + 1 : undefined,
+    hasMore: enrichedData.length === limit,
+    total: result.count || 0,
   };
 };
 
@@ -530,10 +519,7 @@ export const deleteAllDeleted = async (): Promise<{ deletedCount: number }> => {
     .eq("state", "deleted");
 
   // Permanently delete all deleted internships
-  const { error } = await supabase
-    .from("internship")
-    .delete()
-    .eq("state", "deleted");
+  const { error } = await supabase.from("internship").delete().eq("state", "deleted");
 
   if (error) throw error;
 
