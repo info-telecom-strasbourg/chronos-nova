@@ -13,10 +13,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutParams) {
   return (
     <html lang="fr" suppressHydrationWarning>
-      <body className="antialiased">
+      <body className="flex min-h-screen flex-col antialiased">
         <Providers>
           <Navbar />
-          <main className="mx-auto flex min-h-screen w-full max-w-screen-xl flex-1 flex-col px-5 py-3">
+          <main className="mx-auto flex w-full max-w-screen-md flex-1 flex-col px-5 py-3">
             {children}
           </main>
           <Footer />

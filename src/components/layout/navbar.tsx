@@ -1,11 +1,12 @@
 import Link from "next/link";
+import { AdminToggle } from "@/components/admin-toggle";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { AuthButton } from "@/features/auth/auth-button";
 import { Logo } from "./logo";
 
 export const Navbar = () => {
   return (
-    <header className="sticky top-0 w-full bg-card shadow-sm backdrop-blur supports-[backdrop-filter]:bg-card/60">
+    <header className="sticky top-0 z-50 w-full bg-card shadow-sm backdrop-blur supports-[backdrop-filter]:bg-card/60">
       <nav
         aria-label="Main navigation"
         className="mx-auto flex max-w-screen-xl items-center justify-between px-5 py-3"
@@ -15,6 +16,7 @@ export const Navbar = () => {
           <span className="font-semibold text-lg">Chronos</span>
         </Link>
         <div className="flex items-center gap-2">
+          <AdminToggle />
           <ThemeToggle />
           <AuthButton />
         </div>
