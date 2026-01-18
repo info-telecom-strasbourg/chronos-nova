@@ -1,6 +1,11 @@
-import { normalizeForMatching } from "./string-normalizer";
+import {
+  MAJOR_MAPPINGS,
+  OPTION_MAPPINGS,
+  ORGANIZATION_TYPE_ALIASES,
+  ORGANIZATION_TYPE_MAPPINGS,
+} from "@/lib/const/mappings";
 import { findCountryByName } from "./countries";
-import { MAJOR_MAPPINGS, OPTION_MAPPINGS, ORGANIZATION_TYPE_MAPPINGS, ORGANIZATION_TYPE_ALIASES } from "@/lib/const/mappings";
+import { normalizeForMatching } from "./string-normalizer";
 
 // ===============================
 // FONCTIONS DE PARSING

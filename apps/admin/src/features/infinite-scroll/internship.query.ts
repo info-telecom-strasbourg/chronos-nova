@@ -4,6 +4,8 @@ import type { CreateInternshipFormData } from "@/features/form/internship.schema
 import type { InternshipData } from "@/types/drizzle";
 import { z } from "zod";
 import { studentMajors, studentOptions } from "@/features/form/options";
+import { buildSortedQuery } from "@/features/sorting";
+import { getInternshipsWithSearch } from "@/features/sorting/search-sorting";
 import { isBadlyImportedStage } from "@/features/stage-validation";
 import { revalidateAdmin } from "@/lib/revalidation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -11,8 +13,6 @@ import { enrichWithDuplicateStatus } from "@/lib/utils/duplicate-detection-serve
 import { createInternshipHashFromNormalized } from "@/lib/utils/internship-hash-utils";
 import { validateInternshipForApproval } from "@/lib/utils/internship-validation";
 import { normalizeFormData } from "@/lib/utils/stage-normalizer";
-import { buildSortedQuery } from "@/features/sorting";
-import { getInternshipsWithSearch } from "@/features/sorting/search-sorting";
 
 const getInternshipsQuerySchema = z.object({
   q: z.string().optional(),

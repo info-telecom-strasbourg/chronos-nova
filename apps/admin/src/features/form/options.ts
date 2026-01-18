@@ -1,6 +1,6 @@
+import { ORGANIZATION_TYPE_MAPPINGS } from "@/lib/const/mappings";
 import { COUNTRIES_LIST } from "@/lib/utils/countries";
 import { getMajorShortLabel, getOptionShortLabel } from "@/lib/utils/formatters";
-import { ORGANIZATION_TYPE_MAPPINGS } from "@/lib/const/mappings";
 
 // Utiliser les mappings centralisés pour la cohérence
 export const organizationTypes = Object.values(ORGANIZATION_TYPE_MAPPINGS)

@@ -116,8 +116,7 @@ export const sortByLocationWithRPCFallback = async (
 
       return { data: rpcData as InternshipData[], count, error: null };
     }
-  } catch {
-  }
+  } catch {}
 
   // Fallback : tri par localisation côté client
   return await sortByLocationClientSide(supabase, targetState, order, from, to);

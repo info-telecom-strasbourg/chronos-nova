@@ -6,7 +6,11 @@ settings:
 
 importers:
 
-  .: {}
+  .:
+    dependencies:
+      '@biomejs/biome':
+        specifier: 2.1.1
+        version: 2.1.1
 
   apps/admin:
     dependencies:

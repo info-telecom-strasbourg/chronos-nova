@@ -66,12 +66,8 @@
           "name": "internship_studentId_student_id_fk",
           "tableFrom": "internship",
           "tableTo": "student",
-          "columnsFrom": [
-            "studentId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["studentId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -79,12 +75,8 @@
           "name": "internship_organizationId_organization_id_fk",
           "tableFrom": "internship",
           "tableTo": "organization",
-          "columnsFrom": [
-            "organizationId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["organizationId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -232,12 +224,8 @@
           "name": "student_majorAlias_major_alias_fk",
           "tableFrom": "student",
           "tableTo": "major",
-          "columnsFrom": [
-            "majorAlias"
-          ],
-          "columnsTo": [
-            "alias"
-          ],
+          "columnsFrom": ["majorAlias"],
+          "columnsTo": ["alias"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -245,12 +233,8 @@
           "name": "student_optionAlias_option_alias_fk",
           "tableFrom": "student",
           "tableTo": "option",
-          "columnsFrom": [
-            "optionAlias"
-          ],
-          "columnsTo": [
-            "alias"
-          ],
+          "columnsFrom": ["optionAlias"],
+          "columnsTo": ["alias"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -266,28 +250,17 @@
     "public.academic_year": {
       "name": "academic_year",
       "schema": "public",
-      "values": [
-        "1A",
-        "2A",
-        "3A"
-      ]
+      "values": ["1A", "2A", "3A"]
     },
     "public.organization_type": {
       "name": "organization_type",
       "schema": "public",
-      "values": [
-        "company",
-        "not_company"
-      ]
+      "values": ["company", "not_company"]
     },
     "public.degree": {
       "name": "degree",
       "schema": "public",
-      "values": [
-        "gene",
-        "ir",
-        "ti"
-      ]
+      "values": ["gene", "ir", "ti"]
     }
   },
   "schemas": {},

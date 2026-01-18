@@ -1,11 +1,6 @@
-import {
-  parseCountry,
-  parseMajor,
-  parseOption,
-  parseOrganizationType,
-} from "@/lib/utils/parsers";
 import { formatCityName, parseDate } from "@/features/parser/parser-utils";
 import { validateAndFixAcademicData } from "@/lib/utils/academic-validation";
+import { parseCountry, parseMajor, parseOption, parseOrganizationType } from "@/lib/utils/parsers";
 
 export interface NormalizedStudentData {
   major: string | null | "__inconnu__"; // "gene", "ir", "ti-sante", "__inconnu__" ou null
@@ -165,7 +160,7 @@ export function normalizeCompleteStageData(
     },
     fromExcel,
   );
-  
+
   const internship = normalizeInternshipData({
     subject: rawData.subject,
     beginDate: rawData.beginDate,

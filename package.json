@@ -1,13 +1,15 @@
 {
-  "name": "chronos-nova-final",
+  "name": "chronos-nova",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "keywords": [],
+  "scripts": {
+    "lint": "biome check --write"
+  },
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.14.0"
+  "packageManager": "pnpm@10.14.0",
+  "dependencies": {
+    "@biomejs/biome": "2.1.1"
+  }
 }

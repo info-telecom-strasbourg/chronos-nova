@@ -230,7 +230,7 @@ export async function importExcelData(
 
       let parsedData: ParsedData;
       let sheetRowsRead = 0;
-      
+
       try {
         const result = await parseExcelInternship2A(
           tempFilePath,

@@ -145,9 +145,11 @@ export function isBadlyImportedStage(stage: Partial<StageImportData>): boolean {
   ];
 
   // Vérifier les valeurs principales
-  const hasInvalidMainValues = values.some((value) => value === null || value === "__inconnu__" || value === undefined);
-  
+  const hasInvalidMainValues = values.some(
+    (value) => value === null || value === "__inconnu__" || value === undefined,
+  );
+
   const hasInvalidOption = stage.studentOption === "__inconnu__";
-  
+
   return hasInvalidMainValues || hasInvalidOption;
 }

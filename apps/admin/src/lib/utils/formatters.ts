@@ -1,5 +1,5 @@
-import { isValidCountry } from "./countries";
 import { MAJOR_MAPPINGS, OPTION_MAPPINGS, ORGANIZATION_TYPE_MAPPINGS } from "@/lib/const/mappings";
+import { isValidCountry } from "./countries";
 
 // =====================
 // FONCTIONS D'AFFICHAGE

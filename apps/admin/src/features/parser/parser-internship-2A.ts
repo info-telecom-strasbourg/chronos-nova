@@ -38,11 +38,11 @@ export async function parseExcelInternship2A(
     const students: Student[] = parseStudents(worksheet, startRow);
     const organizations: Organization[] = parseOrganizations(worksheet, startRow);
 
-    return { 
-      internships: parseResult.internships, 
-      organizations, 
+    return {
+      internships: parseResult.internships,
+      organizations,
       students,
-      rowsRead: parseResult.rowsRead 
+      rowsRead: parseResult.rowsRead,
     };
   } catch (error) {
     console.error(`Error parsing Excel file "${filePath}", sheet "${sheetName}":`, error);
@@ -59,10 +59,10 @@ function parseRowsWithContent<T>(
   const results: T[] = [];
   let emptyRowCount = 0;
   let rowsRead = 0;
-  
+
   worksheet.eachRow({ includeEmpty: true }, (row, rowNumber) => {
     if (rowNumber < startRow) return;
-    
+
     if (!hasSignificantContent(row)) {
       emptyRowCount++;
       if (emptyRowCount >= maxEmptyRows) {
@@ -70,10 +70,10 @@ function parseRowsWithContent<T>(
       }
       return;
     }
-    
+
     rowsRead++;
     emptyRowCount = 0;
-    
+
     try {
       const parsed = parseRow(row, rowNumber);
       if (parsed) results.push(parsed);
@@ -81,11 +81,15 @@ function parseRowsWithContent<T>(
       console.error(`Error parsing row ${rowNumber}:`, error);
     }
   });
-  
+
   return { results, rowsRead };
 }
 
-function parseInternships(worksheet: Worksheet, startRow: number, year: string): { internships: Internship[]; rowsRead: number } {
+function parseInternships(
+  worksheet: Worksheet,
+  startRow: number,
+  year: string,
+): { internships: Internship[]; rowsRead: number } {
   const result = parseRowsWithContent(worksheet, startRow, 1, (row) => {
     const subjectCell = row.getCell(13);
     const subject = subjectCell?.text?.trim() || null;
@@ -105,7 +109,7 @@ function parseInternships(worksheet: Worksheet, startRow: number, year: string):
       year,
     };
   });
-  
+
   return { internships: result.results, rowsRead: result.rowsRead };
 }
 
@@ -124,7 +128,7 @@ function parseStudents(worksheet: Worksheet, startRow: number): Student[] {
       option,
     };
   });
-  
+
   return result.results;
 }
 
@@ -152,6 +156,6 @@ function parseOrganizations(worksheet: Worksheet, startRow: number): Organizatio
       city,
     };
   });
-  
+
   return result.results;
 }

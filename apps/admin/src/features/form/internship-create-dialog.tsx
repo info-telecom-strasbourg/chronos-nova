@@ -1,9 +1,8 @@
 "use client";
 
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import type { SheetConfig } from "@/types/excel-import";
-import type { ExcelImportSummary } from "@/types/excel-import";
+import type { ExcelImportSummary, SheetConfig } from "@/types/excel-import";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { useQueryClient } from "@tanstack/react-query";
 import { Plus, Upload, X } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -15,9 +14,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Form } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
+import { importExcelData } from "@/features/excel-import/excel-import.action";
 import { ExcelImportDialog } from "@/features/excel-import/excel-import-dialog";
 import { ExcelImportSummaryDialog } from "@/features/excel-import/excel-import-summary-dialog";
-import { importExcelData } from "@/features/excel-import/excel-import.action";
 import {
   type CreateInternshipFormData,
   createInternshipSchema,
@@ -145,7 +144,10 @@ export function InternshipCreateDialog({ open, onOpenChange }: InternshipCreateD
   return (
     <>
       <Dialog open={isImporting} onOpenChange={() => {}}>
-        <DialogContent showCloseButton={false} className="flex flex-col justify-center items-center bg-background/90 max-w-xs">
+        <DialogContent
+          showCloseButton={false}
+          className="flex max-w-xs flex-col items-center justify-center bg-background/90"
+        >
           <DialogTitle asChild>
             <VisuallyHidden>Importation en cours</VisuallyHidden>
           </DialogTitle>
@@ -153,14 +155,16 @@ export function InternshipCreateDialog({ open, onOpenChange }: InternshipCreateD
           <div className="text-center">
             <h3 className="font-semibold text-lg">Import en cours…</h3>
             <p className="mt-1 text-muted-foreground text-sm">
-              Veuillez patienter pendant l'importation des stages. Cette opération peut prendre quelques secondes. Si au bout de quelques minutes l'import n'est pas terminé, veuillez réessayer ou contacter le support.
+              Veuillez patienter pendant l'importation des stages. Cette opération peut prendre
+              quelques secondes. Si au bout de quelques minutes l'import n'est pas terminé, veuillez
+              réessayer ou contacter le support.
             </p>
           </div>
         </DialogContent>
       </Dialog>
 
       <Dialog open={open} onOpenChange={isImporting ? undefined : handleClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
           <DialogHeader>
             <div className="flex flex-row items-stretch gap-4">
               <div className="flex flex-col justify-between py-2">
@@ -169,7 +173,7 @@ export function InternshipCreateDialog({ open, onOpenChange }: InternshipCreateD
                   <span className="text-destructive">*</span> Champs requis
                 </p>
               </div>
-              <div className="flex flex-col flex-1 justify-center items-center">
+              <div className="flex flex-1 flex-col items-center justify-center">
                 <Button
                   variant="outline"
                   size="sm"
@@ -192,7 +196,7 @@ export function InternshipCreateDialog({ open, onOpenChange }: InternshipCreateD
                 <InternshipDetailsSection control={control} />
                 <Separator />
                 <StudentSection control={control} />
-                <div className="flex justify-center items-center gap-2 pt-6">
+                <div className="flex items-center justify-center gap-2 pt-6">
                   <Button
                     type="submit"
                     variant="default"
@@ -223,7 +227,7 @@ export function InternshipCreateDialog({ open, onOpenChange }: InternshipCreateD
         onOpenChange={setIsExcelDialogOpen}
         onImport={handleExcelImport}
       />
-      
+
       <ExcelImportSummaryDialog
         open={isSummaryDialogOpen}
         onOpenChange={setIsSummaryDialogOpen}

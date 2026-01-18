@@ -2,7 +2,6 @@
 
 import type { ExcelImportSummary } from "@/types/excel-import";
 import { CheckCircle, FileSpreadsheet, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -11,6 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { pluralize } from "@/lib/scripts/string";
 
 interface ExcelImportSummaryDialogProps {
@@ -42,12 +42,12 @@ export function ExcelImportSummaryDialog({
         </AlertDialogHeader>
 
         <div className="space-y-4">
-          <div className="p-4 border rounded-lg">
-            <div className="flex items-center gap-2 mb-3">
+          <div className="rounded-lg border p-4">
+            <div className="mb-3 flex items-center gap-2">
               <FileSpreadsheet className="size-4 text-muted-foreground" />
               <span className="font-medium text-sm">Import terminé</span>
             </div>
-            
+
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Lignes lues :</span>
@@ -60,7 +60,7 @@ export function ExcelImportSummaryDialog({
             </div>
 
             {hasIssues && (
-              <div className="mt-4 pt-3 border-t">
+              <div className="mt-4 border-t pt-3">
                 <div className="mb-2 font-medium text-sm">Dont :</div>
                 <div className="space-y-1 text-sm">
                   {summary.totalBadlyImported > 0 && (
@@ -74,9 +74,7 @@ export function ExcelImportSummaryDialog({
                   {summary.totalDuplicates > 0 && (
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Stages en doublon :</span>
-                      <span className="font-medium text-orange-600">
-                        {summary.totalDuplicates}
-                      </span>
+                      <span className="font-medium text-orange-600">{summary.totalDuplicates}</span>
                     </div>
                   )}
                 </div>
@@ -84,11 +82,12 @@ export function ExcelImportSummaryDialog({
             )}
           </div>
 
-          <div className="text-muted-foreground text-xs text-center">
+          <div className="text-center text-muted-foreground text-xs">
             {summary.totalImported > 0 ? (
               <>
-                {pluralize(summary.totalImported, "stage a été importé", "stages ont été importés")} 
-                {" "}en brouillon et {summary.totalImported > 1 ? "sont" : "est"} en attente de validation.
+                {pluralize(summary.totalImported, "stage a été importé", "stages ont été importés")}{" "}
+                en brouillon et {summary.totalImported > 1 ? "sont" : "est"} en attente de
+                validation.
               </>
             ) : (
               "Aucun stage n'a été importé."
