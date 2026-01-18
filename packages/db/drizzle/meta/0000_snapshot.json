@@ -1,0 +1,313 @@
+{
+  "id": "01588153-80f1-41d2-a617-9ef7a6e5c7a5",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.internship": {
+      "name": "internship",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "subject": {
+          "name": "subject",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "beginDate": {
+          "name": "beginDate",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "weeksCount": {
+          "name": "weeksCount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "academicYear": {
+          "name": "academicYear",
+          "type": "academic_year",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "state": {
+          "name": "state",
+          "type": "state",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "internshipHash": {
+          "name": "internshipHash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "isInvalid": {
+          "name": "isInvalid",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "studentId": {
+          "name": "studentId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "organizationId": {
+          "name": "organizationId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "internship_studentId_student_id_fk": {
+          "name": "internship_studentId_student_id_fk",
+          "tableFrom": "internship",
+          "tableTo": "student",
+          "columnsFrom": [
+            "studentId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "internship_organizationId_organization_id_fk": {
+          "name": "internship_organizationId_organization_id_fk",
+          "tableFrom": "internship",
+          "tableTo": "organization",
+          "columnsFrom": [
+            "organizationId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.major": {
+      "name": "major",
+      "schema": "",
+      "columns": {
+        "alias": {
+          "name": "alias",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.option": {
+      "name": "option",
+      "schema": "",
+      "columns": {
+        "alias": {
+          "name": "alias",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.organization": {
+      "name": "organization",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "type": {
+          "name": "type",
+          "type": "organization_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "country": {
+          "name": "country",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "city": {
+          "name": "city",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.student": {
+      "name": "student",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "majorAlias": {
+          "name": "majorAlias",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "optionAlias": {
+          "name": "optionAlias",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "student_majorAlias_major_alias_fk": {
+          "name": "student_majorAlias_major_alias_fk",
+          "tableFrom": "student",
+          "tableTo": "major",
+          "columnsFrom": [
+            "majorAlias"
+          ],
+          "columnsTo": [
+            "alias"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "student_optionAlias_option_alias_fk": {
+          "name": "student_optionAlias_option_alias_fk",
+          "tableFrom": "student",
+          "tableTo": "option",
+          "columnsFrom": [
+            "optionAlias"
+          ],
+          "columnsTo": [
+            "alias"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.academic_year": {
+      "name": "academic_year",
+      "schema": "public",
+      "values": [
+        "1A",
+        "2A",
+        "3A"
+      ]
+    },
+    "public.state": {
+      "name": "state",
+      "schema": "public",
+      "values": [
+        "visible",
+        "draft",
+        "deleted"
+      ]
+    },
+    "public.organization_type": {
+      "name": "organization_type",
+      "schema": "public",
+      "values": [
+        "company",
+        "not_company"
+      ]
+    },
+    "public.degree": {
+      "name": "degree",
+      "schema": "public",
+      "values": [
+        "gene",
+        "ir",
+        "ti"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
