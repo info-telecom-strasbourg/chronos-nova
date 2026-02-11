@@ -1,66 +1,57 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
-  "assist": {
-    "actions": {
-      "source": {
-        "organizeImports": {
-          "level": "on",
-          "options": {
-            "groups": [{ "type": true }]
-          }
-        }
-      }
-    },
-    "enabled": true
+  "$schema": "https://biomejs.dev/schemas/2.3.14/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
   },
   "files": {
-    "ignoreUnknown": false
+    "ignoreUnknown": false,
+    "includes": ["**", "!apps/admin/*"]
   },
   "formatter": {
     "enabled": true,
-    "indentStyle": "space",
-    "indentWidth": 2,
-    "lineWidth": 100
-  },
-  "javascript": {
-    "formatter": {
-      "bracketSpacing": true,
-      "jsxQuoteStyle": "double",
-      "quoteStyle": "double",
-      "semicolons": "always",
-      "trailingCommas": "all"
-    }
+    "indentStyle": "space"
   },
   "linter": {
     "enabled": true,
-    "domains": {
-      "next": "recommended",
-      "react": "recommended"
-    },
     "rules": {
       "recommended": true,
       "correctness": {
         "noUnusedImports": {
-          "fix": "safe",
-          "level": "warn"
+          "level": "warn",
+          "fix": "safe"
         }
       },
-      "nursery": {
-        "useSortedClasses": {
+      "suspicious": {
+        "noConsole": {
           "level": "warn",
-          "fix": "safe",
           "options": {
-            "attributes": ["className", "class"],
-            "functions": ["cn", "clsx"]
+            "allow": ["assert", "error", "info", "warn"]
           }
         }
+      },
+      "style": {
+        "noProcessEnv": "warn"
       }
     }
   },
-  "vcs": {
-    "clientKind": "git",
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double"
+    }
+  },
+  "assist": {
     "enabled": true,
-    "root": ".",
-    "useIgnoreFile": true
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
   }
 }

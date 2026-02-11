@@ -1,0 +1,14 @@
+{
+  "name": "@chronos/env",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "packageManager": "pnpm@10.29.2",
+  "dependencies": {
+    "dotenv": "^17.2.4",
+    "dotenv-expand": "^12.0.3",
+    "zod": "^4.3.5"
+  },
+  "devDependencies": {
+    "@chronos/typescript-config": "workspace:*"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "radix-nova",
+  "rsc": true,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "../../packages/ui/src/styles/globals.css",
+    "baseColor": "neutral",
+    "cssVariables": true
+  },
+  "iconLibrary": "lucide",
+  "aliases": {
+    "components": "@chronos/ui/components",
+    "hooks": "@chronos/ui/hooks",
+    "lib": "@chronos/ui/lib",
+    "utils": "@chronos/ui/lib/utils",
+    "ui": "@chronos/ui/components"
+  }
+}

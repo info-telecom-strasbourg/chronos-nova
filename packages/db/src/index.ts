@@ -1,7 +1,13 @@
+import { env } from "@chronos/env";
 import "dotenv/config";
 import { drizzle } from "drizzle-orm/node-postgres";
 
-const database_url = process.env.DATABASE_URL;
-if (!database_url) throw Error("DATABASE_URL is not set");
-
-export const db = drizzle(database_url);
+export const db = drizzle({
+  connection: {
+    host: env.DB_HOST,
+    port: env.DB_PORT,
+    user: env.DB_USER,
+    password: env.DB_PASSWORD,
+    database: env.DB_NAME,
+  },
+});

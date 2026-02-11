@@ -1,6 +1,9 @@
 import { pgEnum, pgTable, text, uuid } from "drizzle-orm/pg-core";
 
-export const organizationType = pgEnum("organization_type", ["company", "not_company"]);
+export const organizationType = pgEnum("organization_type", [
+  "company",
+  "not_company",
+]);
 
 export const organizations = pgTable("organization", {
   id: uuid("id").defaultRandom().primaryKey(),

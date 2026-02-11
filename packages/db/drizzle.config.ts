@@ -1,14 +1,16 @@
 import "dotenv/config";
+import { env } from "@chronos/env";
 import { defineConfig } from "drizzle-kit";
-
-const database_url = process.env.DATABASE_URL;
-if (!database_url) throw Error("DATABASE_URL is not set");
 
 export default defineConfig({
   out: "./drizzle",
   schema: "./src/schema/*.ts",
   dialect: "postgresql",
   dbCredentials: {
-    url: database_url,
+    host: env.DB_HOST,
+    port: env.DB_PORT,
+    user: env.DB_USER,
+    password: env.DB_PASSWORD,
+    database: env.DB_NAME,
   },
 });
