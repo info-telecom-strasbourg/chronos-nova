@@ -500,6 +500,9 @@ importers:
       drizzle-kit:
         specifier: 'catalog:'
         version: 0.31.8
+      drizzle-seed:
+        specifier: 'catalog:'
+        version: 0.3.1(drizzle-orm@0.44.7(@types/pg@8.16.0)(pg@8.17.1)(postgres@3.4.8))
       tsx:
         specifier: 'catalog:'
         version: 4.21.0
