@@ -1,4 +1,5 @@
-export { internships } from "./internship";
+export { academicYear, internships, state } from "./internship";
 export { majors, options } from "./major";
-export { organizations } from "./organization";
-export { students } from "./student";
+export { organizations, organizationType } from "./organization";
+export { internshipRelations, studentRelations } from "./relations";
+export { degree, students } from "./student";

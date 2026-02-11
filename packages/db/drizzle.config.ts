@@ -3,7 +3,7 @@ import { env } from "@chronos/env";
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({
-  out: "./drizzle",
+  out: "./migrations",
   schema: "./src/schema/*.ts",
   dialect: "postgresql",
   dbCredentials: {
@@ -12,6 +12,6 @@ export default defineConfig({
     user: env.DB_USER,
     password: env.DB_PASSWORD,
     database: env.DB_NAME,
-    ssl: env.DB_SSL === "true",
+    ssl: env.DB_SSL,
   },
 });

@@ -1,9 +1,15 @@
-import { Button } from "@chronos/ui/components/button";
+import { Suspense } from "react";
+import { InternshipHeader } from "@/components/internship/internship-header";
+import { InternshipList } from "@/components/internship/internship-list";
+import { InternshipListSkeleton } from "@/components/internship/internship-skeleton";
 
-export default async function HomePage() {
+export default function HomePage() {
   return (
-    <div className="text-3xl">
-      Hello world <Button></Button>
+    <div className="space-y-8">
+      <InternshipHeader />
+      <Suspense fallback={<InternshipListSkeleton />}>
+        <InternshipList />
+      </Suspense>
     </div>
   );
 }

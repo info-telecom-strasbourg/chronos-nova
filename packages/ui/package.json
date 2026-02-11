@@ -2,6 +2,9 @@
   "name": "@chronos/ui",
   "version": "1.0.0",
   "packageManager": "pnpm@10.29.2",
+  "scripts": {
+    "ui:add": "pnpm dlx shadcn@latest add"
+  },
   "dependencies": {
     "@base-ui/react": "catalog:",
     "class-variance-authority": "catalog:",

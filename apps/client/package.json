@@ -8,9 +8,20 @@
     "start": "next start"
   },
   "dependencies": {
+    "@chronos/db": "workspace:*",
+    "@chronos/env": "workspace:*",
+    "@radix-ui/react-select": "catalog:",
+    "@radix-ui/react-separator": "catalog:",
+    "@tanstack/react-query": "catalog:",
+    "class-variance-authority": "catalog:",
+    "lucide-react": "catalog:",
     "next": "catalog:",
+    "nuqs": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "react-intersection-observer": "catalog:",
+    "sonner": "catalog:",
+    "use-debounce": "catalog:"
   },
   "devDependencies": {
     "@chronos/typescript-config": "workspace:*",
