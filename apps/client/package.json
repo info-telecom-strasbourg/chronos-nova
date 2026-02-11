@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+    "dev": "dotenv -e ../../.env -- next dev",
+    "build": "dotenv -e ../../.env -- next build",
+    "start": "dotenv -e ../../.env -- next start"
   },
   "dependencies": {
     "@chronos/db": "workspace:*",
@@ -16,6 +16,7 @@
     "class-variance-authority": "catalog:",
     "lucide-react": "catalog:",
     "next": "catalog:",
+    "next-themes": "catalog:",
     "nuqs": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",

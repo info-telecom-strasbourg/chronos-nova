@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { type PropsWithChildren, useState } from "react";
 import { Toaster } from "sonner";
+import { ThemeProvider } from "@/components/theme/theme-provider";
 
 export const Providers = ({ children }: PropsWithChildren) => {
   const [queryClient] = useState(
@@ -21,8 +22,10 @@ export const Providers = ({ children }: PropsWithChildren) => {
   return (
     <NuqsAdapter>
       <QueryClientProvider client={queryClient}>
-        {children}
-        <Toaster position="top-center" />
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {children}
+          <Toaster position="top-center" />
+        </ThemeProvider>
       </QueryClientProvider>
     </NuqsAdapter>
   );
