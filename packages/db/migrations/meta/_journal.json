@@ -8,6 +8,13 @@
       "when": 1768737235678,
       "tag": "0000_daffy_solo",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1770834494142,
+      "tag": "0001_spotty_korg",
+      "breakpoints": true
     }
   ]
 }

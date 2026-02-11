@@ -7,4 +7,5 @@ export const EnvSchema = z.object({
   DB_PASSWORD: z.string(),
   DB_HOST: z.string().default("localhost"),
   DB_PORT: z.coerce.number().default(5432),
+  DB_SSL: z.coerce.boolean().default(false),
 });
