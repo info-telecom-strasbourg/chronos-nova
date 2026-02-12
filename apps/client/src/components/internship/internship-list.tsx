@@ -57,7 +57,10 @@ export function InternshipList() {
           country: country || undefined,
         }),
       initialPageParam: 0,
-      getNextPageParam: (lastPage) => lastPage.nextPage,
+      getNextPageParam: (lastPage) => {
+        const { page, totalPages } = lastPage.pagination;
+        return page + 1 < totalPages ? page + 1 : undefined;
+      },
     });
 
   const { ref, inView } = useInView({ rootMargin: "200px" });
@@ -68,7 +71,7 @@ export function InternshipList() {
 
   const allInternships = data?.pages?.flatMap((page) => page.data) || [];
   const lastPage = data?.pages?.[data.pages.length - 1] || data?.pages?.[0];
-  const totalItems = lastPage?.total ?? 0;
+  const totalItems = lastPage?.pagination.total ?? 0;
   const loadedInternships = allInternships.length;
   const remainingInternships = totalItems - loadedInternships;
   const skeletonsToShow = Math.min(limit, remainingInternships);

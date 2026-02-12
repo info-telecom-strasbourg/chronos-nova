@@ -1,33 +1,16 @@
-import {
-  boolean,
-  date,
-  integer,
-  pgEnum,
-  pgTable,
-  text,
-  uuid,
-} from "drizzle-orm/pg-core";
-import { organizations } from "./organization";
-import { students } from "./student";
+import * as t from "drizzle-orm/pg-core";
+import { academicYear, organizationType } from "./enum";
 
-export const academicYear = pgEnum("academic_year", ["1A", "2A", "3A"]);
-export const state = pgEnum("state", ["visible", "draft", "deleted"]);
-
-export const internships = pgTable("internship", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  subject: text("subject"),
-  beginDate: date("beginDate"),
-  weeksCount: integer("weeksCount"),
-  academicYear: academicYear("academicYear"),
-  isInvalid: boolean("isInvalid").default(false).notNull(),
-  studentId: uuid("studentId")
-    .notNull()
-    .references(() => students.id, {
-      onDelete: "cascade",
-    }),
-  organizationId: uuid("organizationId")
-    .notNull()
-    .references(() => organizations.id, {
-      onDelete: "cascade",
-    }),
+export const internshipsTable = t.pgTable("internship", {
+  id: t.uuid("id").defaultRandom().primaryKey(),
+  subject: t.text("subject"),
+  beginDate: t.date("begin_date"),
+  weeksCount: t.integer("weeks_count"),
+  major: t.text("major"),
+  option: t.text("option"),
+  academicYear: academicYear("academic_year"),
+  organizationName: t.text("organization_name"),
+  organizationType: organizationType("organization_type"),
+  country: t.text("country"),
+  city: t.text("city"),
 });

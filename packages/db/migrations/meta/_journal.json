@@ -15,6 +15,20 @@
       "when": 1770834494142,
       "tag": "0001_spotty_korg",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1770903318551,
+      "tag": "0002_small_adam_destine",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1770903494773,
+      "tag": "0003_special_timeslip",
+      "breakpoints": true
     }
   ]
 }

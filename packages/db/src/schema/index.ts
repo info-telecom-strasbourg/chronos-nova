@@ -1,5 +1,2 @@
-export { academicYear, internships, state } from "./internship";
-export { majors, options } from "./major";
-export { organizations, organizationType } from "./organization";
-export { internshipRelations, studentRelations } from "./relations";
-export { degree, students } from "./student";
+export { academicYear, organizationType } from "./enum";
+export { internshipsTable as internships } from "./internship";

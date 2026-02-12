@@ -1,4 +1,5 @@
-/** biome-ignore-all lint/suspicious/noConsole: <explanation> */
+/** biome-ignore-all lint/suspicious/noConsole: Temporary seeding script */
+
 import "dotenv/config";
 import { reset, seed } from "drizzle-seed";
 import { db } from "./index";
@@ -142,46 +143,6 @@ async function main() {
 
   console.log("Seeding database...");
   await seed(db, schema).refine((f) => ({
-    majors: {
-      count: majorValues.length,
-      columns: {
-        alias: f.valuesFromArray({ values: majorValues, isUnique: true }),
-        name: f.valuesFromArray({
-          values: majorValues.map((v) => {
-            const names: Record<string, string> = {
-              gene: "Généraliste",
-              ir: "Informatique et Réseaux",
-              "ti-sante": "Technologie de l'Information pour la Santé",
-              master: "Master",
-            };
-            return names[v] ?? v;
-          }),
-        }),
-      },
-    },
-    options: {
-      count: optionValues.length,
-      columns: {
-        alias: f.valuesFromArray({ values: optionValues, isUnique: true }),
-        name: f.valuesFromArray({ values: optionValues }),
-      },
-    },
-    organizations: {
-      count: 30,
-      columns: {
-        name: f.valuesFromArray({ values: orgNames }),
-        country: f.valuesFromArray({ values: countries }),
-        city: f.valuesFromArray({ values: cities }),
-        type: f.valuesFromArray({ values: ["company", "not_company"] }),
-      },
-    },
-    students: {
-      count: 100,
-      columns: {
-        majorAlias: f.valuesFromArray({ values: majorValues }),
-        optionAlias: f.valuesFromArray({ values: optionValues }),
-      },
-    },
     internships: {
       count: 100,
       columns: {
@@ -191,7 +152,14 @@ async function main() {
           values: [4, 6, 8, 10, 12, 16, 20, 24],
         }),
         academicYear: f.valuesFromArray({ values: ["1A", "2A", "3A"] }),
-        isInvalid: f.default({ defaultValue: false }),
+        major: f.valuesFromArray({ values: majorValues }),
+        option: f.valuesFromArray({ values: optionValues }),
+        organizationName: f.valuesFromArray({ values: orgNames }),
+        organizationType: f.valuesFromArray({
+          values: ["company", "not_company"],
+        }),
+        country: f.valuesFromArray({ values: countries }),
+        city: f.valuesFromArray({ values: cities }),
       },
     },
   }));

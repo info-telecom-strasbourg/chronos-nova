@@ -1,3 +1,3 @@
-import type { InternshipWithRelations } from "@chronos/db/src/queries/internship";
+import type { internships } from "@chronos/db/src/schema";
 
-export type { InternshipWithRelations as InternshipData };
+export type InternshipData = typeof internships.$inferSelect;

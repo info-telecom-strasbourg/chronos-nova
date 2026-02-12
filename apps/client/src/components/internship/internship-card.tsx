@@ -42,8 +42,8 @@ type InternshipCardProps = {
 export function InternshipCard({ internship }: InternshipCardProps) {
   const [expanded, setExpanded] = useState(false);
 
-  const majorAlias = internship.student?.major?.alias;
-  const optionAlias = internship.student?.option?.alias;
+  const majorAlias = internship.major;
+  const optionAlias = internship.option;
 
   const majorLabel =
     !majorAlias || majorAlias === "__inconnu__"
@@ -65,7 +65,7 @@ export function InternshipCard({ internship }: InternshipCardProps) {
         <CardHeader className="border-b-2 pb-4">
           <div className="flex w-full items-start justify-between">
             <CardTitle className="text-2xl">
-              {getTitleLabel(internship.organization.name)}
+              {getTitleLabel(internship.organizationName)}
             </CardTitle>
             <ChevronDown
               className={cn(
@@ -77,7 +77,7 @@ export function InternshipCard({ internship }: InternshipCardProps) {
           <CardDescription>
             <span className="inline-flex items-center gap-1">
               <Building className="inline h-4 w-4 align-text-bottom" />
-              {getOrganizationTypeLabel(internship.organization.type)}
+              {getOrganizationTypeLabel(internship.organizationType)}
             </span>
           </CardDescription>
         </CardHeader>
@@ -89,8 +89,8 @@ export function InternshipCard({ internship }: InternshipCardProps) {
             <div className="flex items-center gap-2">
               <MapPin className="h-4 w-4" />
               <span>
-                {getCountryLabel(internship.organization.country)},{" "}
-                {getCityLabel(internship.organization.city)}
+                {getCountryLabel(internship.country)},{" "}
+                {getCityLabel(internship.city)}
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -118,13 +118,13 @@ export function InternshipCard({ internship }: InternshipCardProps) {
             <span className="flex items-start gap-2">
               <Landmark className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
               <span>
-                <b>Pays :</b> {getCountryLabel(internship.organization.country)}
+                <b>Pays :</b> {getCountryLabel(internship.country)}
               </span>
             </span>
             <span className="flex items-start gap-2">
               <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
               <span>
-                <b>Ville :</b> {getCityLabel(internship.organization.city)}
+                <b>Ville :</b> {getCityLabel(internship.city)}
               </span>
             </span>
             <span className="flex items-start gap-2">
