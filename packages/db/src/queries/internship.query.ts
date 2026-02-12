@@ -3,25 +3,14 @@ import { db } from "..";
 import { internships } from "../schema";
 import { buildInternshipOrderBy } from "../utils/internship-order";
 import { buildInternshipWhere } from "../utils/internship-where";
-
-export type GetInternshipsParams = {
-  q?: string;
-  page?: number;
-  limit?: number;
-  sort?: "most-recent" | "organization" | "duration" | "location";
-  order?: "asc" | "desc";
-  academicYear?: "1A" | "2A" | "3A";
-  major?: string;
-  option?: string;
-  country?: string;
-};
+import type { GetInternshipsParams } from "../validators/internship.validator";
 
 export async function getInternships({
   q,
-  page = 0,
-  limit = 10,
-  sort = "most-recent",
-  order = "asc",
+  page,
+  limit,
+  sort,
+  order,
   academicYear,
   major,
   option,

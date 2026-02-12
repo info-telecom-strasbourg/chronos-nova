@@ -28,6 +28,12 @@
           "fix": "safe"
         }
       },
+      "nursery": {
+        "useSortedClasses": {
+          "level": "warn",
+          "fix": "safe"
+        }
+      },
       "suspicious": {
         "noConsole": {
           "level": "warn",

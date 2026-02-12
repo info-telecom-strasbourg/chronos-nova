@@ -11,8 +11,8 @@
     "db:seed": "dotenv -e ../../.env -- tsx src/seed.ts"
   },
   "devDependencies": {
-    "@chronos/typescript-config": "workspace:*",
     "@chronos/env": "workspace:*",
+    "@chronos/typescript-config": "workspace:*",
     "@types/pg": "catalog:",
     "drizzle-kit": "catalog:",
     "drizzle-seed": "catalog:",
@@ -21,6 +21,7 @@
   "dependencies": {
     "dotenv": "catalog:",
     "drizzle-orm": "catalog:",
-    "pg": "catalog:"
+    "pg": "catalog:",
+    "zod": "catalog:"
   }
 }

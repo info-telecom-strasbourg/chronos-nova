@@ -1,10 +1,9 @@
 "use server";
 
-import {
-  type GetInternshipsParams,
-  getInternships,
-} from "@chronos/db/src/queries/internship.query";
+import { getInternships } from "@chronos/db/src/queries/internship.query";
+import { GetInternshipsParamsValidator } from "@chronos/db/src/validators/internship.validator";
 
-export async function fetchInternships(params: GetInternshipsParams) {
-  return getInternships(params);
+export async function getInternshipsAction(params: object) {
+  const safeParams = GetInternshipsParamsValidator.parse(params);
+  return getInternships(safeParams);
 }

@@ -5,6 +5,7 @@ import { InternshipSort } from "./internship-sort";
 export function InternshipHeader() {
   return (
     <div className="w-full space-y-4">
+      <h1 className="font-semibold text-4xl">Rechercher un stage</h1>
       <InternshipSearch />
       <InternshipFilter />
       <div className="flex w-full items-center justify-between">

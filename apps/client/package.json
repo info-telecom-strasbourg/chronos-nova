@@ -22,7 +22,8 @@
     "react-dom": "catalog:",
     "react-intersection-observer": "catalog:",
     "sonner": "catalog:",
-    "use-debounce": "catalog:"
+    "use-debounce": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@chronos/typescript-config": "workspace:*",

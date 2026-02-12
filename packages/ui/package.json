@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "packageManager": "pnpm@10.29.2",
   "scripts": {
-    "ui:add": "pnpm dlx shadcn@latest add"
+    "ui": "pnpm dlx shadcn@latest"
   },
   "dependencies": {
     "@base-ui/react": "catalog:",
@@ -12,6 +12,7 @@
     "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "shadcn": "catalog:",
     "tailwind-merge": "catalog:",
     "tw-animate-css": "catalog:"
   },

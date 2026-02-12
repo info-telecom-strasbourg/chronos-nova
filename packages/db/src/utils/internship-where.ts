@@ -1,6 +1,6 @@
 import { and, eq, ilike, or, type SQL } from "drizzle-orm";
-import type { GetInternshipsParams } from "../queries/internship.query";
 import { internshipsTable } from "../schema/internship";
+import type { GetInternshipsParams } from "../validators/internship.validator";
 
 export function buildInternshipWhere({
   q,

@@ -1,6 +1,7 @@
 import { asc, desc } from "drizzle-orm";
-import type { GetInternshipsParams } from "../queries/internship.query";
+
 import { internshipsTable } from "../schema/internship";
+import type { GetInternshipsParams } from "../validators/internship.validator";
 
 const DEFAULT_SORT = "most-recent";
 

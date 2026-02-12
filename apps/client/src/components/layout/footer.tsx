@@ -14,7 +14,7 @@ export const Footer = () => {
         </div>
         <Separator />
         <span className="text-muted-foreground text-sm">
-          © {new Date().getFullYear()} - Informatique Télécom Strasbourg
+          &copy; {new Date().getFullYear()} - Informatique Télécom Strasbourg
         </span>
       </div>
     </footer>
