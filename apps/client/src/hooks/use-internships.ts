@@ -17,6 +17,8 @@ export function useInternships() {
   const [major] = useQueryState("major", { defaultValue: "" });
   const [option] = useQueryState("option", { defaultValue: "" });
   const [country] = useQueryState("country", { defaultValue: "" });
+  const [city] = useQueryState("city", { defaultValue: "" });
+  const [companyOnly] = useQueryState("companyOnly", { defaultValue: "" });
 
   const validSort =
     GetInternshipsParamsValidator.shape.sort.safeParse(sort).data;
@@ -27,7 +29,17 @@ export function useInternships() {
     useInfiniteQuery({
       queryKey: [
         "internships",
-        { q, sort: validSort, order: validOrder, year, major, option, country },
+        {
+          q,
+          sort: validSort,
+          order: validOrder,
+          year,
+          major,
+          option,
+          country,
+          city,
+          companyOnly,
+        },
       ],
       queryFn: ({ pageParam }) =>
         getInternshipsAction({
@@ -40,6 +52,8 @@ export function useInternships() {
           major: major || undefined,
           option: option || undefined,
           country: country || undefined,
+          city: city || undefined,
+          organizationType: companyOnly ? "company" : undefined,
         }),
       initialPageParam: 0,
       getNextPageParam: (lastPage) => {

@@ -12,6 +12,8 @@ export const GetInternshipsParamsValidator = z.object({
   major: z.string().optional(),
   option: z.string().optional(),
   country: z.string().optional(),
+  city: z.string().optional(),
+  organizationType: z.enum(["company", "not_company"]).optional(),
 });
 
 export type GetInternshipsParams = z.infer<
