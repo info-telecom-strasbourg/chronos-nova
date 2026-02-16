@@ -1,9 +1,3 @@
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@chronos/ui/components/accordion";
 import { Badge } from "@chronos/ui/components/badge";
 import {
   Card,
@@ -13,19 +7,20 @@ import {
   CardTitle,
 } from "@chronos/ui/components/card";
 import {
-  Item,
-  ItemContent,
-  ItemMedia,
-  ItemTitle,
-} from "@chronos/ui/components/item";
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@chronos/ui/components/empty";
 import {
-  BookOpen,
+  Building2,
   Calendar,
+  Check,
+  CircleAlert,
   Clock,
-  Flag,
   GraduationCap,
   MapPin,
-  University,
 } from "lucide-react";
 import type { getInternshipsAction } from "@/actions/internship.action";
 
@@ -42,86 +37,74 @@ export function InternshipCard({ internship }: InternshipCardProps) {
   return (
     <Card className="w-full">
       <CardHeader>
-        <div className="flex justify-between">
-          <CardTitle className="text-2xl">{internship.subject}</CardTitle>
+        <CardTitle className="text-lg leading-snug">
+          {internship.subject}
+        </CardTitle>
+        <CardDescription className="flex items-center gap-2">
+          <Building2 className="size-3.5 shrink-0" />
+          <span>{internship.organizationName}</span>
           {internship.organizationType && (
             <Badge variant="outline">
               {ORGANIZATION_TYPE_LABELS[internship.organizationType]}
             </Badge>
           )}
-        </div>
-        <CardDescription>{internship.organizationName}</CardDescription>
+        </CardDescription>
       </CardHeader>
-      <CardContent>
-        <Accordion multiple defaultValue={["studies"]}>
-          <AccordionItem value="studies">
-            <AccordionTrigger>Études</AccordionTrigger>
-            <AccordionContent className="flex gap-2">
-              <Item>
-                <ItemMedia variant="icon">
-                  <GraduationCap />
-                </ItemMedia>
-                <ItemContent>
-                  <ItemTitle>{internship.academicYear}</ItemTitle>
-                </ItemContent>
-              </Item>
-              <Item>
-                <ItemMedia variant="icon">
-                  <University />
-                </ItemMedia>
-                <ItemContent>
-                  <ItemTitle>{internship.major}</ItemTitle>
-                </ItemContent>
-              </Item>
-              <Item>
-                <ItemMedia variant="icon">
-                  <BookOpen />
-                </ItemMedia>
-                <ItemContent>
-                  <ItemTitle>{internship.option}</ItemTitle>
-                </ItemContent>
-              </Item>
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="locatisation">
-            <AccordionTrigger>Localisation</AccordionTrigger>
-            <AccordionContent className="flex gap-2">
-              <Item>
-                <ItemMedia variant="icon">
-                  <Flag />
-                </ItemMedia>
-                <ItemContent> {internship.country}</ItemContent>
-              </Item>
-              <Item>
-                <ItemMedia variant="icon">
-                  <MapPin />
-                </ItemMedia>
-                <ItemContent> {internship.city}</ItemContent>
-              </Item>
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="dates">
-            <AccordionTrigger>Dates</AccordionTrigger>
-            <AccordionContent className="flex gap-2">
-              <Item>
-                <ItemMedia variant="icon">
-                  <Calendar />
-                </ItemMedia>
-                <ItemContent>
-                  {internship.beginDate &&
-                    new Date(internship.beginDate).toLocaleDateString("fr")}
-                </ItemContent>
-              </Item>
-              <Item>
-                <ItemMedia variant="icon">
-                  <Clock />
-                </ItemMedia>
-                <ItemContent> {internship.weeksCount} semaines</ItemContent>
-              </Item>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+      <CardContent className="flex flex-wrap items-center gap-x-4 gap-y-2 text-muted-foreground text-sm">
+        {(internship.major || internship.option || internship.academicYear) && (
+          <span className="inline-flex items-center gap-1.5">
+            <GraduationCap className="size-3.5 shrink-0" />
+            {[internship.major, internship.option, internship.academicYear]
+              .filter(Boolean)
+              .join(" · ")}
+          </span>
+        )}
+        {(internship.country || internship.city) && (
+          <span className="inline-flex items-center gap-1.5">
+            <MapPin className="size-3.5 shrink-0" />
+            {[internship.city, internship.country].filter(Boolean).join(", ")}
+          </span>
+        )}
+        {internship.beginDate && (
+          <span className="inline-flex items-center gap-1.5">
+            <Calendar className="size-3.5 shrink-0" />
+            {new Date(internship.beginDate).toLocaleDateString("fr")}
+          </span>
+        )}
+        {internship.weeksCount && (
+          <span className="inline-flex items-center gap-1.5">
+            <Clock className="size-3.5 shrink-0" />
+            {internship.weeksCount} semaines
+          </span>
+        )}
       </CardContent>
     </Card>
+  );
+}
+
+export function NoInternshipCard() {
+  return (
+    <Empty className="border border-dashed">
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <CircleAlert />
+        </EmptyMedia>
+        <EmptyTitle>Aucun stage trouvé</EmptyTitle>
+        <EmptyDescription>Essayer avec d'autres filtres</EmptyDescription>
+      </EmptyHeader>
+    </Empty>
+  );
+}
+
+export function DoneInternshipCard() {
+  return (
+    <Empty className="border border-dashed">
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <Check />
+        </EmptyMedia>
+        <EmptyTitle>Tous les stages ont été chargés</EmptyTitle>
+      </EmptyHeader>
+    </Empty>
   );
 }
