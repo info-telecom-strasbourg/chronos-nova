@@ -5,7 +5,6 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@chronos/ui/components/select";
 import { ArrowDownNarrowWide, ArrowUpNarrowWide } from "lucide-react";
 import { useQueryState } from "nuqs";
@@ -41,17 +40,13 @@ export function InternshipSort() {
 
   return (
     <Select value={sort} onValueChange={(val) => handleValueChange(val)}>
-      <SelectTrigger className="w-[180px]">
-        <SelectValue>
-          <span className="flex items-center gap-2">
-            {order === "desc" ? (
-              <ArrowUpNarrowWide className="size-4" />
-            ) : (
-              <ArrowDownNarrowWide className="size-4" />
-            )}
-            {selectedOption?.label || "Date de début"}
-          </span>
-        </SelectValue>
+      <SelectTrigger className="flex items-center gap-2">
+        {order === "desc" ? (
+          <ArrowUpNarrowWide className="size-4" />
+        ) : (
+          <ArrowDownNarrowWide className="size-4" />
+        )}
+        {selectedOption?.label || "Date de début"}
       </SelectTrigger>
       <SelectContent>
         {sortOptions.map((opt) => {

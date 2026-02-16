@@ -59,7 +59,7 @@ export async function getInternships({
 }
 
 export async function getInternshipFilterOptions(params: GetInternshipsParams) {
-  const baseFilters = {
+  const f = {
     q: params.q,
     academicYear: params.academicYear,
     major: params.major,
@@ -69,85 +69,76 @@ export async function getInternshipFilterOptions(params: GetInternshipsParams) {
     organizationType: params.organizationType,
   };
 
-  const [academicYears, majors, options, countries, cities] = await Promise.all(
-    [
-      db
-        .selectDistinct({ value: internshipsTable.academicYear })
-        .from(internships)
-        .where(
-          buildInternshipWhere({
-            ...baseFilters,
-            academicYear: undefined,
-          }),
-        )
-        .then((rows) =>
-          rows
-            .map((r) => r.value)
-            .filter((v) => v != null)
-            .sort(),
-        ),
-      db
-        .selectDistinct({ value: internshipsTable.major })
-        .from(internships)
-        .where(
-          buildInternshipWhere({
-            ...baseFilters,
-            major: undefined,
-          }),
-        )
-        .then((rows) =>
-          rows
-            .map((r) => r.value)
-            .filter((v): v is string => v != null)
-            .sort(),
-        ),
-      db
-        .selectDistinct({ value: internshipsTable.option })
-        .from(internships)
-        .where(
-          buildInternshipWhere({
-            ...baseFilters,
-            option: undefined,
-          }),
-        )
-        .then((rows) =>
-          rows
-            .map((r) => r.value)
-            .filter((v): v is string => v != null)
-            .sort(),
-        ),
-      db
-        .selectDistinct({ value: internshipsTable.country })
-        .from(internships)
-        .where(
-          buildInternshipWhere({
-            ...baseFilters,
-            country: undefined,
-          }),
-        )
-        .then((rows) =>
-          rows
-            .map((r) => r.value)
-            .filter((v): v is string => v != null)
-            .sort(),
-        ),
-      db
-        .selectDistinct({ value: internshipsTable.city })
-        .from(internships)
-        .where(
-          buildInternshipWhere({
-            ...baseFilters,
-            city: undefined,
-          }),
-        )
-        .then((rows) =>
-          rows
-            .map((r) => r.value)
-            .filter((v): v is string => v != null)
-            .sort(),
-        ),
-    ],
-  );
+  const distinctStrings = (
+    // biome-ignore lint/suspicious/noExplicitAny: mixed drizzle column types
+    column: any,
+    filters: Parameters<typeof buildInternshipWhere>[0],
+  ): Promise<string[]> =>
+    db
+      .selectDistinct({ value: column })
+      .from(internships)
+      .where(buildInternshipWhere(filters))
+      .then((rows: { value: unknown }[]) =>
+        rows
+          .map((r) => r.value)
+          .filter((v): v is string => typeof v === "string")
+          .sort(),
+      );
 
-  return { academicYears, majors, options, countries, cities };
+  const [
+    allMajors,
+    availableYears,
+    availableMajors,
+    allOptions,
+    availableOptions,
+    countries,
+    cities,
+    availableOrgTypes,
+  ] = await Promise.all([
+    // Tous les diplômes existants (sans filtre)
+    distinctStrings(internshipsTable.major, {}),
+    // Années disponibles (tous filtres sauf année)
+    distinctStrings(internshipsTable.academicYear, {
+      ...f,
+      academicYear: undefined,
+    }),
+    // Diplômes disponibles (tous filtres sauf diplôme et filière, car filière cascade)
+    distinctStrings(internshipsTable.major, {
+      ...f,
+      major: undefined,
+      option: undefined,
+    }),
+    // Toutes les filières (filtrées par diplôme uniquement)
+    distinctStrings(internshipsTable.option, { major: params.major }),
+    // Filières disponibles (tous filtres sauf filière)
+    distinctStrings(internshipsTable.option, { ...f, option: undefined }),
+    // Pays filtrés par tout sauf pays et ville
+    distinctStrings(internshipsTable.country, {
+      ...f,
+      country: undefined,
+      city: undefined,
+    }),
+    // Villes filtrées par tout sauf ville
+    distinctStrings(internshipsTable.city, { ...f, city: undefined }),
+    // Types disponibles (tous filtres sauf type)
+    distinctStrings(internshipsTable.organizationType, {
+      ...f,
+      organizationType: undefined,
+    }),
+  ]);
+
+  return {
+    academicYears: {
+      all: ["1A", "2A", "3A"] as string[],
+      available: availableYears,
+    },
+    majors: { all: allMajors, available: availableMajors },
+    options: { all: allOptions, available: availableOptions },
+    countries,
+    cities,
+    organizationTypes: {
+      all: ["company", "not_company"] as string[],
+      available: availableOrgTypes,
+    },
+  };
 }

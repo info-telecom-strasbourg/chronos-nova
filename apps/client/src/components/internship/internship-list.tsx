@@ -1,5 +1,6 @@
 "use client";
 
+import { Skeleton } from "@chronos/ui/components/skeleton";
 import { useInternships } from "@/hooks/use-internships";
 import { pluralize } from "@/lib/utils";
 import {
@@ -21,9 +22,12 @@ export function InternshipList() {
 
   if (isPending) {
     return (
-      <ul className="space-y-4">
-        <InternshipPaginationSkeleton count={10} />
-      </ul>
+      <>
+        <Skeleton className="h-5 w-32" />
+        <ul className="space-y-4">
+          <InternshipPaginationSkeleton count={10} />
+        </ul>
+      </>
     );
   }
 

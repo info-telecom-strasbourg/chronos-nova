@@ -18,7 +18,7 @@ export function useInternships() {
   const [option] = useQueryState("option", { defaultValue: "" });
   const [country] = useQueryState("country", { defaultValue: "" });
   const [city] = useQueryState("city", { defaultValue: "" });
-  const [companyOnly] = useQueryState("companyOnly", { defaultValue: "" });
+  const [orgType] = useQueryState("orgType", { defaultValue: "" });
 
   const validSort =
     GetInternshipsParamsValidator.shape.sort.safeParse(sort).data;
@@ -38,7 +38,7 @@ export function useInternships() {
           option,
           country,
           city,
-          companyOnly,
+          orgType,
         },
       ],
       queryFn: ({ pageParam }) =>
@@ -53,7 +53,10 @@ export function useInternships() {
           option: option || undefined,
           country: country || undefined,
           city: city || undefined,
-          organizationType: companyOnly ? "company" : undefined,
+          organizationType:
+            orgType === "company" || orgType === "not_company"
+              ? orgType
+              : undefined,
         }),
       initialPageParam: 0,
       getNextPageParam: (lastPage) => {
