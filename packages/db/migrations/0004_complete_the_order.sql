@@ -1,0 +1,1 @@
+ALTER TABLE "internship" ADD COLUMN "end_date" date;

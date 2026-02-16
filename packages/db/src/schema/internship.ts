@@ -5,6 +5,7 @@ export const internshipsTable = t.pgTable("internship", {
   id: t.uuid("id").defaultRandom().primaryKey(),
   subject: t.text("subject"),
   beginDate: t.date("begin_date"),
+  endDate: t.date("end_date"),
   weeksCount: t.integer("weeks_count"),
   major: t.text("major"),
   option: t.text("option"),
