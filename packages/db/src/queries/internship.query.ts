@@ -82,7 +82,7 @@ export async function getInternshipFilterOptions(params: GetInternshipsParams) {
         rows
           .map((r) => r.value)
           .filter((v): v is string => typeof v === "string")
-          .sort(),
+          .sort((a, b) => a.localeCompare(b, "fr", { sensitivity: "base" })),
       );
 
   const [

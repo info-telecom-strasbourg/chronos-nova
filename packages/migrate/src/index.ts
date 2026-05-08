@@ -3,6 +3,7 @@ import path from "node:path";
 import { db } from "@chronos/db/src/index";
 import { internships as internshipsTable } from "@chronos/db/src/schema/index";
 import { parse } from "csv-parse/sync";
+import { sql } from "drizzle-orm";
 import z from "zod";
 
 const ACADEMIC_YEARS = ["1A", "2A", "3A"] as const;
@@ -71,6 +72,10 @@ async function main() {
     console.error(`File not found: ${csvPath}`);
     process.exit(1);
   }
+
+  console.info("Truncating internships table...");
+  await db.execute(sql`TRUNCATE TABLE internship RESTART IDENTITY CASCADE`);
+  console.info("Table truncated.");
 
   console.info(`Reading ${csvPath}...`);
   const content = fs.readFileSync(csvPath, "utf-8");
