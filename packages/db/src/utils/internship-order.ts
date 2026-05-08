@@ -1,4 +1,4 @@
-import { asc, desc } from "drizzle-orm";
+import { asc, type SQL, sql } from "drizzle-orm";
 
 import { internshipsTable } from "../schema/internship";
 import type { GetInternshipsParams } from "../validators/internship.validator";
@@ -11,12 +11,13 @@ const SORT_MAP = {
   duration: internshipsTable.weeksCount,
   location: internshipsTable.country,
 } as const;
+
 export function buildInternshipOrderBy({
   sort,
   order,
-}: Pick<GetInternshipsParams, "sort" | "order">) {
+}: Pick<GetInternshipsParams, "sort" | "order">): SQL[] {
   const column = SORT_MAP[sort ?? DEFAULT_SORT];
-  const orderFn = order === "desc" ? desc : asc;
+  const direction = order === "desc" ? sql`DESC` : sql`ASC`;
 
-  return orderFn(column);
+  return [sql`${column} ${direction} NULLS LAST`, asc(internshipsTable.id)];
 }

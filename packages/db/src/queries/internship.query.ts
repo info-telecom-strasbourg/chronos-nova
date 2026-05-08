@@ -36,7 +36,7 @@ export async function getInternships({
       .select()
       .from(internships)
       .where(whereClause)
-      .orderBy(orderByClause)
+      .orderBy(...orderByClause)
       .limit(limit)
       .offset(offset);
     const [totalRes] = await tx

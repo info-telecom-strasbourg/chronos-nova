@@ -10,29 +10,29 @@ import { ArrowDownNarrowWide, ArrowUpNarrowWide } from "lucide-react";
 import { useQueryState } from "nuqs";
 
 const DEFAULT_SORT_STATE = "most-recent";
-const DEFAULT_ORDER_STATE = "asc";
 
 const sortOptions = [
-  { value: "most-recent", label: "Date de début" },
-  { value: "organization", label: "Nom" },
-  { value: "duration", label: "Durée" },
-  { value: "location", label: "Lieu" },
-];
+  { value: "most-recent", label: "Date de début", defaultOrder: "desc" },
+  { value: "organization", label: "Nom", defaultOrder: "asc" },
+  { value: "duration", label: "Durée", defaultOrder: "desc" },
+  { value: "location", label: "Lieu", defaultOrder: "asc" },
+] as const;
 
 export function InternshipSort() {
   const [sort, setSort] = useQueryState("sort", {
     defaultValue: DEFAULT_SORT_STATE,
   });
   const [order, setOrder] = useQueryState("order", {
-    defaultValue: DEFAULT_ORDER_STATE,
+    defaultValue: "desc",
   });
 
   function handleValueChange(optionValue: string | null) {
     if (optionValue === sort) {
       setOrder((prev) => (prev === "asc" ? "desc" : "asc"));
     } else {
+      const newOption = sortOptions.find((opt) => opt.value === optionValue);
       setSort(optionValue);
-      setOrder(DEFAULT_ORDER_STATE);
+      setOrder(newOption?.defaultOrder ?? "desc");
     }
   }
 

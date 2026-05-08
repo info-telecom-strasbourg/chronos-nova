@@ -7,7 +7,7 @@ export const GetInternshipsParamsValidator = z.object({
   sort: z
     .enum(["most-recent", "organization", "duration", "location"])
     .default("most-recent"),
-  order: z.enum(["asc", "desc"]).default("asc"),
+  order: z.enum(["asc", "desc"]).default("desc"),
   academicYear: z.enum(["1A", "2A", "3A"]).optional(),
   major: z.string().optional(),
   option: z.string().optional(),

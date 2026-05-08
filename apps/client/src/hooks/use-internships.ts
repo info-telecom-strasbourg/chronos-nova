@@ -12,7 +12,7 @@ const LIMIT = 10;
 export function useInternships() {
   const [q] = useQueryState("q", { defaultValue: "" });
   const [sort] = useQueryState("sort", { defaultValue: "most-recent" });
-  const [order] = useQueryState("order", { defaultValue: "asc" });
+  const [order] = useQueryState("order", { defaultValue: "desc" });
   const [year] = useQueryState("year", { defaultValue: "" });
   const [major] = useQueryState("major", { defaultValue: "" });
   const [option] = useQueryState("option", { defaultValue: "" });
