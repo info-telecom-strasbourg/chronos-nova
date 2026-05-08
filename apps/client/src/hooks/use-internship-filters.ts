@@ -94,6 +94,30 @@ export function useInternshipFilters() {
       setCityRaw(validCities.join(",") || null);
   }, [data, cityRaw]);
 
+  const setters: Record<string, (v: string | null) => void> = {
+    year: setYearRaw,
+    major: setMajorRaw,
+    option: setOptionRaw,
+    country: setCountryRaw,
+    city: setCityRaw,
+    orgType: setOrgTypeRaw,
+  };
+
+  const removeFilter = (param: string, value: string) => {
+    const current = parseMulti(
+      {
+        year: yearRaw,
+        major: majorRaw,
+        option: optionRaw,
+        country: countryRaw,
+        city: cityRaw,
+        orgType: orgTypeRaw,
+      }[param] ?? "",
+    );
+    const next = current.filter((v) => v !== value);
+    setters[param]?.(next.join(",") || null);
+  };
+
   const hasFilters =
     yearRaw || majorRaw || optionRaw || countryRaw || cityRaw || orgTypeRaw;
 
@@ -102,11 +126,9 @@ export function useInternshipFilters() {
         {
           param: "year",
           label: "Année",
-          options: withAvailability(
-            data.academicYears.all,
-            data.academicYears.available,
-          ),
-          dropdown: true,
+          options: data.academicYears.all.map((v) => ({ value: v, label: v })),
+          radio: true,
+          columns: 2,
         },
         {
           param: "major",
@@ -152,11 +174,31 @@ export function useInternshipFilters() {
       ]
     : [];
 
+  const rawByParam: Record<string, string> = {
+    year: yearRaw,
+    major: majorRaw,
+    option: optionRaw,
+    country: countryRaw,
+    city: cityRaw,
+    orgType: orgTypeRaw,
+  };
+
+  const activeFilters = filterGroups.flatMap((group) => {
+    const selected = parseMulti(rawByParam[group.param] ?? "");
+    return selected.map((value) => ({
+      param: group.param,
+      value,
+      label: group.options.find((o) => o.value === value)?.label ?? value,
+    }));
+  });
+
   return {
     filterGroups,
+    activeFilters,
     hasFilters,
     isPending,
     isFetching,
     handleReset,
+    removeFilter,
   };
 }

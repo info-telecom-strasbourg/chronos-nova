@@ -22,6 +22,7 @@ export function InternshipFilter() {
             options={group.options}
             disabled={isFetching}
             loading={isPending}
+            columns={group.columns}
           />
         ) : group.dropdown ? (
           <FilterDropdown

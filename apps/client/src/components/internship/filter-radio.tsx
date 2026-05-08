@@ -17,6 +17,7 @@ interface FilterRadioProps {
   options: FilterRadioOption[];
   disabled?: boolean;
   loading?: boolean;
+  columns?: number;
 }
 
 export function FilterRadio({
@@ -25,6 +26,7 @@ export function FilterRadio({
   options,
   disabled,
   loading,
+  columns = 1,
 }: FilterRadioProps) {
   const [raw, setRaw] = useQueryState(param, { defaultValue: "" });
 
@@ -44,7 +46,11 @@ export function FilterRadio({
           value={raw || ""}
           onValueChange={(val: string) => setRaw(val || null)}
           disabled={disabled}
-          className="space-y-1.5"
+          className={cn(
+            columns > 1 ? "grid gap-x-2 gap-y-1" : "space-y-1.5",
+            columns === 2 && "grid-cols-2",
+            columns === 3 && "grid-cols-3",
+          )}
         >
           <label
             htmlFor={`${param}-all`}

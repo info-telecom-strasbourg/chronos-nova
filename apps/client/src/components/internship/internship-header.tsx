@@ -1,3 +1,4 @@
+import { InternshipFilterBadges } from "./internship-filter-badges";
 import { InternshipFilterSheet } from "./internship-filter-sheet";
 import { InternshipSearch } from "./internship-search";
 import { InternshipSort } from "./internship-sort";
@@ -13,6 +14,7 @@ export function InternshipHeader() {
           <InternshipFilterSheet />
         </div>
       </div>
+      <InternshipFilterBadges />
     </div>
   );
 }
