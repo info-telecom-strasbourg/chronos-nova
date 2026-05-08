@@ -91,8 +91,10 @@ export async function getInternshipFilterOptions(params: GetInternshipsParams) {
     availableMajors,
     allOptions,
     availableOptions,
-    countries,
-    cities,
+    allCountries,
+    availableCountries,
+    allCities,
+    availableCities,
     availableOrgTypes,
   ] = await Promise.all([
     // Tous les diplômes existants (sans filtre)
@@ -112,13 +114,17 @@ export async function getInternshipFilterOptions(params: GetInternshipsParams) {
     distinctStrings(internshipsTable.option, { major: params.major }),
     // Filières disponibles (tous filtres sauf filière)
     distinctStrings(internshipsTable.option, { ...f, option: undefined }),
-    // Pays filtrés par tout sauf pays et ville
+    // Tous les pays (filtrés par tout sauf pays et ville)
+    distinctStrings(internshipsTable.country, {}),
+    // Pays disponibles (tous filtres sauf pays et ville)
     distinctStrings(internshipsTable.country, {
       ...f,
       country: undefined,
       city: undefined,
     }),
-    // Villes filtrées par tout sauf ville
+    // Toutes les villes (sans filtre)
+    distinctStrings(internshipsTable.city, {}),
+    // Villes disponibles (tous filtres sauf ville)
     distinctStrings(internshipsTable.city, { ...f, city: undefined }),
     // Types disponibles (tous filtres sauf type)
     distinctStrings(internshipsTable.organizationType, {
@@ -134,8 +140,8 @@ export async function getInternshipFilterOptions(params: GetInternshipsParams) {
     },
     majors: { all: allMajors, available: availableMajors },
     options: { all: allOptions, available: availableOptions },
-    countries,
-    cities,
+    countries: { all: allCountries, available: availableCountries },
+    cities: { all: allCities, available: availableCities },
     organizationTypes: {
       all: ["company", "not_company"] as string[],
       available: availableOrgTypes,

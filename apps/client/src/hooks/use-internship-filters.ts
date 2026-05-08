@@ -89,7 +89,7 @@ export function useInternshipFilters() {
   // Reset villes qui ne sont plus disponibles
   useEffect(() => {
     if (!data || !cityRaw) return;
-    const validCities = cities.filter((c) => data.cities.includes(c));
+    const validCities = cities.filter((c) => data.cities.all.includes(c));
     if (validCities.length !== cities.length)
       setCityRaw(validCities.join(",") || null);
   }, [data, cityRaw]);
@@ -106,11 +106,13 @@ export function useInternshipFilters() {
             data.academicYears.all,
             data.academicYears.available,
           ),
+          dropdown: true,
         },
         {
           param: "major",
           label: "Diplôme",
           options: withAvailability(data.majors.all, data.majors.available),
+          dropdown: true,
         },
         {
           param: "option",
@@ -120,16 +122,22 @@ export function useInternshipFilters() {
             data.options.available,
             (v) => v.toUpperCase(),
           ),
+          dropdown: true,
         },
         {
           param: "country",
           label: "Pays",
-          options: data.countries.map((v) => ({ value: v, label: v })),
+          options: withAvailability(
+            data.countries.all,
+            data.countries.available,
+          ),
+          dropdown: true,
         },
         {
           param: "city",
           label: "Ville",
-          options: data.cities.map((v) => ({ value: v, label: v })),
+          options: withAvailability(data.cities.all, data.cities.available),
+          dropdown: true,
         },
         {
           param: "orgType",
@@ -139,6 +147,7 @@ export function useInternshipFilters() {
             data.organizationTypes.available,
             (v) => ORG_TYPE_LABELS[v] ?? v,
           ),
+          radio: true,
         },
       ]
     : [];
