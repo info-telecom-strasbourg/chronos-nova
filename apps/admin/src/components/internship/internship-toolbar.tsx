@@ -2,26 +2,49 @@
 
 import { Button } from "@chronos/ui/components/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@chronos/ui/components/dropdown-menu";
-import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
 } from "@chronos/ui/components/input-group";
-import { Check, Columns2, RotateCcw, Search, X } from "lucide-react";
+import { RotateCcw, Search, X } from "lucide-react";
 import {
   ALL_COLUMNS,
   type ColumnKey,
   useAdminFilters,
 } from "@/hooks/use-admin-filters";
+import {
+  FilterDropdown,
+  FilterDropdownBase,
+  type FilterDropdownOption,
+} from "./filter-dropdown";
 
-export function InternshipToolbar() {
+const ORG_TYPE_LABELS: Record<string, string> = {
+  company: "Entreprise",
+  not_company: "Hors entreprise",
+};
+
+export interface ToolbarFilterOptions {
+  academicYears: string[];
+  majors: string[];
+  options: string[];
+  countries: string[];
+  cities: string[];
+  organizationTypes: string[];
+}
+
+function toOpts(
+  values: string[],
+  labelFn?: (v: string) => string,
+): FilterDropdownOption[] {
+  return values.map((v) => ({ value: v, label: labelFn ? labelFn(v) : v }));
+}
+
+export function InternshipToolbar({
+  filterOptions,
+}: {
+  filterOptions: ToolbarFilterOptions;
+}) {
   const {
     qInput,
     handleSearchChange,
@@ -30,75 +53,120 @@ export function InternshipToolbar() {
     toggleColumn,
     resetColumns,
     hiddenCols,
+    hasFilters,
+    handleReset,
   } = useAdminFilters();
 
-  return (
-    <div className="flex items-center gap-2">
-      <InputGroup className="max-w-sm">
-        <InputGroupAddon align="inline-start">
-          <Search />
-        </InputGroupAddon>
-        <InputGroupInput
-          type="text"
-          placeholder="Rechercher par sujet, organisation, ville…"
-          value={qInput}
-          onChange={(e) => handleSearchChange(e.target.value)}
-        />
-        <InputGroupButton disabled={!qInput} onClick={handleClearSearch}>
-          <X />
-        </InputGroupButton>
-      </InputGroup>
+  const columnOptions: FilterDropdownOption[] = ALL_COLUMNS.map(
+    ({ key, label }) => ({
+      value: key,
+      label,
+    }),
+  );
 
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          render={
-            <Button variant="outline" className="ml-auto gap-1.5">
-              <Columns2 className="size-4" />
-              Colonnes
-              {hiddenCols.length > 0 && (
-                <span className="ml-1 rounded-full bg-primary px-1.5 py-0.5 text-[10px] text-primary-foreground leading-none">
-                  {hiddenCols.length}
-                </span>
-              )}
-            </Button>
-          }
-        />
-        <DropdownMenuContent align="end" className="w-48">
-          {ALL_COLUMNS.map(({ key, label }) => {
-            const visible = isVisible(key as ColumnKey);
-            return (
-              <DropdownMenuItem
-                key={key}
-                onSelect={(e) => {
-                  e.preventDefault();
-                  toggleColumn(key as ColumnKey);
-                }}
-                className="gap-2"
-              >
-                <span
-                  className={
-                    visible
-                      ? "text-foreground"
-                      : "text-muted-foreground line-through"
-                  }
-                >
-                  {label}
-                </span>
-                {visible && <Check className="ml-auto size-3.5 text-primary" />}
-              </DropdownMenuItem>
-            );
-          })}
+  const visibleKeys = ALL_COLUMNS.map((c) => c.key).filter((k) =>
+    isVisible(k as ColumnKey),
+  );
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        <InputGroup className="max-w-sm">
+          <InputGroupAddon align="inline-start">
+            <Search />
+          </InputGroupAddon>
+          <InputGroupInput
+            type="text"
+            placeholder="Rechercher par sujet, organisation, ville…"
+            value={qInput}
+            onChange={(e) => handleSearchChange(e.target.value)}
+          />
+          <InputGroupButton disabled={!qInput} onClick={handleClearSearch}>
+            <X />
+          </InputGroupButton>
+        </InputGroup>
+
+        <div className="ml-auto flex items-center gap-2">
+          <FilterDropdownBase
+            label="Colonnes"
+            options={columnOptions}
+            selected={visibleKeys}
+            onToggle={(key) => toggleColumn(key as ColumnKey)}
+            allLabel="Toutes"
+          />
           {hiddenCols.length > 0 && (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={resetColumns} className="gap-2">
-                <RotateCcw className="size-3.5" />
-                Réinitialiser
-              </DropdownMenuItem>
-            </>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={resetColumns}
+              className="gap-1.5 text-xs"
+            >
+              <RotateCcw className="size-3" />
+              Colonnes
+            </Button>
           )}
-        </DropdownMenuContent>
-      </DropdownMenu>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-end gap-2">
+        <div className="w-36">
+          <FilterDropdown
+            param="year"
+            label="Année"
+            options={toOpts(filterOptions.academicYears)}
+          />
+        </div>
+        <div className="w-40">
+          <FilterDropdown
+            param="major"
+            label="Diplôme"
+            options={toOpts(filterOptions.majors)}
+          />
+        </div>
+        <div className="w-36">
+          <FilterDropdown
+            param="option"
+            label="Filière"
+            options={toOpts(filterOptions.options, (v) => v.toUpperCase())}
+          />
+        </div>
+        <div className="w-40">
+          <FilterDropdown
+            param="country"
+            label="Pays"
+            options={toOpts(filterOptions.countries)}
+          />
+        </div>
+        <div className="w-40">
+          <FilterDropdown
+            param="city"
+            label="Ville"
+            options={toOpts(filterOptions.cities)}
+          />
+        </div>
+        <div className="w-44">
+          <FilterDropdown
+            param="orgType"
+            label="Type"
+            options={toOpts(
+              filterOptions.organizationTypes,
+              (v) => ORG_TYPE_LABELS[v] ?? v,
+            )}
+          />
+        </div>
+
+        {hasFilters && (
+          <Button
+            variant="destructive"
+            size="sm"
+            className="mb-0.5 gap-1.5"
+            onClick={handleReset}
+          >
+            <RotateCcw className="size-3" />
+            Réinitialiser
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

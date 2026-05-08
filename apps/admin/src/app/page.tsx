@@ -5,7 +5,6 @@ import {
 import { Suspense } from "react";
 import { CreateInternshipDialog } from "@/components/internship/create-internship-dialog";
 import { ExcelImportDialog } from "@/components/internship/excel-import-dialog";
-import { InternshipFilters } from "@/components/internship/internship-filters";
 import { InternshipPagination } from "@/components/internship/internship-pagination";
 import { InternshipTable } from "@/components/internship/internship-table";
 import { InternshipToolbar } from "@/components/internship/internship-toolbar";
@@ -31,6 +30,14 @@ function parseMulti(raw: string | undefined) {
   return raw ? raw.split(",").filter(Boolean) : undefined;
 }
 
+const SORT_FIELDS = [
+  "subject",
+  "organization",
+  "academicYear",
+  "country",
+  "beginDate",
+];
+
 async function InternshipContent({
   searchParams,
 }: {
@@ -51,13 +58,7 @@ async function InternshipContent({
       countries: parseMulti(searchParams.country),
       cities: parseMulti(searchParams.city),
       orgTypes: parseMulti(searchParams.orgType),
-      sortField: ([
-        "subject",
-        "organization",
-        "academicYear",
-        "country",
-        "beginDate",
-      ].includes(searchParams.sort ?? "")
+      sortField: (SORT_FIELDS.includes(searchParams.sort ?? "")
         ? searchParams.sort
         : undefined) as SortField | undefined,
       sortDir: searchParams.dir === "desc" ? "desc" : "asc",
@@ -65,33 +66,10 @@ async function InternshipContent({
     getAdminInternshipFilterOptions("visible"),
   ]);
 
-  const allValues = filterOptions;
-
   return (
-    <div className="flex gap-6">
-      <aside className="w-56 shrink-0">
-        <InternshipFilters
-          options={{
-            academicYears: {
-              all: allValues.academicYears,
-              available: allValues.academicYears,
-            },
-            majors: { all: allValues.majors, available: allValues.majors },
-            options: { all: allValues.options, available: allValues.options },
-            countries: {
-              all: allValues.countries,
-              available: allValues.countries,
-            },
-            cities: { all: allValues.cities, available: allValues.cities },
-            organizationTypes: {
-              all: allValues.organizationTypes,
-              available: allValues.organizationTypes,
-            },
-          }}
-        />
-      </aside>
-
-      <div className="min-w-0 flex-1 space-y-3">
+    <>
+      <InternshipToolbar filterOptions={filterOptions} />
+      <div className="space-y-3">
         <p className="text-muted-foreground text-xs">
           {pagination.total} stage{pagination.total !== 1 ? "s" : ""}
           {searchParams.q ? ` pour « ${searchParams.q} »` : ""}
@@ -99,7 +77,7 @@ async function InternshipContent({
         <InternshipTable internships={data} />
         <InternshipPagination total={pagination.total} />
       </div>
-    </div>
+    </>
   );
 }
 
@@ -120,8 +98,6 @@ export default async function HomePage({ searchParams }: PageProps) {
           <CreateInternshipDialog />
         </div>
       </div>
-
-      <InternshipToolbar />
 
       <Suspense
         fallback={

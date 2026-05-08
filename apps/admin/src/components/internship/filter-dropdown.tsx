@@ -19,32 +19,26 @@ export interface FilterDropdownOption {
   secondary?: boolean;
 }
 
-interface FilterDropdownProps {
-  param: string;
+interface FilterDropdownBaseProps {
   label: string;
   options: FilterDropdownOption[];
+  selected: string[];
+  onToggle: (value: string) => void;
   disabled?: boolean;
   loading?: boolean;
+  allLabel?: string;
 }
 
-export function FilterDropdown({
-  param,
+export function FilterDropdownBase({
   label,
   options,
+  selected,
+  onToggle,
   disabled,
   loading,
-}: FilterDropdownProps) {
-  const [raw, setRaw] = useQueryState(param, { defaultValue: "" });
+  allLabel = "Tous",
+}: FilterDropdownBaseProps) {
   const [search, setSearch] = useState("");
-
-  const selected = raw ? raw.split(",").filter(Boolean) : [];
-
-  const toggle = (value: string) => {
-    const next = selected.includes(value)
-      ? selected.filter((v) => v !== value)
-      : [...selected, value];
-    setRaw(next.join(",") || null);
-  };
 
   const filtered = options.filter((o) =>
     o.label.toLowerCase().includes(search.toLowerCase()),
@@ -57,7 +51,6 @@ export function FilterDropdown({
   const unselectedDisabled = filtered.filter(
     (o) => !selected.includes(o.value) && o.secondary,
   );
-
   const sortedOptions = [
     ...selectedOptions,
     ...unselectedAvailable,
@@ -74,13 +67,13 @@ export function FilterDropdown({
   const triggerLabel = isEmpty
     ? "Aucune option"
     : selectedCount === 0
-      ? "Tous"
+      ? allLabel
       : selectedCount <= 2
         ? selectedLabels.join(", ")
         : `${selectedLabels.slice(0, 2).join(", ")} +${selectedCount - 2}`;
 
   return (
-    <div className="space-y-1">
+    <div className="flex flex-col gap-1">
       <p className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
         {label}
       </p>
@@ -96,6 +89,7 @@ export function FilterDropdown({
             className={cn(
               "flex h-8 w-full items-center justify-between gap-2 rounded-lg border border-input bg-transparent px-2.5 py-1 text-left text-sm outline-none transition-colors hover:bg-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50",
               isEmpty && "border-dashed",
+              selectedCount > 0 && "border-primary/50 bg-primary/5",
             )}
           >
             <span
@@ -124,7 +118,7 @@ export function FilterDropdown({
                 </p>
               ) : (
                 sortedOptions.map((o) => {
-                  const id = `${param}-${o.value}`;
+                  const id = `filter-${label}-${o.value}`;
                   const checked = selected.includes(o.value);
                   return (
                     <label
@@ -141,7 +135,9 @@ export function FilterDropdown({
                         id={id}
                         checked={checked}
                         onCheckedChange={() =>
-                          !o.secondary || checked ? toggle(o.value) : undefined
+                          !o.secondary || checked
+                            ? onToggle(o.value)
+                            : undefined
                         }
                         disabled={o.secondary && !checked}
                       />
@@ -155,5 +151,42 @@ export function FilterDropdown({
         </Popover>
       )}
     </div>
+  );
+}
+
+interface FilterDropdownProps {
+  param: string;
+  label: string;
+  options: FilterDropdownOption[];
+  disabled?: boolean;
+  loading?: boolean;
+}
+
+export function FilterDropdown({
+  param,
+  label,
+  options,
+  disabled,
+  loading,
+}: FilterDropdownProps) {
+  const [raw, setRaw] = useQueryState(param, { defaultValue: "" });
+  const selected = raw ? raw.split(",").filter(Boolean) : [];
+
+  const toggle = (value: string) => {
+    const next = selected.includes(value)
+      ? selected.filter((v) => v !== value)
+      : [...selected, value];
+    setRaw(next.join(",") || null);
+  };
+
+  return (
+    <FilterDropdownBase
+      label={label}
+      options={options}
+      selected={selected}
+      onToggle={toggle}
+      disabled={disabled}
+      loading={loading}
+    />
   );
 }
