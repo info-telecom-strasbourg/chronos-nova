@@ -6,3 +6,9 @@ export const organizationType = t.pgEnum("organization_type", [
 ]);
 
 export const academicYear = t.pgEnum("academic_year", ["1A", "2A", "3A"]);
+
+export const internshipStatus = t.pgEnum("internship_status", [
+  "visible",
+  "pending",
+  "deleted",
+]);
