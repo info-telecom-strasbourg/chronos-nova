@@ -12,13 +12,7 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": [
-      "**",
-      "!**/migrations/*",
-      "!apps/admin/*",
-      "!apps/old/*",
-      "!.claude"
-    ]
+    "includes": ["**", "!**/migrations/*", "!apps/old/*", "!.claude"]
   },
   "formatter": {
     "enabled": true,
