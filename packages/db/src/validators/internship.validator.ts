@@ -8,12 +8,12 @@ export const GetInternshipsParamsValidator = z.object({
     .enum(["most-recent", "organization", "duration", "location"])
     .default("most-recent"),
   order: z.enum(["asc", "desc"]).default("desc"),
-  academicYear: z.enum(["1A", "2A", "3A"]).optional(),
-  major: z.string().optional(),
-  option: z.string().optional(),
-  country: z.string().optional(),
-  city: z.string().optional(),
-  organizationType: z.enum(["company", "not_company"]).optional(),
+  academicYear: z.array(z.enum(["1A", "2A", "3A"])).optional(),
+  major: z.array(z.string()).optional(),
+  option: z.array(z.string()).optional(),
+  country: z.array(z.string()).optional(),
+  city: z.array(z.string()).optional(),
+  organizationType: z.array(z.enum(["company", "not_company"])).optional(),
 });
 
 export type GetInternshipsParams = z.infer<

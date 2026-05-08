@@ -9,16 +9,27 @@ import { getInternshipsAction } from "@/actions/internship.action";
 
 const LIMIT = 10;
 
+function parseMulti(raw: string) {
+  return raw ? raw.split(",").filter(Boolean) : [];
+}
+
 export function useInternships() {
   const [q] = useQueryState("q", { defaultValue: "" });
   const [sort] = useQueryState("sort", { defaultValue: "most-recent" });
   const [order] = useQueryState("order", { defaultValue: "desc" });
-  const [year] = useQueryState("year", { defaultValue: "" });
-  const [major] = useQueryState("major", { defaultValue: "" });
-  const [option] = useQueryState("option", { defaultValue: "" });
-  const [country] = useQueryState("country", { defaultValue: "" });
-  const [city] = useQueryState("city", { defaultValue: "" });
-  const [orgType] = useQueryState("orgType", { defaultValue: "" });
+  const [yearRaw] = useQueryState("year", { defaultValue: "" });
+  const [majorRaw] = useQueryState("major", { defaultValue: "" });
+  const [optionRaw] = useQueryState("option", { defaultValue: "" });
+  const [countryRaw] = useQueryState("country", { defaultValue: "" });
+  const [cityRaw] = useQueryState("city", { defaultValue: "" });
+  const [orgTypeRaw] = useQueryState("orgType", { defaultValue: "" });
+
+  const years = parseMulti(yearRaw);
+  const majors = parseMulti(majorRaw);
+  const options = parseMulti(optionRaw);
+  const countries = parseMulti(countryRaw);
+  const cities = parseMulti(cityRaw);
+  const orgTypes = parseMulti(orgTypeRaw);
 
   const validSort =
     GetInternshipsParamsValidator.shape.sort.safeParse(sort).data;
@@ -33,12 +44,12 @@ export function useInternships() {
           q,
           sort: validSort,
           order: validOrder,
-          year,
-          major,
-          option,
-          country,
-          city,
-          orgType,
+          yearRaw,
+          majorRaw,
+          optionRaw,
+          countryRaw,
+          cityRaw,
+          orgTypeRaw,
         },
       ],
       queryFn: ({ pageParam }) =>
@@ -48,15 +59,16 @@ export function useInternships() {
           q,
           sort: validSort,
           order: validOrder,
-          academicYear: year || undefined,
-          major: major || undefined,
-          option: option || undefined,
-          country: country || undefined,
-          city: city || undefined,
-          organizationType:
-            orgType === "company" || orgType === "not_company"
-              ? orgType
-              : undefined,
+          academicYear: years.length
+            ? (years as ("1A" | "2A" | "3A")[])
+            : undefined,
+          major: majors.length ? majors : undefined,
+          option: options.length ? options : undefined,
+          country: countries.length ? countries : undefined,
+          city: cities.length ? cities : undefined,
+          organizationType: orgTypes.length
+            ? (orgTypes as ("company" | "not_company")[])
+            : undefined,
         }),
       initialPageParam: 0,
       getNextPageParam: (lastPage) => {

@@ -1,4 +1,4 @@
-import { InternshipFilter } from "./internship-filter";
+import { InternshipFilterSheet } from "./internship-filter-sheet";
 import { InternshipSearch } from "./internship-search";
 import { InternshipSort } from "./internship-sort";
 
@@ -8,10 +8,10 @@ export function InternshipHeader() {
       <h1 className="font-semibold text-4xl">Rechercher un stage</h1>
       <div className="flex gap-2 max-md:flex-col md:items-center">
         <InternshipSearch />
-        <InternshipSort />
-      </div>
-      <div className="flex flex-wrap gap-2">
-        <InternshipFilter />
+        <div className="flex gap-2">
+          <InternshipSort />
+          <InternshipFilterSheet />
+        </div>
       </div>
     </div>
   );
