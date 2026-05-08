@@ -535,6 +535,31 @@ importers:
         specifier: workspace:*
         version: link:../typescript-config
 
+  packages/migrate:
+    dependencies:
+      '@chronos/db':
+        specifier: workspace:*
+        version: link:../db
+      '@chronos/env':
+        specifier: workspace:*
+        version: link:../env
+      csv-parse:
+        specifier: ^5.6.0
+        version: 5.6.0
+      dotenv:
+        specifier: 'catalog:'
+        version: 17.2.4
+      zod:
+        specifier: 'catalog:'
+        version: 4.3.5
+    devDependencies:
+      '@chronos/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      tsx:
+        specifier: 'catalog:'
+        version: 4.21.0
+
   packages/typescript-config: {}
 
   packages/ui:
@@ -2708,6 +2733,9 @@ packages:
 
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
+
+  csv-parse@5.6.0:
+    resolution: {integrity: sha512-l3nz3euub2QMg5ouu5U09Ew9Wf6/wQ8I++ch1loQ0ljmzhmfZYrH9fflS22i/PQEvsPvxCwxgz5q7UB8K1JO4Q==}
 
   dashdash@1.14.1:
     resolution: {integrity: sha512-jRFi8UDGo6j+odZiEpjazZaWqEal3w/basFjQHQEwVtZJGDpxbH1MeYluwCS8Xq5wmLJooDlMgvVarmWfGM44g==}
@@ -6529,6 +6557,8 @@ snapshots:
   cssesc@3.0.0: {}
 
   csstype@3.2.3: {}
+
+  csv-parse@5.6.0: {}
 
   dashdash@1.14.1:
     dependencies:

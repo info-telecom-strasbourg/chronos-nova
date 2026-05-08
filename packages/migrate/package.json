@@ -1,0 +1,19 @@
+{
+  "name": "@chronos/migrate",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "migrate": "dotenv -e ../../.env -- tsx src/index.ts"
+  },
+  "devDependencies": {
+    "@chronos/typescript-config": "workspace:*",
+    "tsx": "catalog:"
+  },
+  "dependencies": {
+    "@chronos/db": "workspace:*",
+    "@chronos/env": "workspace:*",
+    "csv-parse": "^5.6.0",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  }
+}
