@@ -10,7 +10,7 @@ import {
 } from "@chronos/ui/components/sheet";
 import { SlidersHorizontal } from "lucide-react";
 import { useInternshipFilters } from "@/hooks/use-internship-filters";
-import { InternshipFilter } from "./internship-filter";
+import { InternshipFilterMobile } from "./internship-filter-mobile";
 
 export function InternshipFilterSheet() {
   const { hasFilters } = useInternshipFilters();
@@ -36,7 +36,7 @@ export function InternshipFilterSheet() {
           <SheetHeader className="px-0 pb-4">
             <SheetTitle>Filtres</SheetTitle>
           </SheetHeader>
-          <InternshipFilter />
+          <InternshipFilterMobile />
         </SheetContent>
       </Sheet>
     </div>

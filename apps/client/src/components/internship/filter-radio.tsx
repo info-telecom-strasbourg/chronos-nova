@@ -32,9 +32,11 @@ export function FilterRadio({
 
   return (
     <div className="space-y-1">
-      <p className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
-        {label}
-      </p>
+      {label && (
+        <p className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
+          {label}
+        </p>
+      )}
       {loading ? (
         <div className="space-y-2">
           {[1, 2, 3].map((i) => (

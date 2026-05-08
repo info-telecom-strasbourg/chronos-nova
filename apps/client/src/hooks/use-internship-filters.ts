@@ -126,7 +126,11 @@ export function useInternshipFilters() {
         {
           param: "year",
           label: "Année",
-          options: data.academicYears.all.map((v) => ({ value: v, label: v })),
+          options: data.academicYears.all.map((v) => ({
+            value: v,
+            label: v,
+            secondary: false,
+          })),
           radio: true,
           columns: 2,
         },
