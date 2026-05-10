@@ -1,7 +1,128 @@
-**/node_modules
-**/.next
-**/.git
-**/dist
-apps/admin
-.env.local
-.env*.local
+# dependencies
+node_modules/
+.pnpm-store/
+
+# logs
+logs/
+*.log
+
+# next.js build outputs
+.next/
+out/
+dist/
+build/
+.vercel/
+
+# tests output
+coverage/
+.nyc_output/
+__tests__/
+__mocks__/
+jest/
+cypress/
+cypress/screenshots/
+cypress/videos/
+playwright-report/
+test-results/
+.vitest/
+vitest.config.*
+jest.config.*
+cypress.config.*
+playwright.config.*
+*.test.*
+*.spec.*
+
+# local development and editor files
+.git/
+.gitignore
+.gitattributes
+.gitkeep
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+LICENSE
+
+# environment variables
+.env
+.env.*
+
+# docker configuration files
+Dockerfile*
+.dockerignore
+compose.yaml
+compose.yml
+docker-compose*.yaml
+docker-compose*.yml
+
+# documentation
+*.md
+docs/
+
+# CI/CD configuration files
+.github/
+.gitlab-ci.yml
+.travis.yml
+.circleci/
+Jenkinsfile
+.husky/
+
+# cache directories and temporary data
+.cache/
+.eslintcache
+.swc/
+.turbo/
+.tmp/
+.temp/
+
+# typescript build metadata
+*.tsbuildinfo
+next-env.d.ts
+
+# sensitive or unnecessary configuration files
+*.pem
+.editorconfig
+.prettierrc*
+prettier.config.*
+.eslintrc*
+eslint.config.*
+.stylelintrc*
+stylelint.config.*
+.babelrc*
+*.iml
+*.ipr
+*.iws
+biome.json
+
+# os-specific junk
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# AI/ML tool metadata and configs
+.cursor/
+.cursorrules
+.copilot/
+.copilotignore
+.github/copilot/
+.gemini/
+.anthropic/
+.kiro
+.claude
+AGENTS.md
+CLAUDE.md
+.agents/
+
+# AI-generated temp files
+*.aider*
+*.copilot*
+*.chatgpt*
+*.claude*
+*.gemini*
+*.openai*
+*.anthropic*
