@@ -11,7 +11,7 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-COPY apps/client/package.json ./apps/client/
+COPY apps/admin/package.json ./apps/admin/
 
 COPY packages/db/package.json ./packages/db/
 COPY packages/env/package.json ./packages/env/
@@ -41,9 +41,9 @@ ENV NODE_ENV=production
 # Disable telemetry during the build
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# If you want to speed up Docker rebuilds, you can cache the build artifacts by adding: --mount=type=cache,target=/app/apps/client/.next/cache
+# If you want to speed up Docker rebuilds, you can cache the build artifacts by adding: --mount=type=cache,target=/app/apps/admin/.next/cache
 # This caches the .next/cache directory across builds, but it also prevents .next/cache/fetch-cache from being included in the final image, meaning cached fetch responses from the build won't be available at runtime.
-RUN corepack enable pnpm && pnpm --filter @chronos/client build
+RUN corepack enable pnpm && pnpm --filter @chronos/admin build
 
 # =============================================
 # Stage 3: Run Next.js application
@@ -62,14 +62,14 @@ ENV HOSTNAME="0.0.0.0"
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Automatically leverage output traces to reduce image size
-COPY --from=builder --chown=node:node /app/apps/client/.next/standalone ./
-COPY --from=builder --chown=node:node /app/apps/client/.next/static ./apps/client/.next/static
+COPY --from=builder --chown=node:node /app/apps/admin/.next/standalone ./
+COPY --from=builder --chown=node:node /app/apps/admin/.next/static ./apps/admin/.next/static
 
 # Copy production assets
-COPY --from=builder --chown=node:node /app/apps/client/public ./apps/client/public
+COPY --from=builder --chown=node:node /app/apps/admin/public ./apps/admin/public
 
 # If you want to persist the fetch cache generated during the build so that cached responses are available immediately on startup, uncomment this line:
-# COPY --from=builder --chown=node:node /app/apps/client/.next/cache ./apps/client/.next/cache
+# COPY --from=builder --chown=node:node /app/apps/admin/.next/cache ./apps/admin/.next/cache
 
 # Switch to non-root user for security
 USER node
@@ -78,4 +78,4 @@ USER node
 # EXPOSE 3000
 
 # Start Next.js standalone server
-CMD ["node", "apps/client/server.js"]
+CMD ["node", "apps/admin/server.js"]
