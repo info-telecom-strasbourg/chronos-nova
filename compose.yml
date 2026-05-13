@@ -1,5 +1,28 @@
 name: chronos
 services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data # Crucial for persisting SSL certificates
+      - caddy_config:/config
+    environment:
+      CLIENT_URL: ${CLIENT_URL}
+      CLIENT_PORT: ${CLIENT_PORT}
+
+      ADMIN_URL: ${ADMIN_URL}
+      ADMIN_PORT: ${ADMIN_PORT}
+      ADMIN_USERNAME: ${ADMIN_USERNAME}
+      ADMIN_PASSWORD_HASH: ${ADMIN_PASSWORD_HASH}
+    depends_on:
+      - client
+      - admin
+
   db:
     image: postgres:latest
     volumes:
@@ -8,8 +31,6 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
-    # ports:
-    #   - "5432:5432"
     restart: unless-stopped
 
   client:
@@ -26,11 +47,9 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT}
-    ports:
-      - "3000:3000"
     depends_on:
       - db
-    restart: unless-stopped
+    restart: always
 
   admin:
     build:
@@ -46,11 +65,11 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT}
-    ports:
-      - "3001:3001"
     depends_on:
       - db
-    restart: unless-stopped
+    restart: always
 
 volumes:
   data:
+  caddy_data:
+  caddy_config:

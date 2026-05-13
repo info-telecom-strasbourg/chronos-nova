@@ -74,8 +74,8 @@ COPY --from=builder --chown=node:node /app/apps/client/public ./apps/client/publ
 # Switch to non-root user for security
 USER node
 
-# Expose port 3000 to allow HTTP traffic
-EXPOSE 3000
+# # Expose port 3000 to allow HTTP traffic
+# EXPOSE 3000
 
 # Start Next.js standalone server
 CMD ["node", "apps/client/server.js"]

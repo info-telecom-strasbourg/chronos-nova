@@ -1,0 +1,20 @@
+{$CLIENT_URL} {
+    encode zstd gzip
+
+    # Routes all traffic to client app
+    reverse_proxy client:{$CLIENT_PORT}
+}
+
+${ADMIN_URL} {
+    encode zstd gzip
+    
+    # Protects the admin panel with simple auth
+    basicauth /* {
+        # Replace the hash below with your own. 
+        # Generate it on your VPS by running: docker run --rm caddy caddy hash-password --plaintext "YOUR_SECURE_PASSWORD"
+        {$ADMIN_USERNAME} {$ADMIN_PASSWORD_HASH}
+    }
+    
+    # Routes authorized traffic to the admin app
+    reverse_proxy admin:{$ADMIN_PORT}
+}
