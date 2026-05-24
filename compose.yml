@@ -2,74 +2,92 @@ name: chronos
 services:
   caddy:
     image: caddy:2-alpine
-    restart: unless-stopped
+    restart: always
     ports:
       - "80:80"
       - "443:443"
       - "443:443/udp"
     volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data # Crucial for persisting SSL certificates
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
       - caddy_config:/config
     environment:
       CLIENT_URL: ${CLIENT_URL}
       CLIENT_PORT: ${CLIENT_PORT}
-
       ADMIN_URL: ${ADMIN_URL}
       ADMIN_PORT: ${ADMIN_PORT}
       ADMIN_USERNAME: ${ADMIN_USERNAME}
       ADMIN_PASSWORD_HASH: ${ADMIN_PASSWORD_HASH}
+    networks:
+      - proxy_net
     depends_on:
       - client
       - admin
 
   db:
-    image: postgres:latest
+    image: postgres:16-alpine
+    restart: always
     volumes:
-      - data:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql/data
     environment:
+      POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
-    restart: unless-stopped
+    networks:
+      - backend_net
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   client:
     build:
       context: .
       dockerfile: apps/client/Dockerfile
     image: chronos/client
+    restart: always
     environment:
       NODE_ENV: production
-      PORT: "3000"
-
+      PORT: ${CLIENT_PORT}
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
+      DB_HOST: db
+      DB_PORT: ${DB_PORT:-5432}
+    networks:
+      - proxy_net
+      - backend_net
     depends_on:
-      - db
-    restart: always
+      db:
+        condition: service_healthy
 
   admin:
     build:
       context: .
       dockerfile: apps/admin/Dockerfile
     image: chronos/admin
+    restart: always
     environment:
       NODE_ENV: production
-      PORT: "3001"
-
+      PORT: ${ADMIN_PORT}
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
+      DB_HOST: db
+      DB_PORT: ${DB_PORT:-5432}
+    networks:
+      - proxy_net
+      - backend_net
     depends_on:
-      - db
-    restart: always
+      db:
+        condition: service_healthy
+
+networks:
+  proxy_net:
+  backend_net:
 
 volumes:
-  data:
+  db_data:
   caddy_data:
   caddy_config:
