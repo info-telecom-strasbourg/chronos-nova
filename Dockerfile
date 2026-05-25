@@ -1,3 +1,6 @@
+# syntax=docker/dockerfile:1
+# check=skip=JSONArgsRecommended
+
 # =============================================
 # Stage 1: Dependencies installation stage
 # =============================================
@@ -6,12 +9,13 @@
 ARG NODE_VERSION=lts-trixie-slim
 
 FROM node:${NODE_VERSION} AS dependencies
+ARG APP_VARIANT
 
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-COPY apps/client/package.json ./apps/client/
+COPY apps/${APP_VARIANT}/package.json ./apps/${APP_VARIANT}/
 
 COPY packages/db/package.json ./packages/db/
 COPY packages/env/package.json ./packages/env/
@@ -27,6 +31,7 @@ RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
 # =============================================
 
 FROM node:${NODE_VERSION} AS builder
+ARG APP_VARIANT
 
 WORKDIR /app
 
@@ -41,41 +46,40 @@ ENV NODE_ENV=production
 # Disable telemetry during the build
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# If you want to speed up Docker rebuilds, you can cache the build artifacts by adding: --mount=type=cache,target=/app/apps/client/.next/cache
+# If you want to speed up Docker rebuilds, you can cache the build artifacts by adding: --mount=type=cache,target=/app/apps/${APP_VARIANT}/.next/cache
 # This caches the .next/cache directory across builds, but it also prevents .next/cache/fetch-cache from being included in the final image, meaning cached fetch responses from the build won't be available at runtime.
-RUN corepack enable pnpm && pnpm --filter @chronos/client build
+RUN corepack enable pnpm && pnpm --filter @chronos/${APP_VARIANT} build
 
 # =============================================
 # Stage 3: Run Next.js application
 # =============================================
 
 FROM node:${NODE_VERSION} AS runner
+ARG APP_VARIANT
 
 WORKDIR /app
 
 # Set production environment variables
 ENV NODE_ENV=production
 ENV PORT=3000
-ENV HOSTNAME="0.0.0.0"
 
 # Disable telemetry during the run time
 ENV NEXT_TELEMETRY_DISABLED=1
 
+ENV APP_VARIANT=${APP_VARIANT}
+
 # Automatically leverage output traces to reduce image size
-COPY --from=builder --chown=node:node /app/apps/client/.next/standalone ./
-COPY --from=builder --chown=node:node /app/apps/client/.next/static ./apps/client/.next/static
+COPY --from=builder --chown=node:node /app/apps/${APP_VARIANT}/.next/standalone ./
+COPY --from=builder --chown=node:node /app/apps/${APP_VARIANT}/.next/static ./apps/${APP_VARIANT}/.next/static
 
 # Copy production assets
-COPY --from=builder --chown=node:node /app/apps/client/public ./apps/client/public
+COPY --from=builder --chown=node:node /app/apps/${APP_VARIANT}/public ./apps/${APP_VARIANT}/public
 
 # If you want to persist the fetch cache generated during the build so that cached responses are available immediately on startup, uncomment this line:
-# COPY --from=builder --chown=node:node /app/apps/client/.next/cache ./apps/client/.next/cache
+# COPY --from=builder --chown=node:node /app/apps/${APP_VARIANT}/.next/cache ./apps/${APP_VARIANT}/.next/cache
 
 # Switch to non-root user for security
 USER node
 
-# # Expose port 3000 to allow HTTP traffic
-# EXPOSE 3000
-
 # Start Next.js standalone server
-CMD ["node", "apps/client/server.js"]
+CMD node apps/${APP_VARIANT}/server.js
