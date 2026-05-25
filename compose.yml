@@ -1,7 +1,7 @@
 name: chronos
 services:
   caddy:
-    image: caddy:2-alpine
+    image: caddy:2.11-alpine
     restart: always
     ports:
       - "80:80"
@@ -25,10 +25,10 @@ services:
       - admin
 
   db:
-    image: postgres:16-alpine
+    image: postgres:18.4-trixie
     restart: always
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
@@ -40,11 +40,14 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    stop_grace_period: 1m
 
   client:
     build:
       context: .
-      dockerfile: apps/client/Dockerfile
+      dockerfile: Dockerfile
+      args:
+        APP_VARIANT: client
     image: chronos/client
     restart: always
     environment:
@@ -65,7 +68,9 @@ services:
   admin:
     build:
       context: .
-      dockerfile: apps/admin/Dockerfile
+      dockerfile: Dockerfile
+      args:
+        APP_VARIANT: admin
     image: chronos/admin
     restart: always
     environment:
